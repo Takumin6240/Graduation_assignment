@@ -1,0 +1,210 @@
+# 開発ログ - 2025年10月3日
+
+## 作業時刻: 09:57:03
+
+## 実施した作業内容
+
+### 1. Scratch問題データの追加 (09:00 - 09:30)
+
+**目的**: 採点機能を実現するため、各問題にScratchブロックデータを追加
+
+**作業詳細**:
+- `backend/src/db/seed.js` を編集
+- Chapter 1の8問題すべてに `initial_sb3_data` と `correct_sb3_data` を追加
+- Scratchブロック構造をJSON形式で定義
+
+**追加した問題データ**:
+1. 問題1 (fill_blank): キャラクターを10歩動かす
+   - initial: 空のブロック
+   - correct: event_whenflagclicked → motion_movesteps(10)
+
+2. 問題2 (fill_blank): 「こんにちは」を3回言う
+   - initial: 空のブロック
+   - correct: event_whenflagclicked → control_repeat(3) → looks_say("こんにちは")
+
+3. 問題3 (predict): 実行結果を予測 (10歩 + 20歩)
+   - initial: 10歩と20歩動くプログラム
+   - correct: 合計30歩の位置 (x=30, y=0)
+
+4. 問題4 (predict): 繰り返しの結果を予測 (10回 × 5歩)
+   - initial: 10回繰り返して5歩ずつ動くプログラム
+   - correct: 合計50歩の位置 (x=50, y=0)
+
+5. 問題5 (find_error): バグを見つける
+   - initial: -10歩動くバグのあるプログラム
+   - correct: 10歩動く正しいプログラム
+
+6. 問題6 (find_error): 無限ループを修正
+   - initial: control_forever (無限ループ)
+   - correct: control_repeat(3) (3回繰り返し)
+
+7. 問題7 (mission): 四角形を描く
+   - initial: 空のブロック
+   - correct: ペンを下ろす → 4回繰り返し(50歩動く → 90度回転)
+
+8. 問題8 (mission): 左右に動くアニメーション
+   - initial: 空のブロック
+   - correct: 10回繰り返し(10歩進む → 0.5秒待つ → -10歩戻る → 0.5秒待つ)
+
+**使用したScratchブロックのopcode**:
+- event_whenflagclicked: 緑の旗がクリックされたとき
+- motion_movesteps: 〇歩動かす
+- motion_turnright: 右に〇度回す
+- control_repeat: 〇回繰り返す
+- control_forever: ずっと (無限ループ)
+- control_wait: 〇秒待つ
+- looks_say: 〇と言う
+- pen_penDown: ペンを下ろす
+
+**データベース挿入の修正**:
+- INSERT文に `initial_sb3_data`, `correct_sb3_data` カラムを追加
+- JSON.stringify() でJSONオブジェクトを文字列化してデータベースに保存
+
+**結果**:
+- seed.js の更新完了
+- データベースリセット後に実行する準備完了
+
+---
+
+### 2. 問題一覧ページの作成 (09:30 - 09:50)
+
+**問題**: `/chapters/:chapterId` にアクセスしても何も表示されない
+
+**原因分析**:
+1. APIエンドポイント `/api/auth/me` が404エラー → 正常 (ルーティング確認済み)
+2. `/api/auth/login` が401エラー → 認証エラー (想定内)
+3. `/chapters/1` で「問題を解く」ボタンが反応しない → ルーティング未実装
+
+**解決策**:
+新しいページコンポーネント `ProblemList.tsx` を作成
+
+**実装した機能**:
+- チャプター情報の表示
+- 問題一覧をカード形式で表示
+- 問題タイプ別のアイコン表示
+  - 📝 穴埋め問題 (fill_blank)
+  - 🔮 予測問題 (predict)
+  - 🐛 間違い探し問題 (find_error)
+  - 🚀 ミッション型問題 (mission)
+- 難易度表示
+  - レベル1-2: かんたん (緑)
+  - レベル3: ふつう (黄)
+  - レベル4-5: むずかしい (赤)
+- ユーザー進捗状況の表示
+  - 完了マーク (✓)
+  - 獲得スコア
+  - 挑戦回数
+- レスポンシブデザイン対応
+
+**ファイル作成**:
+- `frontend/src/pages/ProblemList.tsx` (新規作成)
+
+**ルーティング修正**:
+- `frontend/src/App.tsx` を編集
+- `ProblemList` コンポーネントをインポート
+- `/chapters/:chapterId` ルートを `ProblemList` にマッピング
+
+**使用したAPI**:
+- `GET /api/chapters` - チャプター一覧取得
+- `GET /api/chapters/:chapterId/problems` - 問題一覧取得
+- `GET /api/chapters/:chapterId/progress` - ユーザー進捗取得
+
+**結果**:
+- `/chapters/1` にアクセスすると8問題が一覧表示されるようになった
+- 各問題カードから `/problems/:problemId` に遷移可能
+- ユーザーの進捗状況が視覚的に分かりやすく表示される
+
+---
+
+## 次回の作業予定
+
+### 優先度高:
+1. **Scratchプログラム比較ロジックの改善**
+   - 現在: 単純なJSON文字列比較のみ
+   - 改善: ブロック構造の詳細比較、問題タイプ別の評価ロジック
+   - ファイル: `backend/src/controllers/submissionController.js`
+
+2. **管理者ダッシュボードUIの作成**
+   - バックエンドAPIは完成済み
+   - フロントエンド実装が必要
+   - ページ: 統計表示、ユーザー管理、問題分析
+
+### 優先度中:
+3. **進捗ページの作成**
+   - 学生用の学習履歴・提出履歴表示
+   - グラフやチャートで視覚化
+
+4. **環境変数の適切な設定**
+   - `.env` ファイルの作成
+   - シークレット情報の分離
+   - docker-compose.yml からの秘密情報削除
+
+---
+
+## 技術メモ
+
+### Scratchブロック構造のポイント:
+- `targets`: スプライトの配列
+- `blocks`: ブロックIDをキーとしたオブジェクト
+- 各ブロックには:
+  - `opcode`: ブロックの種類
+  - `next`: 次のブロックのID
+  - `parent`: 親ブロックのID
+  - `inputs`: ブロックの入力パラメータ
+  - `fields`: ブロックのフィールド値
+  - `topLevel`: トップレベルのブロックかどうか
+
+### データベースでのJSONB型の扱い:
+- PostgreSQLのJSONB型を使用
+- Node.jsからはJSON.stringify()で文字列化して保存
+- 取得時は自動的にJSONオブジェクトにパース
+- インデックスや検索が可能
+
+---
+
+## 発生した問題と解決
+
+### 問題1: Dockerコマンドが使えない
+**エラー**: `docker: command not found in WSL 2`
+**原因**: WSL統合が有効になっていない
+**解決**: Windows側のPowerShellで実行するよう指示
+
+### 問題2: 問題一覧ページが存在しない
+**エラー**: `/chapters/1` で何も表示されない
+**原因**: ルーティングが未実装
+**解決**: `ProblemList.tsx` を新規作成してルーティング追加
+
+---
+
+## コード品質チェック
+
+- [x] TypeScript型定義の整合性確認
+- [x] エラーハンドリングの実装
+- [x] ローディング状態の表示
+- [x] レスポンシブデザイン対応
+- [x] アクセシビリティ考慮
+- [ ] 単体テストの作成 (未実装)
+- [ ] E2Eテストの作成 (未実装)
+
+---
+
+## データベース状態
+
+現在のデータベース状態:
+- Chapter 1: 「Scratchの基本」
+- Problems: 8問 (fill_blank: 2, predict: 2, find_error: 2, mission: 2)
+- Hints: 各問題に学年別(1-6年生)のヒントが6個ずつ
+- Admin: username="admin", password="admin123"
+
+次回マイグレーション前に実行すべきコマンド:
+```bash
+docker compose down -v
+docker compose up -d
+docker compose exec backend npm run migrate
+docker compose exec backend node src/db/seed.js
+```
+
+---
+
+作業者: Claude Code AI Assistant
+ログ作成日時: 2025-10-03 09:57:03

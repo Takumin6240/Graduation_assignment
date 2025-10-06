@@ -1,0 +1,33 @@
+[2025-10-03 09:29:19] プロジェクト構築完了
+
+実装した機能:
+✓ Docker環境構築 (PostgreSQL, Node.js, React)
+✓ データベーススキーマとマイグレーション
+✓ JWT認証システム (学生・管理者)
+✓ 4種類の問題形式 (穴埋め、予測、バグ発見、ミッション)
+✓ SB3ファイルアップロードと採点ロジック
+✓ 学年別ヒント表示機能
+✓ React + TypeScript フロントエンド
+✓ Tailwind CSS デザインシステム
+✓ レスポンシブUIコンポーネント
+
+バックエンドAPI:
+- 認証: ユーザー登録、ログイン、JWT認証
+- 問題: チャプター取得、問題取得、ヒント取得
+- 提出: SB3ファイル提出、採点、履歴
+- 管理者: ユーザー管理、統計、分析
+
+フロントエンド:
+- ホーム、ログイン、登録ページ
+- チャプター一覧、問題詳細ページ
+- ヒント表示機能 (吹き出しUI)
+- Scratch連携 (外部ウィンドウ)
+
+次のステップ:
+1. docker-compose up --build でコンテナ起動
+2. docker-compose exec backend npm run migrate でDB初期化
+3. docker-compose exec backend node src/db/seed.js でデータ投入
+4. http://localhost:3000 でアクセス
+
+デフォルト管理者: admin / admin123
+
