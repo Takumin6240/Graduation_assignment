@@ -307,7 +307,7 @@ const AdminProblems: React.FC = () => {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   チャプター
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style={{minWidth: '300px'}}>
                   問題タイトル
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -341,9 +341,6 @@ const AdminProblems: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-900">
                     <div className="font-medium">{problem.title}</div>
-                    <div className="text-gray-500 text-xs mt-1">
-                      {problem.description.substring(0, 50)}...
-                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {getProblemTypeLabel(problem.problem_type)}
