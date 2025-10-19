@@ -21,22 +21,56 @@ const AdminUsers: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterGrade, setFilterGrade] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [createForm, setCreateForm] = useState({
+    username: '',
+    password: '',
+    nickname: '',
+    grade: 1
+  });
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [createLoading, setCreateLoading] = useState(false);
+
+  const fetchUsers = async () => {
+    try {
+      const response = await adminAPI.getAllUsers();
+      setUsers(response.data.users || []);
+    } catch (error: any) {
+      console.error('Failed to fetch users:', error);
+      setError('ユーザーデータの取得に失敗しました');
+    }
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await adminAPI.getAllUsers();
-        setUsers(response.data.users || []);
-      } catch (error: any) {
-        console.error('Failed to fetch users:', error);
-        setError('ユーザーデータの取得に失敗しました');
-      } finally {
-        setLoading(false);
-      }
+    const loadUsers = async () => {
+      await fetchUsers();
+      setLoading(false);
     };
-
-    fetchUsers();
+    loadUsers();
   }, []);
+
+  const handleCreateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCreateError(null);
+    setCreateLoading(true);
+
+    try {
+      await adminAPI.createStudent(
+        createForm.username,
+        createForm.password,
+        createForm.nickname,
+        createForm.grade
+      );
+
+      setShowCreateModal(false);
+      setCreateForm({ username: '', password: '', nickname: '', grade: 1 });
+      await fetchUsers();
+    } catch (error: any) {
+      setCreateError(error.response?.data?.error || '学生の作成に失敗しました');
+    } finally {
+      setCreateLoading(false);
+    }
+  };
 
   if (loading) return <Loading />;
 
@@ -58,7 +92,14 @@ const AdminUsers: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold text-primary-700">ユーザー管理</h1>
-        <div className="flex gap-2">
+        <div className="flex gap-4 items-center">
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition"
+          >
+            + 学生を作成
+          </button>
+          <div className="flex gap-2">
           <button
             onClick={() => setFilterGrade(null)}
             className={`px-4 py-2 rounded-lg font-medium transition ${
@@ -82,6 +123,7 @@ const AdminUsers: React.FC = () => {
               {grade}年
             </button>
           ))}
+          </div>
         </div>
       </div>
 
@@ -196,6 +238,91 @@ const AdminUsers: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Create Student Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">学生アカウント作成</h2>
+
+            {createError && (
+              <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                {createError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateStudent} className="space-y-4">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">ユーザー名</label>
+                <input
+                  type="text"
+                  value={createForm.username}
+                  onChange={(e) => setCreateForm({ ...createForm, username: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">パスワード</label>
+                <input
+                  type="password"
+                  value={createForm.password}
+                  onChange={(e) => setCreateForm({ ...createForm, password: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">ニックネーム</label>
+                <input
+                  type="text"
+                  value={createForm.nickname}
+                  onChange={(e) => setCreateForm({ ...createForm, nickname: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">学年</label>
+                <select
+                  value={createForm.grade}
+                  onChange={(e) => setCreateForm({ ...createForm, grade: parseInt(e.target.value) })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  required
+                >
+                  {[1, 2, 3, 4, 5, 6].map(grade => (
+                    <option key={grade} value={grade}>{grade}年生</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-4 mt-6">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setCreateError(null);
+                    setCreateForm({ username: '', password: '', nickname: '', grade: 1 });
+                  }}
+                  className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-lg font-bold transition"
+                >
+                  キャンセル
+                </button>
+                <button
+                  type="submit"
+                  disabled={createLoading}
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
+                >
+                  {createLoading ? '作成中...' : '作成'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

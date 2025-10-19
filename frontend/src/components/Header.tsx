@@ -16,7 +16,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold hover:text-primary-100 transition">
-            Scratchで学ぼう！
+            Scratchでプログラミングについて学ぼう!
           </Link>
 
           <nav className="flex items-center gap-6">
@@ -64,14 +64,11 @@ const Header: React.FC = () => {
               </>
             ) : (
               <>
-                <Link to="/login" className="hover:text-primary-100 transition">
-                  ログイン
-                </Link>
                 <Link
-                  to="/register"
+                  to="/login"
                   className="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition"
                 >
-                  新規登録
+                  ログイン
                 </Link>
               </>
             )}

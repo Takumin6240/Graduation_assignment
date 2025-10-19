@@ -29,6 +29,9 @@ export const authAPI = {
   loginAdmin: (username: string, password: string) =>
     api.post('/auth/admin/login', { username, password }),
 
+  registerAdmin: (username: string, password: string) =>
+    api.post('/auth/admin/register', { username, password }),
+
   getCurrentUser: () =>
     api.get('/auth/me'),
 };
@@ -66,6 +69,9 @@ export const submissionsAPI = {
 
 // Admin API
 export const adminAPI = {
+  createStudent: (username: string, password: string, nickname: string, grade: number) =>
+    api.post('/admin/students', { username, password, nickname, grade }),
+
   getAllUsers: () =>
     api.get('/admin/users'),
 

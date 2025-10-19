@@ -76,17 +76,8 @@ const Login: React.FC = () => {
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600">
-            アカウントをお持ちでない方は{' '}
-            <Link to="/register" className="text-primary-600 font-medium hover:underline">
-              こちら
-            </Link>
-          </p>
-          <p className="mt-4 text-sm text-gray-500">
-            管理者の方は{' '}
-            <Link to="/admin/login" className="text-primary-600 hover:underline">
-              管理者ログイン
-            </Link>
+          <p className="text-gray-600 text-sm">
+            ログインIDとパスワードは先生から受け取ってください
           </p>
         </div>
       </div>

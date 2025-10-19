@@ -1,24 +1,25 @@
 const pool = require('../config/database');
 
 const migrations = `
+-- Admins table (create first as users references it)
+CREATE TABLE IF NOT EXISTS admins (
+  id SERIAL PRIMARY KEY,
+  admin_username VARCHAR(50) UNIQUE NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Users table (students)
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
   username VARCHAR(50) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   nickname VARCHAR(50) NOT NULL,
+  admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
   level INTEGER DEFAULT 1,
   exp INTEGER DEFAULT 0,
   grade INTEGER CHECK (grade >= 1 AND grade <= 6),
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
--- Admins table
-CREATE TABLE IF NOT EXISTS admins (
-  id SERIAL PRIMARY KEY,
-  admin_username VARCHAR(50) UNIQUE NOT NULL,
-  password_hash VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -92,6 +93,7 @@ CREATE TABLE IF NOT EXISTS submission_attempts (
 );
 
 -- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_users_admin_id ON users(admin_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_user_id ON submissions(user_id);
 CREATE INDEX IF NOT EXISTS idx_submissions_problem_id ON submissions(problem_id);
 CREATE INDEX IF NOT EXISTS idx_attempts_user_id ON submission_attempts(user_id);
@@ -133,6 +135,14 @@ BEGIN
   END IF;
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='correct_answer_y') THEN
     ALTER TABLE problems ADD COLUMN correct_answer_y INTEGER;
+  END IF;
+END $$;
+
+-- Add admin_id column to users table if it doesn't exist (for existing databases)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='admin_id') THEN
+    ALTER TABLE users ADD COLUMN admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL;
   END IF;
 END $$;
 `;

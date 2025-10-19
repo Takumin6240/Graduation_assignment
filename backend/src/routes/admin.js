@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const {
+  createStudent,
   getAllUsers,
   getUserDetails,
   getStatistics,
@@ -31,6 +32,7 @@ const upload = multer({
 // All admin routes require admin authentication
 router.use(adminAuthMiddleware);
 
+router.post('/students', createStudent);
 router.get('/users', getAllUsers);
 router.get('/users/:userId', getUserDetails);
 router.get('/statistics', getStatistics);

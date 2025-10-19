@@ -7,7 +7,7 @@ import Loading from './components/Loading';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import AdminLogin from './pages/AdminLogin';
-import Register from './pages/Register';
+import AdminRegister from './pages/AdminRegister';
 import Chapters from './pages/Chapters';
 import ProblemList from './pages/ProblemList';
 import ProblemDetail from './pages/ProblemDetail';
@@ -45,7 +45,7 @@ const AppContent: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/admin/register" element={<AdminRegister />} />
             <Route
               path="/chapters"
               element={

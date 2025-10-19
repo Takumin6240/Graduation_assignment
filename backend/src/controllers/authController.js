@@ -168,6 +168,58 @@ const loginAdmin = async (req, res) => {
   }
 };
 
+// Admin registration
+const registerAdmin = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    // Validation
+    if (!username || !password) {
+      return res.status(400).json({ error: '全ての項目を入力してください' });
+    }
+
+    // Check if username already exists
+    const existingAdmin = await pool.query(
+      'SELECT id FROM admins WHERE admin_username = $1',
+      [username]
+    );
+
+    if (existingAdmin.rows.length > 0) {
+      return res.status(400).json({ error: 'このユーザー名は既に使用されています' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Insert new admin
+    const result = await pool.query(
+      `INSERT INTO admins (admin_username, password_hash)
+       VALUES ($1, $2)
+       RETURNING id, admin_username, created_at`,
+      [username, passwordHash]
+    );
+
+    const admin = result.rows[0];
+
+    // Generate token
+    const token = generateToken({ adminId: admin.id, role: 'admin' });
+
+    log(`New admin registered: ${username}`);
+
+    res.status(201).json({
+      message: '管理者登録が完了しました',
+      token,
+      admin: {
+        id: admin.id,
+        username: admin.admin_username
+      }
+    });
+  } catch (error) {
+    log(`Admin registration error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'サーバーエラーが発生しました' });
+  }
+};
+
 // Get current user info
 const getCurrentUser = async (req, res) => {
   try {
@@ -191,5 +243,6 @@ module.exports = {
   registerStudent,
   loginStudent,
   loginAdmin,
+  registerAdmin,
   getCurrentUser
 };

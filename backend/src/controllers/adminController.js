@@ -1,9 +1,69 @@
 const pool = require('../config/database');
 const { log } = require('../utils/logger');
 const JSZip = require('jszip');
+const bcrypt = require('bcrypt');
 
-// Get all users with statistics
+// Create a student account by admin
+const createStudent = async (req, res) => {
+  const { username, password, nickname, grade } = req.body;
+  const adminId = req.admin.adminId;
+
+  try {
+    // Validation
+    if (!username || !password || !nickname || !grade) {
+      return res.status(400).json({ error: '全ての項目を入力してください' });
+    }
+
+    if (grade < 1 || grade > 6) {
+      return res.status(400).json({ error: '学年は1〜6の間で指定してください' });
+    }
+
+    // Check if username already exists
+    const existingUser = await pool.query(
+      'SELECT id FROM users WHERE username = $1',
+      [username]
+    );
+
+    if (existingUser.rows.length > 0) {
+      return res.status(400).json({ error: 'このユーザー名は既に使用されています' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Insert new user with admin_id
+    const result = await pool.query(
+      `INSERT INTO users (username, password_hash, nickname, grade, admin_id)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, username, nickname, grade, level, exp, created_at`,
+      [username, passwordHash, nickname, grade, adminId]
+    );
+
+    const user = result.rows[0];
+
+    log(`Admin ${adminId} created student: ${username} (Grade: ${grade})`);
+
+    res.status(201).json({
+      message: '学生アカウントが作成されました',
+      user: {
+        id: user.id,
+        username: user.username,
+        nickname: user.nickname,
+        grade: user.grade,
+        level: user.level,
+        exp: user.exp
+      }
+    });
+  } catch (error) {
+    log(`Create student error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'サーバーエラーが発生しました' });
+  }
+};
+
+// Get all users with statistics (filtered by admin)
 const getAllUsers = async (req, res) => {
+  const adminId = req.admin.adminId;
+
   try {
     const result = await pool.query(`
       SELECT
@@ -18,9 +78,10 @@ const getAllUsers = async (req, res) => {
         COUNT(DISTINCT CASE WHEN s.is_correct THEN s.id END) as correct_submissions
       FROM users u
       LEFT JOIN submissions s ON u.id = s.user_id
+      WHERE u.admin_id = $1
       GROUP BY u.id
       ORDER BY u.created_at DESC
-    `);
+    `, [adminId]);
 
     res.json({ users: result.rows });
   } catch (error) {
@@ -32,12 +93,13 @@ const getAllUsers = async (req, res) => {
 // Get user details with full history
 const getUserDetails = async (req, res) => {
   const { userId } = req.params;
+  const adminId = req.admin.adminId;
 
   try {
-    // Get user info
+    // Get user info (verify it belongs to this admin)
     const userResult = await pool.query(
-      'SELECT id, username, nickname, grade, level, exp, created_at FROM users WHERE id = $1',
-      [userId]
+      'SELECT id, username, nickname, grade, level, exp, created_at FROM users WHERE id = $1 AND admin_id = $2',
+      [userId, adminId]
     );
 
     if (userResult.rows.length === 0) {
@@ -78,20 +140,38 @@ const getUserDetails = async (req, res) => {
 
 // Get overall statistics
 const getStatistics = async (req, res) => {
+  const adminId = req.admin.adminId;
+
   try {
-    // Total users
-    const usersResult = await pool.query('SELECT COUNT(*) as total FROM users');
-
-    // Total submissions
-    const submissionsResult = await pool.query('SELECT COUNT(*) as total FROM submissions');
-
-    // Correct submissions
-    const correctResult = await pool.query(
-      'SELECT COUNT(*) as total FROM submissions WHERE is_correct = true'
+    // Total users (for this admin)
+    const usersResult = await pool.query(
+      'SELECT COUNT(*) as total FROM users WHERE admin_id = $1',
+      [adminId]
     );
 
-    // Average score
-    const avgScoreResult = await pool.query('SELECT AVG(score) as avg FROM submissions');
+    // Total submissions (for this admin's students)
+    const submissionsResult = await pool.query(
+      `SELECT COUNT(*) as total FROM submissions s
+       JOIN users u ON s.user_id = u.id
+       WHERE u.admin_id = $1`,
+      [adminId]
+    );
+
+    // Correct submissions (for this admin's students)
+    const correctResult = await pool.query(
+      `SELECT COUNT(*) as total FROM submissions s
+       JOIN users u ON s.user_id = u.id
+       WHERE u.admin_id = $1 AND s.is_correct = true`,
+      [adminId]
+    );
+
+    // Average score (for this admin's students)
+    const avgScoreResult = await pool.query(
+      `SELECT AVG(s.score) as avg FROM submissions s
+       JOIN users u ON s.user_id = u.id
+       WHERE u.admin_id = $1`,
+      [adminId]
+    );
 
     // Problems by type
     const problemTypesResult = await pool.query(`
@@ -100,22 +180,24 @@ const getStatistics = async (req, res) => {
       GROUP BY problem_type
     `);
 
-    // User distribution by grade
+    // User distribution by grade (for this admin)
     const gradeDistResult = await pool.query(`
       SELECT grade, COUNT(*) as count
       FROM users
+      WHERE admin_id = $1
       GROUP BY grade
       ORDER BY grade
-    `);
+    `, [adminId]);
 
-    // Recent activity (last 7 days)
+    // Recent activity (last 7 days, for this admin's students)
     const recentActivityResult = await pool.query(`
-      SELECT DATE(completed_at) as date, COUNT(*) as submissions
-      FROM submissions
-      WHERE completed_at >= NOW() - INTERVAL '7 days'
-      GROUP BY DATE(completed_at)
+      SELECT DATE(s.completed_at) as date, COUNT(*) as submissions
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1 AND s.completed_at >= NOW() - INTERVAL '7 days'
+      GROUP BY DATE(s.completed_at)
       ORDER BY date DESC
-    `);
+    `, [adminId]);
 
     res.json({
       totalUsers: parseInt(usersResult.rows[0].total),
@@ -301,6 +383,7 @@ const updateCorrectAnswer = async (req, res) => {
 };
 
 module.exports = {
+  createStudent,
   getAllUsers,
   getUserDetails,
   getStatistics,

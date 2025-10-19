@@ -79,21 +79,19 @@ const AdminLogin: React.FC = () => {
           </button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600">
+        <div className="mt-6 text-center space-y-2">
+          <p className="text-gray-600 text-sm">
+            管理者アカウントをお持ちでない方は{' '}
+            <Link to="/admin/register" className="text-red-600 font-medium hover:underline">
+              新規登録
+            </Link>
+          </p>
+          <p className="text-gray-600 text-sm">
             学生の方は{' '}
             <Link to="/login" className="text-primary-600 font-medium hover:underline">
               こちら
             </Link>
             {' '}からログインしてください
-          </p>
-        </div>
-
-        <div className="mt-8 p-4 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 text-center">
-            デフォルト管理者アカウント:<br />
-            <span className="font-mono">username: admin</span><br />
-            <span className="font-mono">password: admin123</span>
           </p>
         </div>
       </div>

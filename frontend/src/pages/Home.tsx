@@ -10,7 +10,7 @@ const Home: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-primary-700 mb-4">
-            Scratchで学ぼう！
+            Scratchでプログラミングについて学ぼう!
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             小学生のためのプログラミング学習システム
@@ -48,18 +48,15 @@ const Home: React.FC = () => {
               </h2>
               <div className="flex gap-4 justify-center">
                 <Link
-                  to="/register"
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition"
-                >
-                  新規登録して始める
-                </Link>
-                <Link
                   to="/login"
-                  className="bg-white border-2 border-primary-600 text-primary-600 hover:bg-primary-50 px-8 py-4 rounded-xl text-lg font-bold transition"
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition"
                 >
                   ログイン
                 </Link>
               </div>
+              <p className="mt-6 text-gray-600 text-sm">
+                ログインIDとパスワードは先生から受け取ってください
+              </p>
             </div>
           </div>
         )}
