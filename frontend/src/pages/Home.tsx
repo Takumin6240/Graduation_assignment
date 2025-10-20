@@ -10,10 +10,10 @@ const Home: React.FC = () => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-primary-700 mb-4">
-            Scratchでプログラミングについて学ぼう!
+            Scratchでプログラミングについて<ruby>学<rt>まな</rt></ruby>ぼう!
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            小学生のためのプログラミング学習システム
+            <ruby>小学生<rt>しょうがくせい</rt></ruby>のためのプログラミング<ruby>学習<rt>がくしゅう</rt></ruby>システム
           </p>
         </div>
 
@@ -28,14 +28,14 @@ const Home: React.FC = () => {
                   <span className="text-primary-700 font-bold">レベル {user.level}</span>
                 </div>
                 <div className="bg-yellow-100 px-4 py-2 rounded-full">
-                  <span className="text-yellow-700 font-bold">経験値 {user.exp}</span>
+                  <span className="text-yellow-700 font-bold"><ruby>経験値<rt>けいけんち</rt></ruby> {user.exp}</span>
                 </div>
               </div>
               <Link
                 to="/chapters"
                 className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition"
               >
-                学習を始める →
+                <ruby>学習<rt>がくしゅう</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める →
               </Link>
             </div>
 
@@ -44,7 +44,7 @@ const Home: React.FC = () => {
           <div className="max-w-2xl mx-auto">
             <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
               <h2 className="text-2xl font-bold text-gray-800 mb-6">
-                楽しく学習！
+                <ruby>楽<rt>たの</rt></ruby>しく<ruby>学習<rt>がくしゅう</rt></ruby>！
               </h2>
               <div className="flex gap-4 justify-center">
                 <Link
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
                 </Link>
               </div>
               <p className="mt-6 text-gray-600 text-sm">
-                ログインIDとパスワードは先生から受け取ってください
+                ログインIDとパスワードは<ruby>先生<rt>せんせい</rt></ruby>から<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>ってください
               </p>
             </div>
           </div>

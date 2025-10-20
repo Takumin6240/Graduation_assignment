@@ -77,15 +77,15 @@ const ProblemList: React.FC = () => {
   const getProblemTypeName = (type: string) => {
     switch (type) {
       case 'fill_blank':
-        return '穴埋め問題';
+        return '<ruby>穴埋<rt>あなう</rt></ruby>め<ruby>問題<rt>もんだい</rt></ruby>';
       case 'predict':
-        return '予測問題';
+        return '<ruby>予測<rt>よそく</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>';
       case 'find_error':
-        return '間違い探し問題';
+        return '<ruby>間違<rt>まちが</rt></ruby>い<ruby>探<rt>さが</rt></ruby>し<ruby>問題<rt>もんだい</rt></ruby>';
       case 'mission':
-        return 'ミッション型問題';
+        return 'ミッション<ruby>型<rt>がた</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>';
       default:
-        return '問題';
+        return '<ruby>問題<rt>もんだい</rt></ruby>';
     }
   };
 
@@ -126,15 +126,15 @@ const ProblemList: React.FC = () => {
           to="/chapters"
           className="text-primary-600 hover:text-primary-700 mb-4 inline-block"
         >
-          ← チャプター一覧に戻る
+          ← チャプター<ruby>一覧<rt>いちらん</rt></ruby>に<ruby>戻<rt>もど</rt></ruby>る
         </Link>
-        <h1 className="text-4xl font-bold text-primary-700 mb-2">{chapter.title}</h1>
-        <p className="text-gray-600 text-lg">{chapter.description}</p>
+        <h1 className="text-4xl font-bold text-primary-700 mb-2" dangerouslySetInnerHTML={{ __html: chapter.title }}></h1>
+        <p className="text-gray-600 text-lg" dangerouslySetInnerHTML={{ __html: chapter.description }}></p>
       </div>
 
       {problems.length === 0 ? (
         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-          このチャプターにはまだ問題がありません。
+          このチャプターにはまだ<ruby>問題<rt>もんだい</rt></ruby>がありません。
         </div>
       ) : (
         <div className="grid gap-6">
@@ -164,25 +164,21 @@ const ProblemList: React.FC = () => {
                     score === 100
                       ? 'bg-lime-400 text-gray-800'
                       : 'bg-green-500 text-white'
-                  }`}>
-                    {score === 100 ? '🌟 満点! 100点' : `✓ 完了 (${score}点)`}
+                  }`} dangerouslySetInnerHTML={{ __html: score === 100 ? '🌟 <ruby>満点<rt>まんてん</rt></ruby>! 100<ruby>点<rt>てん</rt></ruby>' : `✓ <ruby>完了<rt>かんりょう</rt></ruby> (${score}<ruby>点<rt>てん</rt></ruby>)` }}>
                   </div>
                 )}
 
                 <div>
                   <div className="flex items-center gap-2 mb-3 flex-wrap">
-                    <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-lg text-sm font-medium">
-                      {getProblemTypeName(problem.problem_type)}
+                    <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-lg text-sm font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeName(problem.problem_type) }}>
                     </span>
                     <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getDifficultyColor(problem.difficulty_level)}`}>
                       {getDifficultyText(problem.difficulty_level)}
                     </span>
                   </div>
 
-                  <h2 className={`text-2xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`}>
-                    {problem.title}
+                  <h2 className={`text-2xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
                   </h2>
-                  <p className="text-gray-600">{problem.description}</p>
                 </div>
 
                 <div className="mt-4 text-right">
@@ -190,8 +186,7 @@ const ProblemList: React.FC = () => {
                     score === 100
                       ? 'bg-lime-500 text-white'
                       : 'bg-primary-600 text-white'
-                  }`}>
-                    {isCompleted ? '再挑戦する' : '挑戦する'} →
+                  }`} dangerouslySetInnerHTML={{ __html: isCompleted ? '<ruby>再挑戦<rt>さいちょうせん</rt></ruby>する →' : '<ruby>挑戦<rt>ちょうせん</rt></ruby>する →' }}>
                   </span>
                 </div>
               </Link>

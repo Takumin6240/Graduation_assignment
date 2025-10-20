@@ -42,7 +42,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-gray-700 font-medium mb-2">
-              ユーザー名
+              ユーザー<ruby>名<rt>めい</rt></ruby>
             </label>
             <input
               type="text"
@@ -71,13 +71,13 @@ const Login: React.FC = () => {
             disabled={loading}
             className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
           >
-            {loading ? 'ログイン中...' : 'ログイン'}
+            {loading ? 'ログイン<ruby>中<rt>ちゅう</rt></ruby>...' : 'ログイン'}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            ログインIDとパスワードは先生から受け取ってください
+            ログインIDとパスワードは<ruby>先生<rt>せんせい</rt></ruby>から<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>ってください
           </p>
         </div>
       </div>

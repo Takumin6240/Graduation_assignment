@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- Chapters table
 CREATE TABLE IF NOT EXISTS chapters (
   id SERIAL PRIMARY KEY,
-  title VARCHAR(100) NOT NULL,
+  title VARCHAR(500) NOT NULL,
   description TEXT,
   order_number INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS problems (
   id SERIAL PRIMARY KEY,
   chapter_id INTEGER REFERENCES chapters(id) ON DELETE CASCADE,
   problem_type VARCHAR(20) CHECK (problem_type IN ('fill_blank', 'predict', 'find_error', 'mission')),
-  title VARCHAR(200) NOT NULL,
+  title VARCHAR(500) NOT NULL,
   description TEXT NOT NULL,
   initial_sb3_data JSONB,
   correct_sb3_data JSONB,
@@ -143,6 +143,20 @@ DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='admin_id') THEN
     ALTER TABLE users ADD COLUMN admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL;
+  END IF;
+END $$;
+
+-- Increase title column length for chapters and problems to accommodate ruby tags (furigana)
+DO $$
+BEGIN
+  -- Alter chapters.title to VARCHAR(500)
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='chapters' AND column_name='title') THEN
+    ALTER TABLE chapters ALTER COLUMN title TYPE VARCHAR(500);
+  END IF;
+
+  -- Alter problems.title to VARCHAR(500)
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='title') THEN
+    ALTER TABLE problems ALTER COLUMN title TYPE VARCHAR(500);
   END IF;
 END $$;
 `;

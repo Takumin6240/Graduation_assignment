@@ -91,10 +91,10 @@ const ProblemDetail: React.FC = () => {
 
   const getProblemTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      fill_blank: '📝 穴埋め問題',
-      predict: '🔮 予測問題',
-      find_error: '🐛 バグ発見問題',
-      mission: '🚀 ミッション問題',
+      fill_blank: '📝 <ruby>穴埋<rt>あなう</rt></ruby>め<ruby>問題<rt>もんだい</rt></ruby>',
+      predict: '🔮 <ruby>予測<rt>よそく</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
+      find_error: '🐛 バグ<ruby>発見<rt>はっけん</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
+      mission: '🚀 ミッション<ruby>問題<rt>もんだい</rt></ruby>',
     };
     return labels[type] || type;
   };
@@ -105,7 +105,7 @@ const ProblemDetail: React.FC = () => {
   };
 
   if (loading) return <Loading />;
-  if (!problem) return <div>問題が見つかりません</div>;
+  if (!problem) return <div><ruby>問題<rt>もんだい</rt></ruby>が<ruby>見<rt>み</rt></ruby>つかりません</div>;
 
   if (result) {
     const isPerfectScore = result.score === 100;
@@ -131,7 +131,7 @@ const ProblemDetail: React.FC = () => {
             {isPerfectScore && (
               <div className="mb-4">
                 <div className="text-4xl font-black text-lime-600 mb-2">
-                  ★ 満点おめでとう！ ★
+                  ★ <ruby>満点<rt>まんてん</rt></ruby>おめでとう！ ★
                 </div>
                 <div className="text-xl text-gray-700">
                   すごい！パーフェクトだよ！
@@ -144,19 +144,19 @@ const ProblemDetail: React.FC = () => {
             <div className={`text-6xl font-black mb-6 ${
               isPerfectScore ? 'text-lime-600' : 'text-primary-700'
             }`}>
-              {result.score}点
+              {result.score}<ruby>点<rt>てん</rt></ruby>
             </div>
 
             {isPerfectScore && (
               <div className="mb-6 p-4 bg-white rounded-xl shadow-lg border-2 border-lime-300">
                 <div className="text-sm text-gray-600 mt-1">
-                  次の問題にも挑戦してみよう！
+                  <ruby>次<rt>つぎ</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>にも<ruby>挑戦<rt>ちょうせん</rt></ruby>してみよう！
                 </div>
               </div>
             )}
 
             <p className="text-lg text-gray-700 mb-6">
-              試行回数: {result.attemptNumber}回目
+              <ruby>試行<rt>しこう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby>: {result.attemptNumber}<ruby>回目<rt>かいめ</rt></ruby>
             </p>
 
             <div className="flex gap-4 justify-center flex-wrap">
@@ -168,7 +168,7 @@ const ProblemDetail: React.FC = () => {
                     : 'bg-primary-600 hover:bg-primary-700'
                 } text-white px-8 py-3 rounded-lg font-bold transition shadow-lg`}
               >
-                チャプターに戻る
+                チャプターに<ruby>戻<rt>もど</rt></ruby>る
               </button>
 
               {nextProblem && (
@@ -180,7 +180,7 @@ const ProblemDetail: React.FC = () => {
                   }}
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg"
                 >
-                  次の問題へ →
+                  <ruby>次<rt>つぎ</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>へ →
                 </button>
               )}
 
@@ -193,7 +193,7 @@ const ProblemDetail: React.FC = () => {
                   }}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg"
                 >
-                  もう一度挑戦
+                  もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby>
                 </button>
               )}
             </div>
@@ -207,32 +207,31 @@ const ProblemDetail: React.FC = () => {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <span className="text-sm text-primary-600 font-medium">
-            {getProblemTypeLabel(problem.problem_type)}
+          <span className="text-sm text-primary-600 font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeLabel(problem.problem_type) }}>
           </span>
-          <h1 className="text-3xl font-bold text-gray-800 mt-2">{problem.title}</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mt-2" dangerouslySetInnerHTML={{ __html: problem.title }}></h1>
         </div>
 
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4">問題説明</h2>
-          <p className="text-gray-700 whitespace-pre-wrap">{problem.description}</p>
+          <h2 className="text-xl font-bold text-gray-800 mb-4"><ruby>問題<rt>もんだい</rt></ruby><ruby>説明<rt>せつめい</rt></ruby></h2>
+          <p className="text-gray-700 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
         </div>
 
         <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-blue-800 mb-3">📌 解答方法</h3>
+          <h3 className="text-lg font-bold text-blue-800 mb-3">📌 <ruby>解答<rt>かいとう</rt></ruby><ruby>方法<rt>ほうほう</rt></ruby></h3>
           {problem.problem_type === 'predict' ? (
             <ol className="list-decimal list-inside space-y-2 text-gray-700">
-              <li>「Scratchエディタを開く」ボタンでプログラムを確認</li>
-              <li>プログラムがどう動くか予測します</li>
-              <li>スプライトの最終的なX座標とY座標を計算します</li>
-              <li>下の解答欄にX座標とY座標を入力して提出</li>
+              <li>「Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く」ボタンでプログラムを<ruby>確認<rt>かくにん</rt></ruby></li>
+              <li>プログラムがどう<ruby>動<rt>うご</rt></ruby>くか<ruby>予測<rt>よそく</rt></ruby>します</li>
+              <li>スプライトの<ruby>最終的<rt>さいしゅうてき</rt></ruby>なX<ruby>座標<rt>ざひょう</rt></ruby>とY<ruby>座標<rt>ざひょう</rt></ruby>を<ruby>計算<rt>けいさん</rt></ruby>します</li>
+              <li><ruby>下<rt>した</rt></ruby>の<ruby>解答欄<rt>かいとうらん</rt></ruby>にX<ruby>座標<rt>ざひょう</rt></ruby>とY<ruby>座標<rt>ざひょう</rt></ruby>を<ruby>入力<rt>にゅうりょく</rt></ruby>して<ruby>提出<rt>ていしゅつ</rt></ruby></li>
             </ol>
           ) : (
             <ol className="list-decimal list-inside space-y-2 text-gray-700">
-              <li>「Scratchエディタを開く」ボタンでScratchを起動</li>
-              <li>問題に従ってプログラムを作成します</li>
-              <li>完成したら「ファイル」→「コンピューターに保存する」で.sb3ファイルをダウンロード</li>
-              <li>ダウンロードした.sb3ファイルをこのページにアップロードして提出</li>
+              <li>「Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く」ボタンでScratchを<ruby>起動<rt>きどう</rt></ruby></li>
+              <li><ruby>問題<rt>もんだい</rt></ruby>に<ruby>従<rt>したが</rt></ruby>ってプログラムを<ruby>作成<rt>さくせい</rt></ruby>します</li>
+              <li><ruby>完成<rt>かんせい</rt></ruby>したら「ファイル」→「コンピューターに<ruby>保存<rt>ほぞん</rt></ruby>する」で.sb3ファイルをダウンロード</li>
+              <li>ダウンロードした.sb3ファイルをこのページにアップロードして<ruby>提出<rt>ていしゅつ</rt></ruby></li>
             </ol>
           )}
           <div className="mt-4">
@@ -243,22 +242,22 @@ const ProblemDetail: React.FC = () => {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
-              Scratchエディタを開く
+              Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く
             </button>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
-          <h3 className="text-xl font-bold text-gray-800 mb-4">解答を提出</h3>
+          <h3 className="text-xl font-bold text-gray-800 mb-4"><ruby>解答<rt>かいとう</rt></ruby>を<ruby>提出<rt>ていしゅつ</rt></ruby></h3>
 
           {problem.problem_type === 'predict' ? (
             <div className="mb-6">
               <label className="block text-gray-700 font-medium mb-4">
-                スプライトの最終位置を入力してください
+                スプライトの<ruby>最終<rt>さいしゅう</rt></ruby><ruby>位置<rt>いち</rt></ruby>を<ruby>入力<rt>にゅうりょく</rt></ruby>してください
               </label>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">X座標</label>
+                  <label className="block text-sm text-gray-600 mb-2">X<ruby>座標<rt>ざひょう</rt></ruby></label>
                   <input
                     type="number"
                     value={answerX}
@@ -269,7 +268,7 @@ const ProblemDetail: React.FC = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-2">Y座標</label>
+                  <label className="block text-sm text-gray-600 mb-2">Y<ruby>座標<rt>ざひょう</rt></ruby></label>
                   <input
                     type="number"
                     value={answerY}
@@ -282,7 +281,7 @@ const ProblemDetail: React.FC = () => {
               </div>
               {answerX !== '' && answerY !== '' && (
                 <p className="mt-3 text-sm text-green-600">
-                  ✓ X座標: {answerX}, Y座標: {answerY}
+                  ✓ X<ruby>座標<rt>ざひょう</rt></ruby>: {answerX}, Y<ruby>座標<rt>ざひょう</rt></ruby>: {answerY}
                 </p>
               )}
             </div>
@@ -300,7 +299,7 @@ const ProblemDetail: React.FC = () => {
               />
               {file && (
                 <p className="mt-2 text-sm text-green-600">
-                  ✓ {file.name} を選択しました
+                  ✓ {file.name} を<ruby>選択<rt>せんたく</rt></ruby>しました
                 </p>
               )}
             </div>
@@ -313,8 +312,8 @@ const ProblemDetail: React.FC = () => {
               (problem.problem_type === 'predict' ? (answerX === '' || answerY === '') : !file)
             }
             className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-lg font-bold text-lg transition disabled:opacity-50"
+            dangerouslySetInnerHTML={{ __html: submitting ? '<ruby>提出<rt>ていしゅつ</rt></ruby><ruby>中<rt>ちゅう</rt></ruby>...' : '<ruby>提出<rt>ていしゅつ</rt></ruby>する' }}
           >
-            {submitting ? '提出中...' : '提出する'}
           </button>
         </form>
       </div>
