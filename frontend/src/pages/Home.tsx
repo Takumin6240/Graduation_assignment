@@ -9,6 +9,18 @@ const Home: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
+          {/* シンプルなイラスト表示エリア */}
+          <div className="mb-8 flex justify-center">
+            <div className="relative">
+              {/* プログラミングを表現するシンプルなイラスト（絵文字） */}
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <span className="text-8xl">💻</span>
+                <span className="text-8xl">🐱</span>
+                <span className="text-8xl">✨</span>
+              </div>
+            </div>
+          </div>
+
           <h1 className="text-5xl font-bold text-primary-700 mb-4">
             Scratchでプログラミングについて<ruby>学<rt>まな</rt></ruby>ぼう!
           </h1>
@@ -33,7 +45,7 @@ const Home: React.FC = () => {
               </div>
               <Link
                 to="/chapters"
-                className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition"
+                className="inline-block bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
               >
                 <ruby>学習<rt>がくしゅう</rt></ruby>を<ruby>始<rt>はじ</rt></ruby>める →
               </Link>
@@ -49,7 +61,7 @@ const Home: React.FC = () => {
               <div className="flex gap-4 justify-center">
                 <Link
                   to="/login"
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition"
+                  className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
                 >
                   ログイン
                 </Link>

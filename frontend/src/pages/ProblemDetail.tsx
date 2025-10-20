@@ -129,7 +129,13 @@ const ProblemDetail: React.FC = () => {
             }`}
           >
             {isPerfectScore && (
-              <div className="mb-4">
+              <div className="mb-6">
+                {/* 満点時の大きなイラスト */}
+                <div className="flex justify-center gap-4 mb-4">
+                  <span className="text-8xl animate-bounce">🎉</span>
+                  <span className="text-8xl animate-bounce" style={{ animationDelay: '0.1s' }}>🏆</span>
+                  <span className="text-8xl animate-bounce" style={{ animationDelay: '0.2s' }}>⭐</span>
+                </div>
                 <div className="text-4xl font-black text-lime-600 mb-2">
                   ★ <ruby>満点<rt>まんてん</rt></ruby>おめでとう！ ★
                 </div>
@@ -166,7 +172,7 @@ const ProblemDetail: React.FC = () => {
                   isPerfectScore
                     ? 'bg-lime-500 hover:bg-lime-600'
                     : 'bg-primary-600 hover:bg-primary-700'
-                } text-white px-8 py-3 rounded-lg font-bold transition shadow-lg`}
+                } text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg`}
               >
                 チャプターに<ruby>戻<rt>もど</rt></ruby>る
               </button>
@@ -178,7 +184,7 @@ const ProblemDetail: React.FC = () => {
                     setFile(null);
                     navigate(`/problems/${nextProblem.id}`);
                   }}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
                   <ruby>次<rt>つぎ</rt></ruby>の<ruby>問題<rt>もんだい</rt></ruby>へ →
                 </button>
@@ -191,7 +197,7 @@ const ProblemDetail: React.FC = () => {
                     setFile(null);
                     setStartTime(Date.now()); // Reset timer for retry
                   }}
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg"
                 >
                   もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby>
                 </button>
@@ -206,15 +212,28 @@ const ProblemDetail: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-6">
-          <span className="text-sm text-primary-600 font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeLabel(problem.problem_type) }}>
-          </span>
-          <h1 className="text-3xl font-bold text-gray-800 mt-2" dangerouslySetInnerHTML={{ __html: problem.title }}></h1>
+        {/* 問題タイプヘッダー */}
+        <div className="mb-6 flex items-center gap-4">
+          <div className="text-6xl">
+            {problem.problem_type === 'fill_blank' && '📝'}
+            {problem.problem_type === 'predict' && '🔮'}
+            {problem.problem_type === 'find_error' && '🐛'}
+            {problem.problem_type === 'mission' && '🚀'}
+          </div>
+          <div>
+            <span className="text-lg text-primary-600 font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeLabel(problem.problem_type) }}>
+            </span>
+            <h1 className="text-4xl font-bold text-gray-800 mt-2" dangerouslySetInnerHTML={{ __html: problem.title }}></h1>
+          </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <h2 className="text-xl font-bold text-gray-800 mb-4"><ruby>問題<rt>もんだい</rt></ruby><ruby>説明<rt>せつめい</rt></ruby></h2>
-          <p className="text-gray-700 whitespace-pre-wrap" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
+        {/* 問題説明カード */}
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-primary-100">
+          <div className="flex items-start gap-4 mb-4">
+            <span className="text-4xl">💡</span>
+            <h2 className="text-2xl font-bold text-gray-800"><ruby>問題<rt>もんだい</rt></ruby><ruby>説明<rt>せつめい</rt></ruby></h2>
+          </div>
+          <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
         </div>
 
         <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 mb-6">
@@ -237,9 +256,9 @@ const ProblemDetail: React.FC = () => {
           <div className="mt-4">
             <button
               onClick={handleOpenScratch}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition flex items-center gap-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl flex items-center gap-2"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
               </svg>
               Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く
@@ -311,7 +330,7 @@ const ProblemDetail: React.FC = () => {
               submitting ||
               (problem.problem_type === 'predict' ? (answerX === '' || answerY === '') : !file)
             }
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-lg font-bold text-lg transition disabled:opacity-50"
+            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-4 rounded-lg font-bold text-xl transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100 disabled:hover:shadow-lg"
             dangerouslySetInnerHTML={{ __html: submitting ? '<ruby>提出<rt>ていしゅつ</rt></ruby><ruby>中<rt>ちゅう</rt></ruby>...' : '<ruby>提出<rt>ていしゅつ</rt></ruby>する' }}
           >
           </button>

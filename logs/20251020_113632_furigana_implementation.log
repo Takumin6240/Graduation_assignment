@@ -1,0 +1,317 @@
+# 作業ログ: ふりがな実装と問題リスト改善
+
+**作業日時**: 2025年10月20日 11:36
+**作業者**: Claude Code
+**作業内容**: 小学生向けふりがな機能の実装と問題リスト表示の改善
+
+---
+
+## 作業概要
+
+小学生が読みやすいように、アプリケーション内のすべての漢字にふりがな（ルビ）を追加しました。
+また、`/chapters/1` などの問題リスト画面で、問題の説明文を非表示にし、タイトルのみを表示するよう変更しました。
+
+---
+
+## 変更ファイル一覧
+
+### バックエンド (Backend)
+
+1. **backend/src/db/seed.js**
+   - チャプタータイトルと説明文にふりがなを追加
+   - 全4問題のタイトルと説明文にふりがなを追加
+
+2. **backend/src/db/migrate.js**
+   - データベーススキーマ変更: `chapters.title` を VARCHAR(100) → VARCHAR(500)
+   - データベーススキーマ変更: `problems.title` を VARCHAR(200) → VARCHAR(500)
+   - 既存データベース対応のALTER TABLEステートメントを追加
+
+### フロントエンド (Frontend)
+
+3. **frontend/src/pages/Chapters.tsx**
+   - ページタイトル「学習チャプター」にふりがな追加
+   - チャプタータイトルと説明文のHTMLレンダリング対応 (dangerouslySetInnerHTML使用)
+   - ボタンテキスト「問題を解く」にふりがな追加
+
+4. **frontend/src/pages/ProblemList.tsx**
+   - **問題説明文を非表示化**: 185行目の `<p>{problem.description}</p>` を削除
+   - 問題タイプ名にふりがな追加 (穴埋め問題、予測問題、間違い探し問題、ミッション型問題)
+   - 全テキストにふりがな追加 (チャプター一覧に戻る、完了、満点、再挑戦する、など)
+   - HTMLレンダリング対応 (dangerouslySetInnerHTML使用)
+
+5. **frontend/src/pages/Home.tsx**
+   - メインタイトル「学ぼう」にふりがな追加
+   - サブタイトル「小学生のためのプログラミング学習システム」にふりがな追加
+   - ユーザー情報表示 (経験値、学習を始める) にふりがな追加
+   - ログイン案内テキストにふりがな追加
+
+6. **frontend/src/pages/Login.tsx**
+   - ラベル「ユーザー名」にふりがな追加
+   - ボタン「ログイン中」にふりがな追加
+   - 案内テキスト「先生から受け取ってください」にふりがな追加
+
+7. **frontend/src/pages/ProblemDetail.tsx**
+   - 問題タイプラベルにふりがな追加
+   - 問題タイトルと説明文のHTMLレンダリング対応
+   - 解答方法の説明文にふりがな追加 (予測問題用、その他の問題用)
+   - フォームラベルにふりがな追加 (座標入力、ファイルアップロード)
+   - ボタンテキストにふりがな追加 (提出する、次の問題へ、もう一度挑戦、など)
+   - 結果表示にふりがな追加 (満点、試行回数、など)
+
+---
+
+## 詳細な変更内容
+
+### 1. データベーススキーマ変更
+
+#### 変更理由
+HTMLの `<ruby>` タグを使用してふりがなを実装したため、テキスト長が大幅に増加。
+既存の VARCHAR(100) や VARCHAR(200) では文字数制限エラーが発生。
+
+#### 変更内容
+
+**migrate.js の変更**:
+
+```sql
+-- Chapters table
+CREATE TABLE IF NOT EXISTS chapters (
+  title VARCHAR(500) NOT NULL,  -- 100 → 500 に変更
+  ...
+);
+
+-- Problems table
+CREATE TABLE IF NOT EXISTS problems (
+  title VARCHAR(500) NOT NULL,  -- 200 → 500 に変更
+  ...
+);
+
+-- 既存データベース対応の ALTER TABLE ステートメント追加
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='chapters' AND column_name='title') THEN
+    ALTER TABLE chapters ALTER COLUMN title TYPE VARCHAR(500);
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='title') THEN
+    ALTER TABLE problems ALTER COLUMN title TYPE VARCHAR(500);
+  END IF;
+END $$;
+```
+
+### 2. ふりがな実装方法
+
+HTMLの `<ruby>` タグを使用:
+
+```html
+<ruby>漢字<rt>かんじ</rt></ruby>
+```
+
+**実装例**:
+
+```javascript
+// Before
+<h1>学習チャプター</h1>
+
+// After
+<h1><ruby>学習<rt>がくしゅう</rt></ruby>チャプター</h1>
+```
+
+**HTMLレンダリング対応**:
+
+```javascript
+// dangerouslySetInnerHTML を使用してHTMLタグを適切にレンダリング
+<h2 dangerouslySetInnerHTML={{ __html: chapter.title }}></h2>
+<p dangerouslySetInnerHTML={{ __html: chapter.description }}></p>
+```
+
+### 3. seed.js のデータ変更例
+
+**Chapter 1**:
+
+```javascript
+// Before
+title: 'Chapter 1: 順次処理 - 命令を順番に実行しよう'
+
+// After
+title: 'Chapter 1: <ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby> - <ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>しよう'
+```
+
+**Problem 1**:
+
+```javascript
+// Before
+title: '問題1: ネコを歩かせよう'
+description: 'プログラミングの基本は「命令を順番に実行すること」です。...'
+
+// After
+title: '<ruby>問題<rt>もんだい</rt></ruby>1: ネコを<ruby>歩<rt>ある</rt></ruby>かせよう'
+description: 'プログラミングの<ruby>基本<rt>きほん</rt></ruby>は「<ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>すること」です。...'
+```
+
+全4問題（問題1〜4）すべてのタイトルと説明文に同様の処理を適用。
+
+### 4. 問題リスト表示の改善
+
+**ProblemList.tsx の変更**:
+
+```javascript
+// Before (182-185行目)
+<h2 className={`text-2xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`}>
+  {problem.title}
+</h2>
+<p className="text-gray-600">{problem.description}</p>
+
+// After (182-184行目)
+<h2 className={`text-2xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
+</h2>
+// 説明文の <p> タグを削除
+```
+
+これにより、`/chapters/1` などの問題リスト画面では、問題タイトルのみが表示され、説明文は非表示になります。
+
+---
+
+## ふりがなを追加した主要な単語
+
+### 教育・学習関連
+- 学習(がくしゅう)
+- 問題(もんだい)
+- 解答(かいとう)
+- 説明(せつめい)
+- 挑戦(ちょうせん)
+- 完了(かんりょう)
+- 満点(まんてん)
+- 試行回数(しこうかいすう)
+
+### プログラミング関連
+- 順次処理(じゅんじしょり)
+- 命令(めいれい)
+- 実行(じっこう)
+- 順番(じゅんばん)
+- 基本(きほん)
+- 座標(ざひょう)
+- 予測(よそく)
+- 計算(けいさん)
+
+### 動作・位置関連
+- 歩く(ある)
+- 動く(うご)
+- 始める(はじ)
+- 戻る(もど)
+- 位置(いち)
+- 横(よこ)
+- 縦(たて)
+- 上(うえ)
+- 下(した)
+- 右(みぎ)
+
+### UI要素
+- 一覧(いちらん)
+- 提出(ていしゅつ)
+- 入力(にゅうりょく)
+- 選択(せんたく)
+- 確認(かくにん)
+- 開く(ひら)
+
+---
+
+## データベース更新手順
+
+以下のコマンドを順番に実行してデータベースを更新:
+
+```powershell
+# 1. データベースを完全にクリーンアップ（すべてのデータを削除）
+docker compose down -v
+
+# 2. サービスを再起動
+docker compose up -d
+
+# 3. 更新されたスキーマでマイグレーションを実行
+docker compose exec backend npm run migrate
+
+# 4. ふりがな付きシードデータを投入
+docker compose exec backend node src/db/seed.js
+```
+
+---
+
+## 動作確認
+
+### 確認ポイント
+
+1. **チャプター一覧ページ** (`http://localhost:3000/chapters`)
+   - 「学習チャプター」にふりがな表示
+   - Chapter 1 のタイトルと説明文にふりがな表示
+   - 「問題を解く」ボタンにふりがな表示
+
+2. **問題リストページ** (`http://localhost:3000/chapters/1`)
+   - Chapter 1 のタイトルと説明文にふりがな表示
+   - 問題タイトルのみ表示、説明文は非表示
+   - 問題タイプ（穴埋め問題、予測問題など）にふりがな表示
+   - 完了バッジ（満点、完了）にふりがな表示
+   - ボタン（挑戦する、再挑戦する）にふりがな表示
+
+3. **問題詳細ページ** (`http://localhost:3000/problems/1`)
+   - 問題タイトルと説明文にふりがな表示
+   - 解答方法の説明にふりがな表示
+   - フォームラベル（座標、ファイルアップロードなど）にふりがな表示
+   - ボタン（提出する、次の問題へなど）にふりがな表示
+
+4. **ホームページ** (`http://localhost:3000/`)
+   - メインタイトル「学ぼう」にふりがな表示
+   - 「小学生のため」「学習システム」にふりがな表示
+   - ユーザー情報（経験値、学習を始める）にふりがな表示
+
+5. **ログインページ** (`http://localhost:3000/login`)
+   - 「ユーザー名」にふりがな表示
+   - 案内テキストにふりがな表示
+
+---
+
+## 技術的な注意事項
+
+### セキュリティ考慮
+
+`dangerouslySetInnerHTML` を使用しているため、以下の点に注意:
+
+1. **データソース**: データベースに保存される内容は管理者が seed.js で管理
+2. **ユーザー入力なし**: 学生ユーザーは HTML を入力できない設計
+3. **XSS対策**: 管理者UIで問題を追加する機能を実装する場合は、入力の sanitization が必要
+
+### ブラウザ互換性
+
+`<ruby>` タグは以下のブラウザでサポート:
+- Chrome/Edge: 完全サポート
+- Firefox: 完全サポート
+- Safari: 完全サポート
+- IE11: 部分サポート（表示は可能）
+
+---
+
+## 今後の拡張案
+
+1. **管理者UI拡張**
+   - 問題作成時のふりがな自動付与機能
+   - ふりがなプレビュー機能
+
+2. **ふりがな表示切り替え**
+   - 学年別にふりがなの表示/非表示を切り替える機能
+   - ユーザー設定でふりがなのON/OFF切り替え
+
+3. **データベース最適化**
+   - ふりがなありバージョンとふりがななしバージョンを別カラムで管理
+   - フロントエンドでの表示切り替えを高速化
+
+4. **問題リスト機能拡張**
+   - 説明文のプレビュー機能（ホバー時に表示など）
+   - 難易度や進捗に応じた並び替え機能
+
+---
+
+## まとめ
+
+- ✅ 全7ファイルを修正し、アプリケーション全体にふりがなを実装
+- ✅ データベーススキーマを更新し、ふりがな付きテキストの保存に対応
+- ✅ 問題リストページで説明文を非表示化し、タイトルのみ表示
+- ✅ 小学生が読みやすいユーザーインターフェースを実現
+
+**作業完了時刻**: 2025年10月20日 11:36

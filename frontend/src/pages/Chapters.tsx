@@ -34,14 +34,23 @@ const Chapters: React.FC = () => {
           <Link
             key={chapter.id}
             to={`/chapters/${chapter.id}`}
-            className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-1"
+            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] border-2 border-transparent hover:border-primary-300"
           >
-            <h2 className="text-2xl font-bold text-gray-800 mb-2" dangerouslySetInnerHTML={{ __html: chapter.title }}></h2>
-            <p className="text-gray-600" dangerouslySetInnerHTML={{ __html: chapter.description }}></p>
-            <div className="mt-4">
-              <span className="bg-primary-600 text-white px-4 py-2 rounded-lg font-medium inline-block">
-                <ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>く →
-              </span>
+            <div className="flex items-start gap-6">
+              {/* シンプルなアイコン表示 */}
+              <div className="text-6xl flex-shrink-0">📚</div>
+
+              <div className="flex-1">
+                <h2 className="text-3xl font-bold text-gray-800 mb-3" dangerouslySetInnerHTML={{ __html: chapter.title }}></h2>
+                <p className="text-gray-600 text-lg mb-4" dangerouslySetInnerHTML={{ __html: chapter.description }}></p>
+
+                <div className="flex items-center gap-2">
+                  <span className="bg-primary-600 text-white px-6 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-primary-700 transition-colors">
+                    <ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>く
+                    <span className="text-xl">→</span>
+                  </span>
+                </div>
+              </div>
             </div>
           </Link>
         ))}

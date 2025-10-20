@@ -39,7 +39,7 @@ async function seedDatabase() {
       {
         type: 'fill_blank',
         title: '<ruby>問題<rt>もんだい</rt></ruby>1: ネコを<ruby>歩<rt>ある</rt></ruby>かせよう',
-        description: 'プログラミングの<ruby>基本<rt>きほん</rt></ruby>は「<ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>すること」です。\nプログラムは<ruby>基本<rt>きほん</rt></ruby><ruby>上<rt>うえ</rt></ruby>から<ruby>順<rt>じゅん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>されるため、<ruby>順番<rt>じゅんばん</rt></ruby>はとても<ruby>重要<rt>じゅうよう</rt></ruby>です。<ruby>実際<rt>じっさい</rt></ruby>に<ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>いて<ruby>確認<rt>かくにん</rt></ruby>してみましょう\nネコを<ruby>右<rt>みぎ</rt></ruby>に50<ruby>歩<rt>ほ</rt></ruby><ruby>動<rt>うご</rt></ruby>かす→こんにちは!と2<ruby>秒<rt>びょう</rt></ruby><ruby>言<rt>い</rt></ruby>う→100<ruby>歩<rt>ほ</rt></ruby><ruby>動<rt>うご</rt></ruby>かす。プログラムを<ruby>完成<rt>かんせい</rt></ruby>させましょう。\n\nプログラムは「<ruby>緑<rt>みどり</rt></ruby>の<ruby>旗<rt>はた</rt></ruby>がクリックされたとき」から<ruby>始<rt>はじ</rt></ruby>まり、その<ruby>下<rt>した</rt></ruby>に<ruby>繋<rt>つな</rt></ruby>げたブロックが<ruby>上<rt>うえ</rt></ruby>から<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>されます。\n\nヒント:「◯<ruby>歩<rt>ほ</rt></ruby><ruby>動<rt>うご</rt></ruby>かす」ブロックを<ruby>探<rt>さが</rt></ruby>して<ruby>中<rt>なか</rt></ruby>に<ruby>数字<rt>すうじ</rt></ruby>を<ruby>入<rt>い</rt></ruby>れてみましょう。',
+        description: 'ネコを<ruby>右<rt>みぎ</rt></ruby>に50<ruby>歩<rt>ほ</rt></ruby>、そして100<ruby>歩<rt>ほ</rt></ruby><ruby>動<rt>うご</rt></ruby>かそう！\n\n「◯<ruby>歩<rt>ほ</rt></ruby><ruby>動<rt>うご</rt></ruby>かす」ブロックを<ruby>使<rt>つか</rt></ruby>ってね。',
         difficulty: 1,
         order: 1,
         initial_sb3_data: {
@@ -207,7 +207,7 @@ async function seedDatabase() {
       {
         type: 'predict',
         title: '<ruby>問題<rt>もんだい</rt></ruby>2: ネコはどこかな?',
-        description: '<ruby>問<rt>もん</rt></ruby>１で<ruby>学<rt>まな</rt></ruby>んだように<ruby>上<rt>うえ</rt></ruby>から<ruby>順<rt>じゅん</rt></ruby>にプログラムが<ruby>実行<rt>じっこう</rt></ruby>されることを<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>と<ruby>言<rt>い</rt></ruby>います。\n<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>は<ruby>実生活<rt>じっせいかつ</rt></ruby>でもよく<ruby>使<rt>つか</rt></ruby>われています。\n<ruby>例<rt>たと</rt></ruby>えば、カレー<ruby>作<rt>づく</rt></ruby>り(<ruby>火<rt>ひ</rt></ruby>を<ruby>付<rt>つ</rt></ruby>ける→<ruby>野菜<rt>やさい</rt></ruby>を<ruby>炒<rt>いた</rt></ruby>める→<ruby>水<rt>みず</rt></ruby>を<ruby>入<rt>い</rt></ruby>れる→ルーを<ruby>入<rt>い</rt></ruby>れる)も<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>です。\n<ruby>順番<rt>じゅんばん</rt></ruby>を<ruby>守<rt>まも</rt></ruby>ることはとても<ruby>大切<rt>たいせつ</rt></ruby>ですね!\n\nプログラムがどう<ruby>動<rt>うご</rt></ruby>くか<ruby>予測<rt>よそく</rt></ruby>してみましょう!\nネコが<ruby>最終的<rt>さいしゅうてき</rt></ruby>にどこにいるか<ruby>計算<rt>けいさん</rt></ruby>してください。\nヒント: xというのは<ruby>平面<rt>へいめん</rt></ruby>や<ruby>空間<rt>くうかん</rt></ruby><ruby>上<rt>じょう</rt></ruby>での<ruby>横<rt>よこ</rt></ruby>の<ruby>位置<rt>いち</rt></ruby>、yというのは<ruby>縦<rt>たて</rt></ruby>の<ruby>位置<rt>いち</rt></ruby>を<ruby>表<rt>あらわ</rt></ruby>します。\nx<ruby>座標<rt>ざひょう</rt></ruby>(<ruby>横<rt>よこ</rt></ruby><ruby>位置<rt>いち</rt></ruby>)とy<ruby>座標<rt>ざひょう</rt></ruby>(<ruby>縦<rt>たて</rt></ruby><ruby>位置<rt>いち</rt></ruby>)をそれぞれで<ruby>計算<rt>けいさん</rt></ruby>してみましょう。',
+        description: 'プログラムを<ruby>見<rt>み</rt></ruby>て、ネコが<ruby>最後<rt>さいご</rt></ruby>にどこにいるか<ruby>考<rt>かんが</rt></ruby>えよう！\n\nX<ruby>座標<rt>ざひょう</rt></ruby>(<ruby>横<rt>よこ</rt></ruby>)とY<ruby>座標<rt>ざひょう</rt></ruby>(<ruby>縦<rt>たて</rt></ruby>)を<ruby>計算<rt>けいさん</rt></ruby>してね。',
         difficulty: 2,
         order: 2,
         correctAnswerX: 30,
@@ -288,8 +288,8 @@ async function seedDatabase() {
       },
       {
         type: 'find_error',
-        title: '<ruby>問題<rt>もんだい</rt></ruby>3: <ruby>準備<rt>じゅんび</rt></ruby>の<ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>間違<rt>まちが</rt></ruby>っているよ!',
-        description: 'プログラムでは「<ruby>順番<rt>じゅんばん</rt></ruby>を<ruby>間違<rt>まちが</rt></ruby>えると、<ruby>思<rt>おも</rt></ruby>った<ruby>通<rt>とお</rt></ruby>りに<ruby>動<rt>うご</rt></ruby>かない」ことがよくあります。\n<ruby>料理<rt>りょうり</rt></ruby>のレシピと<ruby>同<rt>おな</rt></ruby>じで、<ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>大切<rt>たいせつ</rt></ruby>なんです。\n\n<ruby>例<rt>たと</rt></ruby>えば、カレーを<ruby>作<rt>つく</rt></ruby>るとき:\n<ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby>: <ruby>野菜<rt>やさい</rt></ruby>を<ruby>切<rt>き</rt></ruby>る → <ruby>炒<rt>いた</rt></ruby>める → <ruby>水<rt>みず</rt></ruby>を<ruby>入<rt>い</rt></ruby>れる → ルーを<ruby>入<rt>い</rt></ruby>れる\n<ruby>間違<rt>まちが</rt></ruby>った<ruby>順番<rt>じゅんばん</rt></ruby>: ルーを<ruby>入<rt>い</rt></ruby>れる → <ruby>野菜<rt>やさい</rt></ruby>を<ruby>切<rt>き</rt></ruby>る → ... (うまくいきませんね!)\n\nこのプログラムには<ruby>順番<rt>じゅんばん</rt></ruby>の<ruby>間違<rt>まちが</rt></ruby>いがあります。<ruby>見<rt>み</rt></ruby>つけて<ruby>直<rt>なお</rt></ruby>しましょう!\nネコが<ruby>右<rt>みぎ</rt></ruby>に<ruby>歩<rt>ある</rt></ruby>いてから１<ruby>秒<rt>びょう</rt></ruby><ruby>立<rt>た</rt></ruby>ち<ruby>止<rt>ど</rt></ruby>まり、<ruby>背景<rt>はいけい</rt></ruby>をPartyに<ruby>変更<rt>へんこう</rt></ruby>して、こんにちはと<ruby>言<rt>い</rt></ruby>うように<ruby>直<rt>なお</rt></ruby>してください。\nヒント: <ruby>問題<rt>もんだい</rt></ruby><ruby>文<rt>ぶん</rt></ruby>の<ruby>順序<rt>じゅんじょ</rt></ruby><ruby>通<rt>どお</rt></ruby>りになるように<ruby>整理<rt>せいり</rt></ruby>しましょう。',
+        title: '<ruby>問題<rt>もんだい</rt></ruby>3: <ruby>順番<rt>じゅんばん</rt></ruby>を<ruby>直<rt>なお</rt></ruby>そう!',
+        description: 'プログラムの<ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>間違<rt>まちが</rt></ruby>っています！\n\n<ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby>:\n1. ネコを<ruby>動<rt>うご</rt></ruby>かす\n2. 1<ruby>秒<rt>びょう</rt></ruby><ruby>待<rt>ま</rt></ruby>つ\n3. こんにちは!と<ruby>言<rt>い</rt></ruby>う',
         difficulty: 3,
         order: 3,
         initial_sb3_data: {
@@ -375,8 +375,8 @@ async function seedDatabase() {
       },
       {
         type: 'mission',
-        title: '<ruby>問題<rt>もんだい</rt></ruby>4: <ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>るプログラムを<ruby>作<rt>つく</rt></ruby>ろう',
-        description: '<ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>るプログラムを<ruby>作<rt>つく</rt></ruby>りましょう!\n「<ruby>右<rt>みぎ</rt></ruby>に100<ruby>歩<rt>ほ</rt></ruby> → <ruby>上<rt>うえ</rt></ruby>に80<ruby>歩<rt>ほ</rt></ruby>」の<ruby>動<rt>うご</rt></ruby>きを<ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>して、<ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>ります。\n\n<ruby>今回<rt>こんかい</rt></ruby>は<ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>しブロックを<ruby>使<rt>つか</rt></ruby>わず、<ruby>既<rt>すで</rt></ruby>に<ruby>用意<rt>ようい</rt></ruby>されているブロックを<ruby>並<rt>なら</rt></ruby>べて<ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>ろう。\n<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>でも、<ruby>同<rt>おな</rt></ruby>じ<ruby>命令<rt>めいれい</rt></ruby>を<ruby>何度<rt>なんど</rt></ruby>も<ruby>並<rt>なら</rt></ruby>べれば<ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>しを<ruby>表現<rt>ひょうげん</rt></ruby>できます。\n\nヒント: １<ruby>秒<rt>びょう</rt></ruby><ruby>待<rt>ま</rt></ruby>つは<ruby>移動<rt>いどう</rt></ruby>するたびに<ruby>使<rt>つか</rt></ruby>いましょう。\n<ruby>右<rt>みぎ</rt></ruby> → <ruby>上<rt>うえ</rt></ruby> → <ruby>右<rt>みぎ</rt></ruby> → <ruby>上<rt>うえ</rt></ruby> → <ruby>右<rt>みぎ</rt></ruby> → <ruby>上<rt>うえ</rt></ruby> → <ruby>右<rt>みぎ</rt></ruby>の<ruby>順番<rt>じゅんばん</rt></ruby>です。',
+        title: '<ruby>問題<rt>もんだい</rt></ruby>4: <ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>ろう!',
+        description: 'ネコが<ruby>階段<rt>かいだん</rt></ruby>を<ruby>登<rt>のぼ</rt></ruby>るプログラムを<ruby>作<rt>つく</rt></ruby>ろう！\n\n<ruby>右<rt>みぎ</rt></ruby>に10<ruby>歩<rt>ほ</rt></ruby> → <ruby>上<rt>うえ</rt></ruby>に10<ruby>歩<rt>ほ</rt></ruby>\nこれを3<ruby>回<rt>かい</rt></ruby><ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>してね！',
         difficulty: 4,
         order: 4,
         initial_sb3_data: {

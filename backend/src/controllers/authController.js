@@ -20,8 +20,8 @@ const registerStudent = async (req, res) => {
       return res.status(400).json({ error: '全ての項目を入力してください' });
     }
 
-    if (grade < 1 || grade > 6) {
-      return res.status(400).json({ error: '学年は1〜6の間で指定してください' });
+    if (grade < 3 || grade > 6) {
+      return res.status(400).json({ error: '学年は3〜6の間で指定してください' });
     }
 
     // Check if username already exists

@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS users (
   admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
   level INTEGER DEFAULT 1,
   exp INTEGER DEFAULT 0,
-  grade INTEGER CHECK (grade >= 1 AND grade <= 6),
+  grade INTEGER CHECK (grade >= 3 AND grade <= 6),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS problems (
 CREATE TABLE IF NOT EXISTS hints (
   id SERIAL PRIMARY KEY,
   problem_id INTEGER REFERENCES problems(id) ON DELETE CASCADE,
-  grade INTEGER CHECK (grade >= 1 AND grade <= 6),
+  grade INTEGER CHECK (grade >= 3 AND grade <= 6),
   hint_text TEXT NOT NULL,
   hint_order INTEGER NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -158,6 +158,22 @@ BEGIN
   IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='title') THEN
     ALTER TABLE problems ALTER COLUMN title TYPE VARCHAR(500);
   END IF;
+END $$;
+
+-- Update grade constraints to grade 3-6 (from 1-6)
+DO $$
+BEGIN
+  -- Drop and recreate check constraint for users.grade
+  IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_name='users' AND constraint_type='CHECK' AND constraint_name LIKE '%grade%') THEN
+    ALTER TABLE users DROP CONSTRAINT IF EXISTS users_grade_check;
+  END IF;
+  ALTER TABLE users ADD CONSTRAINT users_grade_check CHECK (grade >= 3 AND grade <= 6);
+
+  -- Drop and recreate check constraint for hints.grade
+  IF EXISTS (SELECT 1 FROM information_schema.table_constraints WHERE table_name='hints' AND constraint_type='CHECK' AND constraint_name LIKE '%grade%') THEN
+    ALTER TABLE hints DROP CONSTRAINT IF EXISTS hints_grade_check;
+  END IF;
+  ALTER TABLE hints ADD CONSTRAINT hints_grade_check CHECK (grade >= 3 AND grade <= 6);
 END $$;
 `;
 

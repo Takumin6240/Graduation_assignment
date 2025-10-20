@@ -147,8 +147,10 @@ const ProblemList: React.FC = () => {
               <Link
                 key={problem.id}
                 to={`/problems/${problem.id}`}
-                className={`bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition transform hover:-translate-y-1 relative overflow-hidden ${
-                  score === 100 ? 'border-4 border-lime-400 bg-gradient-to-br from-lime-50 to-yellow-50 shadow-lime-200' : ''
+                className={`bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden border-2 ${
+                  score === 100
+                    ? 'border-lime-400 bg-gradient-to-br from-lime-50 to-yellow-50'
+                    : 'border-transparent hover:border-primary-200'
                 }`}
               >
                 {/* 満点時の装飾的な背景要素 */}
@@ -168,17 +170,24 @@ const ProblemList: React.FC = () => {
                   </div>
                 )}
 
-                <div>
-                  <div className="flex items-center gap-2 mb-3 flex-wrap">
-                    <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-lg text-sm font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeName(problem.problem_type) }}>
-                    </span>
-                    <span className={`px-3 py-1 rounded-lg text-sm font-medium ${getDifficultyColor(problem.difficulty_level)}`}>
-                      {getDifficultyText(problem.difficulty_level)}
-                    </span>
+                <div className="flex items-start gap-6">
+                  {/* 問題タイプごとの大きなアイコン */}
+                  <div className="text-7xl flex-shrink-0">
+                    {getProblemTypeIcon(problem.problem_type)}
                   </div>
 
-                  <h2 className={`text-2xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
-                  </h2>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      <span className="bg-primary-100 text-primary-800 px-4 py-2 rounded-lg text-base font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeName(problem.problem_type) }}>
+                      </span>
+                      <span className={`px-4 py-2 rounded-lg text-base font-bold ${getDifficultyColor(problem.difficulty_level)}`}>
+                        {getDifficultyText(problem.difficulty_level)}
+                      </span>
+                    </div>
+
+                    <h2 className={`text-3xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
+                    </h2>
+                  </div>
                 </div>
 
                 <div className="mt-4 text-right">
