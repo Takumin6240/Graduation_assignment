@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS problems (
   chapter_id INTEGER REFERENCES chapters(id) ON DELETE CASCADE,
   problem_type VARCHAR(20) CHECK (problem_type IN ('fill_blank', 'predict', 'find_error', 'mission')),
   title VARCHAR(500) NOT NULL,
+  learning_objective TEXT,
   description TEXT NOT NULL,
   initial_sb3_data JSONB,
   correct_sb3_data JSONB,
@@ -174,6 +175,14 @@ BEGIN
     ALTER TABLE hints DROP CONSTRAINT IF EXISTS hints_grade_check;
   END IF;
   ALTER TABLE hints ADD CONSTRAINT hints_grade_check CHECK (grade >= 3 AND grade <= 6);
+END $$;
+
+-- Add learning_objective column to problems table if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='learning_objective') THEN
+    ALTER TABLE problems ADD COLUMN learning_objective TEXT;
+  END IF;
 END $$;
 `;
 

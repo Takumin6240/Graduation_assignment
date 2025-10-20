@@ -28,6 +28,7 @@ export interface Problem {
   chapter_id: number;
   problem_type: ProblemType;
   title: string;
+  learning_objective?: string;
   description: string;
   initial_sb3_data?: any;
   scratch_editor_url?: string;

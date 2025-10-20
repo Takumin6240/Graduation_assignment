@@ -227,11 +227,22 @@ const ProblemDetail: React.FC = () => {
           </div>
         </div>
 
-        {/* 問題説明カード */}
+        {/* 学ぼうセクション */}
+        {problem.learning_objective && (
+          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-purple-200">
+            <div className="flex items-start gap-4 mb-4">
+              <span className="text-4xl">📚</span>
+              <h2 className="text-2xl font-bold text-purple-800"><ruby>学<rt>まな</rt></ruby>ぼう</h2>
+            </div>
+            <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.learning_objective }}></p>
+          </div>
+        )}
+
+        {/* 問題文カード */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-primary-100">
           <div className="flex items-start gap-4 mb-4">
             <span className="text-4xl">💡</span>
-            <h2 className="text-2xl font-bold text-gray-800"><ruby>問題<rt>もんだい</rt></ruby><ruby>説明<rt>せつめい</rt></ruby></h2>
+            <h2 className="text-2xl font-bold text-gray-800"><ruby>問題文<rt>もんだいぶん</rt></ruby></h2>
           </div>
           <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
         </div>

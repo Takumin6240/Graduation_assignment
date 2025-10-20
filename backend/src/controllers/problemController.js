@@ -20,7 +20,7 @@ const getProblemsByChapter = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, chapter_id, problem_type, title, description,
+      `SELECT id, chapter_id, problem_type, title, learning_objective, description,
               max_score, difficulty_level, order_number, created_at
        FROM problems
        WHERE chapter_id = $1
@@ -40,7 +40,7 @@ const getProblemDetails = async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, chapter_id, problem_type, title, description,
+      `SELECT id, chapter_id, problem_type, title, learning_objective, description,
               initial_sb3_data, scratch_editor_url, max_score, difficulty_level, order_number
        FROM problems
        WHERE id = $1`,
