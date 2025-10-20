@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- ミッション問題 - ゴール旗のアイコン -->
+  <defs>
+    <linearGradient id="flagGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 旗の棒 -->
+  <rect x="55" y="50" width="6" height="120" fill="#78350F" rx="3"/>
+
+  <!-- 旗 -->
+  <path d="M 61 60 Q 120 50 150 70 Q 120 90 61 80 Z"
+        fill="url(#flagGrad)" stroke="#065F46" stroke-width="2"/>
+
+  <!-- 旗の模様（チェック柄） -->
+  <path d="M 80 62 L 90 72 L 110 52" stroke="#FFFFFF" stroke-width="4" fill="none"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- 星 -->
+  <path d="M 125 65 L 128 73 L 136 73 L 130 78 L 132 86 L 125 81 L 118 86 L 120 78 L 114 73 L 122 73 Z"
+        fill="#FCD34D" stroke="#F59E0B" stroke-width="1"/>
+
+  <!-- 台座 -->
+  <ellipse cx="58" cy="170" rx="30" ry="6" fill="#78350F"/>
+
+  <!-- キラキラ -->
+  <circle cx="165" cy="55" r="3" fill="#FCD34D"/>
+  <circle cx="175" cy="75" r="2" fill="#FCD34D"/>
+  <circle cx="160" cy="85" r="2.5" fill="#FCD34D"/>
+</svg>

@@ -27,27 +27,48 @@ const Chapters: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-700 mb-8"><ruby>学習<rt>がくしゅう</rt></ruby>チャプター</h1>
+      <div className="mb-12 text-center">
+        <div className="flex justify-center mb-6">
+          <img
+            src="/programming-hero.svg"
+            alt="プログラミング学習"
+            className="w-80 h-auto animate-float"
+          />
+        </div>
+        <h1 className="text-4xl font-bold text-blue-700 mb-4"><ruby>学習<rt>がくしゅう</rt></ruby>チャプター</h1>
+        <p className="text-gray-600 text-lg"><ruby>好<rt>す</rt></ruby>きなチャプターを<ruby>選<rt>えら</rt></ruby>んで<ruby>始<rt>はじ</rt></ruby>めよう！</p>
+      </div>
 
-      <div className="grid gap-6">
-        {chapters.map((chapter) => (
+      <div className="grid gap-6 max-w-4xl mx-auto">
+        {chapters.map((chapter, index) => (
           <Link
             key={chapter.id}
             to={`/chapters/${chapter.id}`}
-            className="bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] border-2 border-transparent hover:border-primary-300"
+            className="bg-white rounded-xl shadow-lg p-8 card-hover border-2 border-transparent hover:border-blue-300"
           >
             <div className="flex items-start gap-6">
-              {/* シンプルなアイコン表示 */}
-              <div className="text-6xl flex-shrink-0">📚</div>
+              {/* チャプターのイラスト */}
+              <div className="flex-shrink-0">
+                <img
+                  src="/chapter-icon.svg"
+                  alt={`チャプター${index + 1}`}
+                  className="w-32 h-32 object-contain"
+                />
+              </div>
 
               <div className="flex-1">
+                <div className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full inline-block mb-3 text-sm font-bold">
+                  Chapter {chapter.order_number}
+                </div>
                 <h2 className="text-3xl font-bold text-gray-800 mb-3" dangerouslySetInnerHTML={{ __html: chapter.title }}></h2>
                 <p className="text-gray-600 text-lg mb-4" dangerouslySetInnerHTML={{ __html: chapter.description }}></p>
 
                 <div className="flex items-center gap-2">
-                  <span className="bg-primary-600 text-white px-6 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-primary-700 transition-colors">
+                  <span className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold inline-flex items-center gap-2 hover:bg-blue-700 transition-all">
                     <ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>く
-                    <span className="text-xl">→</span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
                   </span>
                 </div>
               </div>

@@ -91,12 +91,22 @@ const ProblemDetail: React.FC = () => {
 
   const getProblemTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
-      fill_blank: '📝 <ruby>穴埋<rt>あなう</rt></ruby>め<ruby>問題<rt>もんだい</rt></ruby>',
-      predict: '🔮 <ruby>予測<rt>よそく</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
-      find_error: '🐛 バグ<ruby>発見<rt>はっけん</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
-      mission: '🚀 ミッション<ruby>問題<rt>もんだい</rt></ruby>',
+      fill_blank: '<ruby>穴埋<rt>あなう</rt></ruby>め<ruby>問題<rt>もんだい</rt></ruby>',
+      predict: '<ruby>予測<rt>よそく</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
+      find_error: 'バグ<ruby>発見<rt>はっけん</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>',
+      mission: 'ミッション<ruby>問題<rt>もんだい</rt></ruby>',
     };
     return labels[type] || type;
+  };
+
+  const getProblemTypeImage = (type: string) => {
+    const images: Record<string, string> = {
+      fill_blank: '/fill-blank-icon.svg',
+      predict: '/predict-icon.svg',
+      find_error: '/find-error-icon.svg',
+      mission: '/mission-icon.svg',
+    };
+    return images[type] || images.fill_blank;
   };
 
   const handleOpenScratch = () => {
@@ -209,40 +219,53 @@ const ProblemDetail: React.FC = () => {
     );
   }
 
+  const problemImageSrc = getProblemTypeImage(problem.problem_type);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* 問題タイプヘッダー */}
-        <div className="mb-6 flex items-center gap-4">
-          <div className="text-6xl">
-            {problem.problem_type === 'fill_blank' && '📝'}
-            {problem.problem_type === 'predict' && '🔮'}
-            {problem.problem_type === 'find_error' && '🐛'}
-            {problem.problem_type === 'mission' && '🚀'}
-          </div>
-          <div>
-            <span className="text-lg text-primary-600 font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeLabel(problem.problem_type) }}>
-            </span>
-            <h1 className="text-4xl font-bold text-gray-800 mt-2" dangerouslySetInnerHTML={{ __html: problem.title }}></h1>
+        <div className="mb-6 bg-white rounded-xl shadow-lg p-6 hover-lift">
+          <div className="flex items-center gap-6">
+            <div className="flex-shrink-0">
+              <img
+                src={problemImageSrc}
+                alt={getProblemTypeLabel(problem.problem_type)}
+                className="w-24 h-24 object-contain"
+              />
+            </div>
+            <div className="flex-1">
+              <span className="text-lg text-blue-600 font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeLabel(problem.problem_type) }}>
+              </span>
+              <h1 className="text-4xl font-bold text-gray-800 mt-2" dangerouslySetInnerHTML={{ __html: problem.title }}></h1>
+            </div>
           </div>
         </div>
 
         {/* 学ぼうセクション */}
         {problem.learning_objective && (
-          <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-purple-200">
+          <div className="bg-blue-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-blue-200 hover-lift">
             <div className="flex items-start gap-4 mb-4">
-              <span className="text-4xl">📚</span>
-              <h2 className="text-2xl font-bold text-purple-800"><ruby>学<rt>まな</rt></ruby>ぼう</h2>
+              <img
+                src="/learning-icon.svg"
+                alt="学習"
+                className="w-16 h-16"
+              />
+              <h2 className="text-2xl font-bold text-blue-800"><ruby>学<rt>まな</rt></ruby>ぼう</h2>
             </div>
             <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.learning_objective }}></p>
           </div>
         )}
 
         {/* 問題文カード */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-primary-100">
+        <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-green-100 hover-lift">
           <div className="flex items-start gap-4 mb-4">
-            <span className="text-4xl">💡</span>
-            <h2 className="text-2xl font-bold text-gray-800"><ruby>問題文<rt>もんだいぶん</rt></ruby></h2>
+            <img
+              src="/question-icon.svg"
+              alt="問題"
+              className="w-16 h-16"
+            />
+            <h2 className="text-2xl font-bold text-green-800"><ruby>問題文<rt>もんだいぶん</rt></ruby></h2>
           </div>
           <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
         </div>

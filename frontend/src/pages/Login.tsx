@@ -27,9 +27,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-primary-50 to-white flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-center text-primary-700 mb-8">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex items-center justify-center px-4">
+      <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 hover-lift">
+        <div className="flex justify-center mb-6">
+          <img
+            src="/login-icon.svg"
+            alt="ログイン"
+            className="w-48 h-auto"
+          />
+        </div>
+        <h1 className="text-3xl font-bold text-center text-blue-700 mb-8">
           ログイン
         </h1>
 
@@ -69,7 +76,7 @@ const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-bold transition disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:hover:scale-100"
           >
             {loading ? 'ログイン<ruby>中<rt>ちゅう</rt></ruby>...' : 'ログイン'}
           </button>

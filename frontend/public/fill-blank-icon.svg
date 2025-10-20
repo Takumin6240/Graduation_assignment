@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- 穴埋め問題 - パズルピースのアイコン -->
+  <defs>
+    <linearGradient id="puzzleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#60A5FA;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- パズルピース1 -->
+  <path d="M 40 60 L 90 60 L 90 40 Q 110 40 110 60 L 110 110 L 130 110 Q 130 90 110 90 L 60 90 L 60 110 Q 40 110 40 90 Z"
+        fill="url(#puzzleGrad)" stroke="#1E40AF" stroke-width="3"/>
+
+  <!-- パズルピース2（空白） -->
+  <path d="M 110 60 L 160 60 L 160 110 L 110 110 L 110 90 Q 130 90 130 110 Z"
+        fill="none" stroke="#94A3B8" stroke-width="3" stroke-dasharray="5,5"/>
+
+  <!-- 矢印 -->
+  <path d="M 135 130 L 135 150 M 125 140 L 135 150 L 145 140"
+        stroke="#F59E0B" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

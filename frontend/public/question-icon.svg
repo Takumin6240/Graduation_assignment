@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- 問題アイコン - クエスチョンマーク -->
+  <defs>
+    <linearGradient id="qGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 円形の背景 -->
+  <circle cx="100" cy="100" r="70" fill="url(#qGrad)" stroke="#065F46" stroke-width="4"/>
+
+  <!-- クエスチョンマーク -->
+  <path d="M 80 70 Q 80 50 100 50 Q 120 50 120 70 Q 120 85 100 95 L 100 110"
+        stroke="#FFFFFF" stroke-width="10" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="100" cy="130" r="6" fill="#FFFFFF"/>
+
+  <!-- 装飾的な星 -->
+  <circle cx="45" cy="55" r="4" fill="#FCD34D"/>
+  <circle cx="155" cy="60" r="3" fill="#FCD34D"/>
+  <circle cx="150" cy="140" r="3.5" fill="#FCD34D"/>
+</svg>

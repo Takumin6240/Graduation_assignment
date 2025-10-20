@@ -59,19 +59,14 @@ const ProblemList: React.FC = () => {
     fetchData();
   }, [chapterId]);
 
-  const getProblemTypeIcon = (type: string) => {
-    switch (type) {
-      case 'fill_blank':
-        return '📝';
-      case 'predict':
-        return '🔮';
-      case 'find_error':
-        return '🐛';
-      case 'mission':
-        return '🚀';
-      default:
-        return '📚';
-    }
+  const getProblemTypeImage = (type: string) => {
+    const images: Record<string, string> = {
+      fill_blank: '/fill-blank-icon.svg',
+      predict: '/predict-icon.svg',
+      find_error: '/find-error-icon.svg',
+      mission: '/mission-icon.svg',
+    };
+    return images[type] || images.fill_blank;
   };
 
   const getProblemTypeName = (type: string) => {
@@ -142,20 +137,21 @@ const ProblemList: React.FC = () => {
             const progress = userProgress[problem.id];
             const isCompleted = progress?.is_correct;
             const score = progress?.score || 0;
+            const problemImageSrc = getProblemTypeImage(problem.problem_type);
 
             return (
               <Link
                 key={problem.id}
                 to={`/problems/${problem.id}`}
-                className={`bg-white rounded-xl shadow-lg p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-[1.02] relative overflow-hidden border-2 ${
+                className={`bg-white rounded-xl shadow-lg p-8 card-hover relative overflow-hidden border-2 ${
                   score === 100
-                    ? 'border-lime-400 bg-gradient-to-br from-lime-50 to-yellow-50'
-                    : 'border-transparent hover:border-primary-200'
+                    ? 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-orange-50'
+                    : 'border-transparent hover:border-blue-200'
                 }`}
               >
                 {/* 満点時の装飾的な背景要素 */}
                 {score === 100 && (
-                  <div className="absolute -top-10 -right-10 text-9xl opacity-10 pointer-events-none">
+                  <div className="absolute -top-10 -right-10 opacity-20 pointer-events-none text-9xl">
                     🏆
                   </div>
                 )}
@@ -164,38 +160,46 @@ const ProblemList: React.FC = () => {
                 {isCompleted && (
                   <div className={`absolute top-4 right-4 px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
                     score === 100
-                      ? 'bg-lime-400 text-gray-800'
+                      ? 'bg-yellow-400 text-gray-800'
                       : 'bg-green-500 text-white'
-                  }`} dangerouslySetInnerHTML={{ __html: score === 100 ? '🌟 <ruby>満点<rt>まんてん</rt></ruby>! 100<ruby>点<rt>てん</rt></ruby>' : `✓ <ruby>完了<rt>かんりょう</rt></ruby> (${score}<ruby>点<rt>てん</rt></ruby>)` }}>
+                  }`} dangerouslySetInnerHTML={{ __html: score === 100 ? '⭐ <ruby>満点<rt>まんてん</rt></ruby>! 100<ruby>点<rt>てん</rt></ruby>' : `✓ <ruby>完了<rt>かんりょう</rt></ruby> (${score}<ruby>点<rt>てん</rt></ruby>)` }}>
                   </div>
                 )}
 
                 <div className="flex items-start gap-6">
-                  {/* 問題タイプごとの大きなアイコン */}
-                  <div className="text-7xl flex-shrink-0">
-                    {getProblemTypeIcon(problem.problem_type)}
+                  {/* 問題タイプごとのイラスト */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={problemImageSrc}
+                      alt={getProblemTypeName(problem.problem_type)}
+                      className="w-24 h-24 object-contain"
+                    />
                   </div>
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-3 flex-wrap">
-                      <span className="bg-primary-100 text-primary-800 px-4 py-2 rounded-lg text-base font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeName(problem.problem_type) }}>
+                      <span className="bg-blue-100 text-blue-800 px-4 py-2 rounded-lg text-base font-bold" dangerouslySetInnerHTML={{ __html: getProblemTypeName(problem.problem_type) }}>
                       </span>
                       <span className={`px-4 py-2 rounded-lg text-base font-bold ${getDifficultyColor(problem.difficulty_level)}`}>
                         {getDifficultyText(problem.difficulty_level)}
                       </span>
                     </div>
 
-                    <h2 className={`text-3xl font-bold mb-2 ${score === 100 ? 'text-lime-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
+                    <h2 className={`text-3xl font-bold mb-2 ${score === 100 ? 'text-orange-700' : 'text-gray-800'}`} dangerouslySetInnerHTML={{ __html: problem.title }}>
                     </h2>
                   </div>
                 </div>
 
                 <div className="mt-4 text-right">
-                  <span className={`px-6 py-2 rounded-lg font-medium inline-block ${
+                  <span className={`inline-flex items-center gap-2 px-6 py-2 rounded-lg font-medium ${
                     score === 100
-                      ? 'bg-lime-500 text-white'
-                      : 'bg-primary-600 text-white'
-                  }`} dangerouslySetInnerHTML={{ __html: isCompleted ? '<ruby>再挑戦<rt>さいちょうせん</rt></ruby>する →' : '<ruby>挑戦<rt>ちょうせん</rt></ruby>する →' }}>
+                      ? 'bg-yellow-500 text-white'
+                      : 'bg-blue-600 text-white'
+                  }`}>
+                    <span dangerouslySetInnerHTML={{ __html: isCompleted ? '<ruby>再挑戦<rt>さいちょうせん</rt></ruby>する' : '<ruby>挑戦<rt>ちょうせん</rt></ruby>する' }}></span>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
                   </span>
                 </div>
               </Link>

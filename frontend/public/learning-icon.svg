@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- 学習アイコン - 本と電球 -->
+  <defs>
+    <linearGradient id="bookGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1D4ED8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 本 -->
+  <rect x="50" y="100" width="100" height="80" rx="5" fill="url(#bookGrad)" stroke="#1E40AF" stroke-width="3"/>
+
+  <!-- 本のページ -->
+  <line x1="100" y1="100" x2="100" y2="180" stroke="#1E40AF" stroke-width="2"/>
+  <path d="M 60 110 Q 70 105 80 110" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+  <path d="M 60 120 Q 70 115 80 120" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+  <path d="M 60 130 Q 70 125 80 130" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+  <path d="M 110 110 Q 120 105 130 110" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+  <path d="M 110 120 Q 120 115 130 120" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+  <path d="M 110 130 Q 120 125 130 130" stroke="#DBEAFE" stroke-width="2" fill="none"/>
+
+  <!-- 電球（アイデア） -->
+  <circle cx="135" cy="50" r="20" fill="#FCD34D" stroke="#F59E0B" stroke-width="2"/>
+  <rect x="128" y="68" width="14" height="8" fill="#F59E0B"/>
+  <rect x="130" y="76" width="10" height="3" fill="#D97706"/>
+
+  <!-- 電球の光線 -->
+  <path d="M 135 25 L 135 15" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 160 40 L 168 35" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 165 65 L 173 70" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 110 40 L 102 35" stroke="#FCD34D" stroke-width="3" stroke-linecap="round"/>
+</svg>
