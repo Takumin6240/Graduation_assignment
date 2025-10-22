@@ -18,6 +18,7 @@ export interface Chapter {
   title: string;
   description: string;
   order_number: number;
+  image_url?: string;
   created_at?: string;
 }
 
@@ -35,6 +36,7 @@ export interface Problem {
   max_score: number;
   difficulty_level: number;
   order_number: number;
+  image_url?: string;
   created_at?: string;
 }
 

@@ -14,7 +14,7 @@ const Home: React.FC = () => {
             <div className="relative animate-float">
               {/* Scratchプログラミング学習のイラスト */}
               <img
-                src="/programming-hero.svg"
+                src="/キラキラした目で期待をするひよこ.png"
                 alt="プログラミングを学ぶ子供たち"
                 className="w-96 h-auto drop-shadow-2xl"
               />
@@ -35,7 +35,7 @@ const Home: React.FC = () => {
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
                   <img
-                    src="/student-icon.svg"
+                    src="/いいね！ポーズをするひよこ.png"
                     alt="学習する生徒"
                     className="w-32 h-32"
                   />

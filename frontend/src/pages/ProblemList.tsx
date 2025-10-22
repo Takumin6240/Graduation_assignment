@@ -61,10 +61,10 @@ const ProblemList: React.FC = () => {
 
   const getProblemTypeImage = (type: string) => {
     const images: Record<string, string> = {
-      fill_blank: '/fill-blank-icon.svg',
-      predict: '/predict-icon.svg',
-      find_error: '/find-error-icon.svg',
-      mission: '/mission-icon.svg',
+      fill_blank: '/右に向かって走るひよこ.png',
+      predict: '/虫眼鏡を除くひよこ.png',
+      find_error: '/はてなマークを浮かべるひよこ.png',
+      mission: '/ノートパソコンを開いて作業をするひよこ.png',
     };
     return images[type] || images.fill_blank;
   };
@@ -162,7 +162,7 @@ const ProblemList: React.FC = () => {
                     score === 100
                       ? 'bg-yellow-400 text-gray-800'
                       : 'bg-green-500 text-white'
-                  }`} dangerouslySetInnerHTML={{ __html: score === 100 ? '⭐ <ruby>満点<rt>まんてん</rt></ruby>! 100<ruby>点<rt>てん</rt></ruby>' : `✓ <ruby>完了<rt>かんりょう</rt></ruby> (${score}<ruby>点<rt>てん</rt></ruby>)` }}>
+                  }`} dangerouslySetInnerHTML={{ __html: score === 100 ? '⭐ 100<ruby>点<rt>てん</rt></ruby><ruby>満点<rt>まんてん</rt></ruby>!' : `✓ <ruby>完了<rt>かんりょう</rt></ruby> (${score}<ruby>点<rt>てん</rt></ruby>)` }}>
                   </div>
                 )}
 
@@ -170,7 +170,7 @@ const ProblemList: React.FC = () => {
                   {/* 問題タイプごとのイラスト */}
                   <div className="flex-shrink-0">
                     <img
-                      src={problemImageSrc}
+                      src={problem.image_url || problemImageSrc}
                       alt={getProblemTypeName(problem.problem_type)}
                       className="w-24 h-24 object-contain"
                     />

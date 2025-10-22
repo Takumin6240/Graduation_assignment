@@ -184,6 +184,22 @@ BEGIN
     ALTER TABLE problems ADD COLUMN learning_objective TEXT;
   END IF;
 END $$;
+
+-- Add image_url column to chapters table if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='chapters' AND column_name='image_url') THEN
+    ALTER TABLE chapters ADD COLUMN image_url VARCHAR(500);
+  END IF;
+END $$;
+
+-- Add image_url column to problems table if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='problems' AND column_name='image_url') THEN
+    ALTER TABLE problems ADD COLUMN image_url VARCHAR(500);
+  END IF;
+END $$;
 `;
 
 async function runMigrations() {

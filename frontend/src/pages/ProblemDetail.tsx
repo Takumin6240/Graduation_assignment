@@ -101,10 +101,10 @@ const ProblemDetail: React.FC = () => {
 
   const getProblemTypeImage = (type: string) => {
     const images: Record<string, string> = {
-      fill_blank: '/fill-blank-icon.svg',
-      predict: '/predict-icon.svg',
-      find_error: '/find-error-icon.svg',
-      mission: '/mission-icon.svg',
+      fill_blank: '/右に向かって走るひよこ.png',
+      predict: '/虫眼鏡を除くひよこ.png',
+      find_error: '/はてなマークを浮かべるひよこ.png',
+      mission: '/ノートパソコンを開いて作業をするひよこ.png',
     };
     return images[type] || images.fill_blank;
   };
@@ -138,22 +138,32 @@ const ProblemDetail: React.FC = () => {
                 : 'bg-orange-50 border-4 border-orange-400'
             }`}
           >
-            {isPerfectScore && (
-              <div className="mb-6">
-                {/* 満点時の大きなイラスト */}
-                <div className="flex justify-center gap-4 mb-4">
-                  <span className="text-8xl animate-bounce">🎉</span>
-                  <span className="text-8xl animate-bounce" style={{ animationDelay: '0.1s' }}>🏆</span>
-                  <span className="text-8xl animate-bounce" style={{ animationDelay: '0.2s' }}>⭐</span>
-                </div>
-                <div className="text-4xl font-black text-lime-600 mb-2">
-                  ★ <ruby>満点<rt>まんてん</rt></ruby>おめでとう！ ★
-                </div>
-                <div className="text-xl text-gray-700">
-                  すごい！パーフェクトだよ！
-                </div>
+            <div className="mb-6">
+              {/* 結果に応じたキャラクター表示 */}
+              <div className="flex justify-center items-center mb-4">
+                {isPerfectScore ? (
+                  <div className="flex gap-6">
+                    <img src="/合格証を見せるひよこ.png" alt="合格" className="w-40 h-40 animate-bounce" />
+                    <img src="/花丸を描くひよこ.png" alt="花丸" className="w-32 h-32 animate-bounce" style={{ animationDelay: '0.1s' }} />
+                    <img src="/ハンコ風の「よくがんばりました」.png" alt="よくがんばりました" className="w-32 h-32 animate-bounce" style={{ animationDelay: '0.2s' }} />
+                  </div>
+                ) : result.isCorrect ? (
+                  <img src="/パチパチと拍手するひよこ.png" alt="拍手" className="w-40 h-40" />
+                ) : (
+                  <img src="/もやもやと悩むひよこ.png" alt="悩む" className="w-40 h-40" />
+                )}
               </div>
-            )}
+              {isPerfectScore && (
+                <div>
+                  <div className="text-4xl font-black text-lime-600 mb-2">
+                    ★ <ruby>満点<rt>まんてん</rt></ruby>おめでとう！ ★
+                  </div>
+                  <div className="text-xl text-gray-700">
+                    すごい！パーフェクトだよ！
+                  </div>
+                </div>
+              )}
+            </div>
 
             <h2 className="text-3xl font-bold mb-4 text-gray-800">{result.message}</h2>
 
@@ -229,7 +239,7 @@ const ProblemDetail: React.FC = () => {
           <div className="flex items-center gap-6">
             <div className="flex-shrink-0">
               <img
-                src={problemImageSrc}
+                src={problem.image_url || problemImageSrc}
                 alt={getProblemTypeLabel(problem.problem_type)}
                 className="w-24 h-24 object-contain"
               />
@@ -247,7 +257,7 @@ const ProblemDetail: React.FC = () => {
           <div className="bg-blue-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-blue-200 hover-lift">
             <div className="flex items-start gap-4 mb-4">
               <img
-                src="/learning-icon.svg"
+                src="/指示棒を持つひよこ.png"
                 alt="学習"
                 className="w-16 h-16"
               />
@@ -261,7 +271,7 @@ const ProblemDetail: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-green-100 hover-lift">
           <div className="flex items-start gap-4 mb-4">
             <img
-              src="/question-icon.svg"
+              src="/シンプルなQ＆A.png"
               alt="問題"
               className="w-16 h-16"
             />

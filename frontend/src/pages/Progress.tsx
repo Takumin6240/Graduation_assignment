@@ -186,10 +186,9 @@ const Progress: React.FC = () => {
                       )}
                     </div>
 
-                    <h3 className="text-lg font-bold text-gray-800 mb-1">
-                      {submission.title}
+                    <h3 className="text-lg font-bold text-gray-800 mb-1" dangerouslySetInnerHTML={{ __html: submission.title }}>
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3">{submission.chapter_title}</p>
+                    <p className="text-sm text-gray-600 mb-3" dangerouslySetInnerHTML={{ __html: submission.chapter_title }}></p>
 
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                       <div>

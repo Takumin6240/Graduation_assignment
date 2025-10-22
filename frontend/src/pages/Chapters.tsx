@@ -30,7 +30,7 @@ const Chapters: React.FC = () => {
       <div className="mb-12 text-center">
         <div className="flex justify-center mb-6">
           <img
-            src="/programming-hero.svg"
+            src="/パソコンを開いてメガネをカチャカチャするエリート風ひよこ.png"
             alt="プログラミング学習"
             className="w-80 h-auto animate-float"
           />
@@ -50,7 +50,7 @@ const Chapters: React.FC = () => {
               {/* チャプターのイラスト */}
               <div className="flex-shrink-0">
                 <img
-                  src="/chapter-icon.svg"
+                  src={chapter.image_url || '/指示棒を持つひよこ.png'}
                   alt={`チャプター${index + 1}`}
                   className="w-32 h-32 object-contain"
                 />

@@ -5,7 +5,7 @@ const { log } = require('../utils/logger');
 const getChapters = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT * FROM chapters ORDER BY order_number'
+      'SELECT id, title, description, order_number, image_url, created_at FROM chapters ORDER BY order_number'
     );
     res.json({ chapters: result.rows });
   } catch (error) {
@@ -21,7 +21,7 @@ const getProblemsByChapter = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, chapter_id, problem_type, title, learning_objective, description,
-              max_score, difficulty_level, order_number, created_at
+              max_score, difficulty_level, order_number, image_url, created_at
        FROM problems
        WHERE chapter_id = $1
        ORDER BY order_number`,
@@ -41,7 +41,7 @@ const getProblemDetails = async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, chapter_id, problem_type, title, learning_objective, description,
-              initial_sb3_data, scratch_editor_url, max_score, difficulty_level, order_number
+              initial_sb3_data, scratch_editor_url, max_score, difficulty_level, order_number, image_url
        FROM problems
        WHERE id = $1`,
       [problemId]

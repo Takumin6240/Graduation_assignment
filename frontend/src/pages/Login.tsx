@@ -31,7 +31,7 @@ const Login: React.FC = () => {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 hover-lift">
         <div className="flex justify-center mb-6">
           <img
-            src="/login-icon.svg"
+            src="/デスクトップパソコンの画面を眺めるひよこ.png"
             alt="ログイン"
             className="w-48 h-auto"
           />
