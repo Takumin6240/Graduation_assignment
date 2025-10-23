@@ -7,7 +7,10 @@
       "Bash(node:*)",
       "Bash(cp -v \"/mnt/c/Users/hirta/OneDrive/ドキュメント/Graduation_assignment/Images/\"*.png \"/mnt/c/Users/hirta/OneDrive/ドキュメント/Graduation_assignment/frontend/public/\")",
       "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, chapter_id, title, image_url FROM problems WHERE chapter_id = 2 ORDER BY order_number;\")",
-      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose restart backend)"
+      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose restart backend)",
+      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose down -v)",
+      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T backend npm run migrate)",
+      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T backend node src/db/seed.js)"
     ],
     "deny": [],
     "ask": []

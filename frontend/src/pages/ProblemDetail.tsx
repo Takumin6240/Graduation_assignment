@@ -255,42 +255,42 @@ const ProblemDetail: React.FC = () => {
         {/* 学ぼうセクション */}
         {problem.learning_objective && (
           <div className="bg-blue-50 rounded-xl shadow-lg p-8 mb-6 border-2 border-blue-200 hover-lift">
-            <div className="flex items-start gap-4 mb-4">
+            <div className="flex items-start gap-4 mb-6">
               <img
                 src="/指示棒を持つひよこ.png"
                 alt="学習"
-                className="w-16 h-16"
+                className="w-20 h-20"
               />
-              <h2 className="text-2xl font-bold text-blue-800"><ruby>学<rt>まな</rt></ruby>ぼう</h2>
+              <h2 className="text-3xl font-bold text-blue-800"><ruby>学<rt>まな</rt></ruby>ぼう</h2>
             </div>
-            <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.learning_objective }}></p>
+            <p className="text-gray-800 text-xl whitespace-pre-wrap leading-loose" dangerouslySetInnerHTML={{ __html: problem.learning_objective }}></p>
           </div>
         )}
 
         {/* 問題文カード */}
         <div className="bg-white rounded-xl shadow-lg p-8 mb-6 border-2 border-green-100 hover-lift">
-          <div className="flex items-start gap-4 mb-4">
+          <div className="flex items-start gap-4 mb-6">
             <img
               src="/シンプルなQ＆A.png"
               alt="問題"
-              className="w-16 h-16"
+              className="w-20 h-20"
             />
-            <h2 className="text-2xl font-bold text-green-800"><ruby>問題文<rt>もんだいぶん</rt></ruby></h2>
+            <h2 className="text-3xl font-bold text-green-800"><ruby>問題文<rt>もんだいぶん</rt></ruby></h2>
           </div>
-          <p className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
+          <p className="text-gray-800 text-xl whitespace-pre-wrap leading-loose" dangerouslySetInnerHTML={{ __html: problem.description }}></p>
         </div>
 
-        <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-blue-800 mb-3">📌 <ruby>解答<rt>かいとう</rt></ruby><ruby>方法<rt>ほうほう</rt></ruby></h3>
+        <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-8 mb-6">
+          <h3 className="text-2xl font-bold text-blue-800 mb-5">📌 <ruby>解答<rt>かいとう</rt></ruby><ruby>方法<rt>ほうほう</rt></ruby></h3>
           {problem.problem_type === 'predict' ? (
-            <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <ol className="list-decimal list-inside space-y-4 text-gray-800 text-lg leading-loose">
               <li>「Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く」ボタンでプログラムを<ruby>確認<rt>かくにん</rt></ruby></li>
               <li>プログラムがどう<ruby>動<rt>うご</rt></ruby>くか<ruby>予測<rt>よそく</rt></ruby>します</li>
               <li>スプライトの<ruby>最終的<rt>さいしゅうてき</rt></ruby>なX<ruby>座標<rt>ざひょう</rt></ruby>とY<ruby>座標<rt>ざひょう</rt></ruby>を<ruby>計算<rt>けいさん</rt></ruby>します</li>
               <li><ruby>下<rt>した</rt></ruby>の<ruby>解答欄<rt>かいとうらん</rt></ruby>にX<ruby>座標<rt>ざひょう</rt></ruby>とY<ruby>座標<rt>ざひょう</rt></ruby>を<ruby>入力<rt>にゅうりょく</rt></ruby>して<ruby>提出<rt>ていしゅつ</rt></ruby></li>
             </ol>
           ) : (
-            <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <ol className="list-decimal list-inside space-y-4 text-gray-800 text-lg leading-loose">
               <li>「Scratchエディタを<ruby>開<rt>ひら</rt></ruby>く」ボタンでScratchを<ruby>起動<rt>きどう</rt></ruby></li>
               <li><ruby>問題<rt>もんだい</rt></ruby>に<ruby>従<rt>したが</rt></ruby>ってプログラムを<ruby>作成<rt>さくせい</rt></ruby>します</li>
               <li><ruby>完成<rt>かんせい</rt></ruby>したら「ファイル」→「コンピューターに<ruby>保存<rt>ほぞん</rt></ruby>する」で.sb3ファイルをダウンロード</li>
