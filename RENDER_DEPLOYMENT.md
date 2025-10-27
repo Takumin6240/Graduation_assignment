@@ -66,12 +66,12 @@ Blueprint（`render.yaml`）により、以下の環境変数が**自動的に�
 - `PORT`: 5000
 - `DATABASE_URL`: PostgreSQLデータベースから自動取得
 - `JWT_SECRET`: 自動生成されるランダム文字列
-- `FRONTEND_URL`: フロントエンドサービスのURLから自動取得
+- `FRONTEND_URL`: `https://scratch-learning-frontend.onrender.com`
 
 #### Frontend
-- `REACT_APP_API_URL`: バックエンドサービスのURLから自動取得
+- `REACT_APP_API_URL`: `https://scratch-learning-backend.onrender.com`
 
-⚠️ **注意**: `FRONTEND_URL`には`https://`プレフィックスを手動で追加する必要があります（後述）
+✅ **すべての環境変数が自動設定されます！** 追加の手動設定は不要です。
 
 ---
 
@@ -106,46 +106,9 @@ Build completed successfully
 
 ---
 
-## ステップ5: 環境変数の設定（重要）
+## ステップ5: データベースマイグレーションと初期データ投入
 
-⚠️ **このステップは必須です。環境変数を正しく設定しないとアプリが動作しません。**
-
-### 5-1. Backend の FRONTEND_URL を設定
-
-1. **Backend サービス** を開く
-2. **「Environment」** タブをクリック
-3. `FRONTEND_URL`を手動で追加：
-   ```
-   FRONTEND_URL=https://scratch-learning-frontend.onrender.com
-   ```
-   （実際のフロントエンドURLに置き換えてください）
-4. **「Save Changes」** をクリック
-5. 自動的に再デプロイされます
-
-### 5-2. Frontend の REACT_APP_API_URL を設定
-
-⚠️ **最重要**: Reactアプリはビルド時に環境変数を埋め込むため、この設定が必須です。
-
-1. **Frontend サービス** を開く
-2. **「Environment」** タブをクリック
-3. `REACT_APP_API_URL`を手動で追加：
-   ```
-   REACT_APP_API_URL=https://scratch-learning-backend.onrender.com
-   ```
-   （実際のバックエンドURLに置き換えてください）
-4. **「Save Changes」** をクリック
-5. **Manual Deploy** → **「Deploy latest commit」** をクリックして再ビルド
-
-⚠️ **重要事項**:
-- `https://`プレフィックスを必ず含める
-- 末尾に`/`を含めない
-- フロントエンドは環境変数変更後に**必ず再デプロイ**が必要（ビルド時に環境変数が埋め込まれるため）
-
----
-
-## ステップ6: データベースマイグレーションと初期データ投入
-
-### 6-1. マイグレーションの確認
+### 5-1. マイグレーションの確認
 
 バックエンドの`Dockerfile`に記載されているため、デプロイ時に**自動実行**されます：
 
@@ -158,7 +121,7 @@ Backend サービスの「Logs」で以下を確認：
 ✓ Migrations completed successfully
 ```
 
-### 6-2. 初期データ投入（管理者アカウント作成）
+### 5-2. 初期データ投入（管理者アカウント作成）
 
 #### オプション1: Shellで実行（推奨）
 
@@ -187,15 +150,15 @@ CMD ["sh", "-c", "npm run migrate && npm start"]
 
 ---
 
-## ステップ7: 動作確認
+## ステップ6: 動作確認
 
-### 7-1. フロントエンドにアクセス
+### 6-1. フロントエンドにアクセス
 
 1. Frontend サービスのURLにアクセス
    - 例: `https://scratch-learning-frontend.onrender.com`
 2. ページが正しく表示されることを確認
 
-### 7-2. 機能テスト
+### 6-2. 機能テスト
 
 - ✅ ユーザー登録ができる
 - ✅ ログインができる（`admin` / `admin123`）

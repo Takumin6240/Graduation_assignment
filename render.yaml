@@ -21,10 +21,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: scratch-learning-frontend
-          property: host
+        value: https://scratch-learning-frontend.onrender.com
 
   # Frontend Web Service
   - type: web
@@ -37,7 +34,7 @@ services:
     branch: main
     envVars:
       - key: REACT_APP_API_URL
-        sync: false
+        value: https://scratch-learning-backend.onrender.com
 
 databases:
   # PostgreSQL Database
