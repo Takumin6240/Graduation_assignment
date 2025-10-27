@@ -40,3 +40,16 @@ Thumbs.db
 
 # Docker
 docker-compose.override.yml
+
+# Logs directory
+logs/
+*.log
+
+# Uploaded files (if any)
+uploads/
+
+# Railway
+.railway/
+
+# Scratch files
+*.sb3
