@@ -10,7 +10,12 @@
       "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose restart backend)",
       "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose down -v)",
       "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T backend npm run migrate)",
-      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T backend node src/db/seed.js)"
+      "Bash(/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe compose exec -T backend node src/db/seed.js)",
+      "Bash(git log:*)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose restart frontend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose restart backend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 50)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs frontend --tail 30)"
     ],
     "deny": [],
     "ask": []

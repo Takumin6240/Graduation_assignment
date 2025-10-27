@@ -83,9 +83,6 @@ const Home: React.FC = () => {
                   </svg>
                 </Link>
               </div>
-              <p className="mt-6 text-gray-600 text-sm">
-                ログインIDとパスワードは<ruby>先生<rt>せんせい</rt></ruby>から<ruby>受<rt>う</rt></ruby>け<ruby>取<rt>と</rt></ruby>ってください
-              </p>
             </div>
           </div>
         )}

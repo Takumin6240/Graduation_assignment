@@ -26,7 +26,7 @@ const AdminUsers: React.FC = () => {
     username: '',
     password: '',
     nickname: '',
-    grade: 1
+    grade: 3
   });
   const [createError, setCreateError] = useState<string | null>(null);
   const [createLoading, setCreateLoading] = useState(false);
@@ -63,7 +63,7 @@ const AdminUsers: React.FC = () => {
       );
 
       setShowCreateModal(false);
-      setCreateForm({ username: '', password: '', nickname: '', grade: 1 });
+      setCreateForm({ username: '', password: '', nickname: '', grade: 3 });
       await fetchUsers();
     } catch (error: any) {
       setCreateError(error.response?.data?.error || '学生の作成に失敗しました');
@@ -110,7 +110,7 @@ const AdminUsers: React.FC = () => {
           >
             全て
           </button>
-          {[1, 2, 3, 4, 5, 6].map(grade => (
+          {[3, 4, 5, 6].map(grade => (
             <button
               key={grade}
               onClick={() => setFilterGrade(grade)}
@@ -293,7 +293,7 @@ const AdminUsers: React.FC = () => {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                   required
                 >
-                  {[1, 2, 3, 4, 5, 6].map(grade => (
+                  {[3, 4, 5, 6].map(grade => (
                     <option key={grade} value={grade}>{grade}年生</option>
                   ))}
                 </select>
@@ -305,7 +305,7 @@ const AdminUsers: React.FC = () => {
                   onClick={() => {
                     setShowCreateModal(false);
                     setCreateError(null);
-                    setCreateForm({ username: '', password: '', nickname: '', grade: 1 });
+                    setCreateForm({ username: '', password: '', nickname: '', grade: 3 });
                   }}
                   className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 rounded-lg font-bold transition"
                 >

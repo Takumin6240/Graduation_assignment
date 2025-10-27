@@ -382,6 +382,352 @@ const updateCorrectAnswer = async (req, res) => {
   }
 };
 
+// Get detailed analytics for research
+const getDetailedAnalytics = async (req, res) => {
+  const adminId = req.admin.adminId;
+
+  try {
+    // 1. Problem-level detailed analytics
+    const problemAnalytics = await pool.query(`
+      SELECT
+        p.id as problem_id,
+        p.title as problem_title,
+        p.problem_type,
+        p.difficulty_level,
+        p.order_number as problem_order,
+        c.id as chapter_id,
+        c.title as chapter_title,
+        c.order_number as chapter_order,
+
+        -- Overall statistics
+        COUNT(DISTINCT s.user_id) as unique_students,
+        COUNT(s.id) as total_submissions,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score,
+        ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent_seconds,
+        ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts_to_solve,
+        ROUND(AVG(s.hint_usage_count)::numeric, 2) as avg_hint_usage,
+
+        -- First attempt success rate (critical for research)
+        COUNT(CASE WHEN s.total_attempts = 1 AND s.is_correct THEN 1 END) as first_attempt_success,
+        COUNT(CASE WHEN s.total_attempts = 1 THEN 1 END) as first_attempt_total,
+
+        -- Time analysis
+        MIN(s.time_spent) as min_time_spent,
+        MAX(s.time_spent) as max_time_spent,
+        PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY s.time_spent) as median_time_spent
+
+      FROM problems p
+      JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submissions s ON p.id = s.problem_id
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1 OR s.id IS NULL
+      GROUP BY p.id, p.title, p.problem_type, p.difficulty_level, p.order_number,
+               c.id, c.title, c.order_number
+      ORDER BY c.order_number, p.order_number
+    `, [adminId]);
+
+    // 2. Error pattern analysis
+    const errorPatterns = await pool.query(`
+      SELECT
+        p.id as problem_id,
+        p.title as problem_title,
+        p.problem_type,
+        sa.error_message,
+        COUNT(*) as error_count,
+        COUNT(DISTINCT sa.user_id) as affected_students
+      FROM submission_attempts sa
+      JOIN problems p ON sa.problem_id = p.id
+      JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1
+        AND sa.is_correct_attempt = false
+        AND sa.error_message IS NOT NULL
+      GROUP BY p.id, p.title, p.problem_type, sa.error_message
+      ORDER BY error_count DESC
+      LIMIT 100
+    `, [adminId]);
+
+    // 3. Student-level analysis (individual struggling points)
+    const studentAnalysis = await pool.query(`
+      SELECT
+        u.id as student_id,
+        u.nickname,
+        u.grade,
+        u.created_at as registration_date,
+
+        -- Overall performance
+        COUNT(DISTINCT s.problem_id) as problems_attempted,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as problems_solved,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score,
+        ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts,
+        SUM(s.time_spent) as total_time_spent,
+
+        -- Problem type performance
+        COUNT(CASE WHEN p.problem_type = 'fill_blank' AND s.is_correct THEN 1 END) as fill_blank_solved,
+        COUNT(CASE WHEN p.problem_type = 'fill_blank' THEN 1 END) as fill_blank_attempted,
+        COUNT(CASE WHEN p.problem_type = 'predict' AND s.is_correct THEN 1 END) as predict_solved,
+        COUNT(CASE WHEN p.problem_type = 'predict' THEN 1 END) as predict_attempted,
+        COUNT(CASE WHEN p.problem_type = 'find_error' AND s.is_correct THEN 1 END) as find_error_solved,
+        COUNT(CASE WHEN p.problem_type = 'find_error' THEN 1 END) as find_error_attempted,
+        COUNT(CASE WHEN p.problem_type = 'mission' AND s.is_correct THEN 1 END) as mission_solved,
+        COUNT(CASE WHEN p.problem_type = 'mission' THEN 1 END) as mission_attempted
+
+      FROM users u
+      LEFT JOIN submissions s ON u.id = s.user_id
+      LEFT JOIN problems p ON s.problem_id = p.id
+      WHERE u.admin_id = $1
+      GROUP BY u.id, u.nickname, u.grade, u.created_at
+      ORDER BY u.created_at
+    `, [adminId]);
+
+    // 4. Problem type comparison
+    const problemTypeAnalysis = await pool.query(`
+      SELECT
+        p.problem_type,
+        COUNT(DISTINCT s.user_id) as students_attempted,
+        COUNT(s.id) as total_submissions,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score,
+        ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent,
+        ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts
+      FROM problems p
+      LEFT JOIN submissions s ON p.id = s.problem_id
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1 OR s.id IS NULL
+      GROUP BY p.problem_type
+      ORDER BY p.problem_type
+    `, [adminId]);
+
+    // 5. Time series data (daily)
+    const timeSeriesDaily = await pool.query(`
+      SELECT
+        DATE(s.completed_at) as date,
+        COUNT(s.id) as submissions,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT s.user_id) as active_students,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1
+      GROUP BY DATE(s.completed_at)
+      ORDER BY date DESC
+      LIMIT 90
+    `, [adminId]);
+
+    // 6. Time series data (weekly)
+    const timeSeriesWeekly = await pool.query(`
+      SELECT
+        DATE_TRUNC('week', s.completed_at) as week_start,
+        COUNT(s.id) as submissions,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT s.user_id) as active_students,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1
+      GROUP BY DATE_TRUNC('week', s.completed_at)
+      ORDER BY week_start DESC
+      LIMIT 52
+    `, [adminId]);
+
+    // 7. Time series data (monthly)
+    const timeSeriesMonthly = await pool.query(`
+      SELECT
+        DATE_TRUNC('month', s.completed_at) as month_start,
+        COUNT(s.id) as submissions,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT s.user_id) as active_students,
+        ROUND(AVG(s.score)::numeric, 2) as avg_score
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1
+      GROUP BY DATE_TRUNC('month', s.completed_at)
+      ORDER BY month_start DESC
+      LIMIT 12
+    `, [adminId]);
+
+    // 8. Struggling points (problems with high failure rates)
+    const strugglingPoints = await pool.query(`
+      SELECT
+        p.id as problem_id,
+        p.title as problem_title,
+        p.problem_type,
+        c.title as chapter_title,
+        COUNT(s.id) as total_attempts,
+        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN s.is_correct THEN 1 END) / NULLIF(COUNT(s.id), 0), 2) as success_rate,
+        ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts_to_solve,
+        ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent
+      FROM problems p
+      JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submissions s ON p.id = s.problem_id
+      LEFT JOIN users u ON s.user_id = u.id
+      WHERE u.admin_id = $1
+      GROUP BY p.id, p.title, p.problem_type, c.title
+      HAVING COUNT(s.id) > 0
+      ORDER BY success_rate ASC, avg_attempts_to_solve DESC
+      LIMIT 20
+    `, [adminId]);
+
+    // 9. Attempt progression analysis (learning curve)
+    const attemptProgression = await pool.query(`
+      SELECT
+        sa.attempt_number,
+        COUNT(*) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as successful_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) / COUNT(*), 2) as success_rate
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1
+      GROUP BY sa.attempt_number
+      ORDER BY sa.attempt_number
+      LIMIT 20
+    `, [adminId]);
+
+    res.json({
+      problemAnalytics: problemAnalytics.rows,
+      errorPatterns: errorPatterns.rows,
+      studentAnalysis: studentAnalysis.rows,
+      problemTypeAnalysis: problemTypeAnalysis.rows,
+      timeSeriesDaily: timeSeriesDaily.rows,
+      timeSeriesWeekly: timeSeriesWeekly.rows,
+      timeSeriesMonthly: timeSeriesMonthly.rows,
+      strugglingPoints: strugglingPoints.rows,
+      attemptProgression: attemptProgression.rows
+    });
+  } catch (error) {
+    log(`Get detailed analytics error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'サーバーエラーが発生しました' });
+  }
+};
+
+// Export analytics as CSV
+const exportAnalyticsCSV = async (req, res) => {
+  const adminId = req.admin.adminId;
+
+  try {
+    // Get comprehensive data for CSV export
+    const data = await pool.query(`
+      SELECT
+        u.nickname as "生徒名",
+        u.grade as "学年",
+        c.title as "チャプター",
+        p.title as "問題タイトル",
+        p.problem_type as "問題タイプ",
+        p.difficulty_level as "難易度",
+        s.is_correct as "正解",
+        s.score as "スコア",
+        s.total_attempts as "試行回数",
+        s.hint_usage_count as "ヒント使用回数",
+        s.time_spent as "所要時間（秒）",
+        s.completed_at as "提出日時"
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      JOIN problems p ON s.problem_id = p.id
+      JOIN chapters c ON p.chapter_id = c.id
+      WHERE u.admin_id = $1
+      ORDER BY s.completed_at DESC
+    `, [adminId]);
+
+    // Convert to CSV
+    if (data.rows.length === 0) {
+      return res.status(404).json({ error: 'エクスポートするデータがありません' });
+    }
+
+    const headers = Object.keys(data.rows[0]);
+    const csvRows = [headers.join(',')];
+
+    for (const row of data.rows) {
+      const values = headers.map(header => {
+        const value = row[header];
+        // Escape commas and quotes in CSV
+        if (value === null || value === undefined) return '';
+        const stringValue = String(value);
+        if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
+          return `"${stringValue.replace(/"/g, '""')}"`;
+        }
+        return stringValue;
+      });
+      csvRows.push(values.join(','));
+    }
+
+    const csv = csvRows.join('\n');
+
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="analytics_${Date.now()}.csv"`);
+    res.send('\uFEFF' + csv); // Add BOM for Excel compatibility
+  } catch (error) {
+    log(`Export CSV error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'CSVエクスポートに失敗しました' });
+  }
+};
+
+// Export analytics as JSON
+const exportAnalyticsJSON = async (req, res) => {
+  const adminId = req.admin.adminId;
+
+  try {
+    // Get all relevant data for JSON export
+    const submissions = await pool.query(`
+      SELECT
+        s.id,
+        s.user_id,
+        u.nickname as user_nickname,
+        u.grade as user_grade,
+        s.problem_id,
+        p.title as problem_title,
+        p.problem_type,
+        p.difficulty_level,
+        c.title as chapter_title,
+        s.is_correct,
+        s.score,
+        s.total_attempts,
+        s.hint_usage_count,
+        s.time_spent,
+        s.completed_at
+      FROM submissions s
+      JOIN users u ON s.user_id = u.id
+      JOIN problems p ON s.problem_id = p.id
+      JOIN chapters c ON p.chapter_id = c.id
+      WHERE u.admin_id = $1
+      ORDER BY s.completed_at DESC
+    `, [adminId]);
+
+    const attempts = await pool.query(`
+      SELECT
+        sa.id,
+        sa.user_id,
+        u.nickname as user_nickname,
+        sa.problem_id,
+        p.title as problem_title,
+        sa.attempt_number,
+        sa.is_correct_attempt,
+        sa.error_message,
+        sa.hint_viewed,
+        sa.timestamp
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      JOIN problems p ON sa.problem_id = p.id
+      WHERE u.admin_id = $1
+      ORDER BY sa.timestamp DESC
+      LIMIT 1000
+    `, [adminId]);
+
+    const exportData = {
+      exportDate: new Date().toISOString(),
+      submissions: submissions.rows,
+      attempts: attempts.rows
+    };
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="analytics_${Date.now()}.json"`);
+    res.json(exportData);
+  } catch (error) {
+    log(`Export JSON error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'JSONエクスポートに失敗しました' });
+  }
+};
+
 module.exports = {
   createStudent,
   getAllUsers,
@@ -391,5 +737,8 @@ module.exports = {
   getAllProblems,
   uploadCorrectSB3,
   updateScratchEditorUrl,
-  updateCorrectAnswer
+  updateCorrectAnswer,
+  getDetailedAnalytics,
+  exportAnalyticsCSV,
+  exportAnalyticsJSON
 };

@@ -222,7 +222,7 @@ const compareScratchPrograms = (submittedData, correctData, problemType = null) 
     return {
       isCorrect: true,
       score: 100,
-      message: '完璧です！素晴らしい！',
+      message: '正解です！',
       feedback: '✓ プログラムが正解と完全に一致しています'
     };
   }
@@ -322,23 +322,10 @@ const compareScratchPrograms = (submittedData, correctData, problemType = null) 
   // Determine if correct based on score
   const isCorrect = totalScore >= 80;
 
-  let message = '';
-  if (totalScore >= 95) {
-    message = '完璧です！素晴らしい！';
-  } else if (totalScore >= 80) {
-    message = '正解です！よくできました！';
-  } else if (totalScore >= 60) {
-    message = 'もう少しです。ヒントを見てみましょう。';
-  } else if (totalScore >= 30) {
-    message = 'がんばりましょう！ブロックを確認してください。';
-  } else {
-    message = 'もう一度問題を読んでみましょう。';
-  }
-
   return {
     isCorrect,
     score: totalScore,
-    message,
+    message: isCorrect ? '正解です！' : '不正解です',
     feedback: feedback.join('\n')
   };
 };
@@ -362,6 +349,66 @@ const calculateSimilarity = (data1, data2) => {
   }
 };
 
+// Calculate EXP based on difficulty and performance
+const calculateEarnedExp = (difficulty, score, attemptNumber, isPerfect) => {
+  // Base EXP by difficulty (1-5)
+  const baseExpByDifficulty = {
+    1: 50,
+    2: 80,
+    3: 120,
+    4: 150,
+    5: 200
+  };
+
+  let baseExp = baseExpByDifficulty[difficulty] || 50;
+  let bonusExp = 0;
+
+  // Perfect score bonus
+  if (isPerfect) {
+    bonusExp += 20;
+  }
+
+  // First-try bonus
+  if (attemptNumber === 1) {
+    bonusExp += 30;
+  } else if (attemptNumber === 2) {
+    bonusExp += 15;
+  } else {
+    bonusExp += 10;
+  }
+
+  // Score multiplier (proportional to score)
+  const scoreMultiplier = score / 100;
+  const earnedExp = Math.floor(baseExp * scoreMultiplier + bonusExp);
+
+  return {
+    earnedExp,
+    bonusExp,
+    baseExp: Math.floor(baseExp * scoreMultiplier)
+  };
+};
+
+// Calculate level up
+const calculateLevelUp = (currentExp, currentLevel) => {
+  let newLevel = currentLevel;
+  let remainingExp = currentExp;
+
+  // Level up formula: required EXP = level * 100
+  while (remainingExp >= newLevel * 100) {
+    remainingExp -= newLevel * 100;
+    newLevel++;
+  }
+
+  const expToNextLevel = newLevel * 100 - remainingExp;
+
+  return {
+    newLevel,
+    leveledUp: newLevel > currentLevel,
+    expToNextLevel,
+    currentLevelExp: remainingExp
+  };
+};
+
 // Submit solution
 const submitSolution = async (req, res) => {
   const { problemId } = req.params;
@@ -371,7 +418,7 @@ const submitSolution = async (req, res) => {
   try {
     // Get problem data first to check problem type
     const problemResult = await pool.query(
-      'SELECT problem_type, correct_sb3_data, correct_answer_x, correct_answer_y, max_score FROM problems WHERE id = $1',
+      'SELECT problem_type, correct_sb3_data, correct_answer_x, correct_answer_y, max_score, difficulty_level FROM problems WHERE id = $1',
       [problemId]
     );
 
@@ -413,15 +460,15 @@ const submitSolution = async (req, res) => {
       if (xMatch && yMatch) {
         isCorrect = true;
         score = 100;
-        message = '完璧です！素晴らしい！';
+        message = '正解です！';
       } else if (xMatch || yMatch) {
         isCorrect = false;
         score = 50;
-        message = xMatch ? 'X座標は正解です！Y座標を確認してください。' : 'Y座標は正解です！X座標を確認してください。';
+        message = '不正解です';
       } else {
         isCorrect = false;
         score = 0;
-        message = 'もう一度計算してみましょう。';
+        message = '不正解です';
       }
 
       // Store answer as JSON for tracking
@@ -460,8 +507,28 @@ const submitSolution = async (req, res) => {
       [userId, problemId, attemptNumber, submittedData, isCorrect, hintUsageCount > 0]
     );
 
+    // Calculate EXP and level
+    let expData = null;
+
     // If correct or best score, update/insert submission
     if (isCorrect) {
+      // Get user's current level and exp
+      const userResult = await pool.query(
+        'SELECT level, exp FROM users WHERE id = $1',
+        [userId]
+      );
+
+      const currentUser = userResult.rows[0];
+      const difficulty = problem.difficulty_level || 1;
+      const isPerfect = score === 100;
+
+      // Calculate earned EXP
+      const expCalc = calculateEarnedExp(difficulty, score, attemptNumber, isPerfect);
+      const newTotalExp = currentUser.exp + expCalc.earnedExp;
+
+      // Calculate level up
+      const levelData = calculateLevelUp(newTotalExp, currentUser.level);
+
       await pool.query(
         `INSERT INTO submissions
          (user_id, problem_id, is_correct, score, total_attempts, hint_usage_count, time_spent, final_sb3_data)
@@ -478,13 +545,26 @@ const submitSolution = async (req, res) => {
         [userId, problemId, isCorrect, score, attemptNumber, hintUsageCount, timeSpent, submittedData]
       );
 
-      // Update user EXP
+      // Update user EXP and level
       await pool.query(
-        'UPDATE users SET exp = exp + $1 WHERE id = $2',
-        [score, userId]
+        'UPDATE users SET exp = $1, level = $2 WHERE id = $3',
+        [newTotalExp, levelData.newLevel, userId]
       );
 
-      log(`User ${userId} solved problem ${problemId} (Score: ${score})`);
+      // Prepare exp data for response
+      expData = {
+        earnedExp: expCalc.earnedExp,
+        baseExp: expCalc.baseExp,
+        bonusExp: expCalc.bonusExp,
+        totalExp: newTotalExp,
+        previousLevel: currentUser.level,
+        newLevel: levelData.newLevel,
+        leveledUp: levelData.leveledUp,
+        expToNextLevel: levelData.expToNextLevel,
+        currentLevelExp: levelData.currentLevelExp
+      };
+
+      log(`User ${userId} solved problem ${problemId} (Score: ${score}, Earned: ${expCalc.earnedExp} EXP, Level: ${levelData.newLevel})`);
     }
 
     res.json({
@@ -492,7 +572,8 @@ const submitSolution = async (req, res) => {
       score,
       message,
       attemptNumber,
-      totalAttempts: attemptNumber
+      totalAttempts: attemptNumber,
+      expData
     });
   } catch (error) {
     log(`Submit solution error: ${error.message}`, 'ERROR');

@@ -85,6 +85,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setAdmin(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const response = await authAPI.getCurrentUser();
+      setUser(response.data.user);
+    } catch (error) {
+      console.error('Failed to refresh user data:', error);
+    }
+  };
+
   const value: AuthContextType = {
     user,
     admin,
@@ -92,6 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     loginAdmin,
     register,
     logout,
+    refreshUser,
     isAuthenticated: !!(user || admin),
     isAdmin: !!admin,
     loading,

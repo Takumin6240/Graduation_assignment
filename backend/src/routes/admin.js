@@ -10,7 +10,10 @@ const {
   getAllProblems,
   uploadCorrectSB3,
   updateScratchEditorUrl,
-  updateCorrectAnswer
+  updateCorrectAnswer,
+  getDetailedAnalytics,
+  exportAnalyticsCSV,
+  exportAnalyticsJSON
 } = require('../controllers/adminController');
 const { adminAuthMiddleware } = require('../middleware/auth');
 
@@ -37,6 +40,9 @@ router.get('/users', getAllUsers);
 router.get('/users/:userId', getUserDetails);
 router.get('/statistics', getStatistics);
 router.get('/analytics/problems', getProblemAnalytics);
+router.get('/analytics/detailed', getDetailedAnalytics);
+router.get('/analytics/export/csv', exportAnalyticsCSV);
+router.get('/analytics/export/json', exportAnalyticsJSON);
 router.get('/problems', getAllProblems);
 router.post('/problems/:problemId/upload-correct', upload.single('sb3File'), uploadCorrectSB3);
 router.patch('/problems/:problemId/scratch-url', updateScratchEditorUrl);

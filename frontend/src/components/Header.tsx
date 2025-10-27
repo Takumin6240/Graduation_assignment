@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import ExpGauge from './ExpGauge';
 
 const Header: React.FC = () => {
   const { user, admin, isAuthenticated, isAdmin, logout } = useAuth();
@@ -10,6 +11,10 @@ const Header: React.FC = () => {
     logout();
     navigate('/');
   };
+
+  // Calculate EXP progress for current level
+  const currentLevelExp = user ? user.exp % (user.level * 100) : 0;
+  const expToNextLevel = user ? user.level * 100 - currentLevelExp : 100;
 
   return (
     <header className="bg-primary-600 text-white shadow-lg">
@@ -51,9 +56,26 @@ const Header: React.FC = () => {
                 )}
 
                 <div className="flex items-center gap-4">
-                  <span className="text-sm">
-                    {user ? `${user.nickname} (Lv.${user.level})` : admin?.username}
-                  </span>
+                  {user ? (
+                    <div className="flex items-center gap-4">
+                      <div className="text-right">
+                        <div className="text-sm font-bold">{user.nickname}</div>
+                        <div className="text-xs text-primary-100">Lv.{user.level}</div>
+                      </div>
+                      <div className="w-48">
+                        <ExpGauge
+                          currentExp={currentLevelExp}
+                          expToNextLevel={expToNextLevel}
+                          level={user.level}
+                          animate={false}
+                          showLabel={false}
+                          size="small"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-sm">{admin?.username}</span>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="bg-white text-primary-600 px-4 py-2 rounded-lg font-medium hover:bg-primary-50 transition"

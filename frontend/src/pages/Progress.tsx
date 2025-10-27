@@ -31,7 +31,7 @@ const Progress: React.FC = () => {
         setSubmissions(response.data.submissions || []);
       } catch (error: any) {
         console.error('Failed to fetch submissions:', error);
-        setError('提出履歴の取得に失敗しました');
+        setError('<ruby>提出<rt>ていしゅつ</rt></ruby><ruby>履歴<rt>りれき</rt></ruby>の<ruby>取得<rt>しゅとく</rt></ruby>に<ruby>失敗<rt>しっぱい</rt></ruby>しました');
       } finally {
         setLoading(false);
       }
@@ -45,8 +45,7 @@ const Progress: React.FC = () => {
   if (error) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {error}
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded" dangerouslySetInnerHTML={{ __html: error }}>
         </div>
       </div>
     );
@@ -64,11 +63,11 @@ const Progress: React.FC = () => {
 
   const getProblemTypeName = (type: string) => {
     switch (type) {
-      case 'fill_blank': return '穴埋め問題';
-      case 'predict': return '予測問題';
-      case 'find_error': return '間違い探し問題';
-      case 'mission': return 'ミッション型問題';
-      default: return '問題';
+      case 'fill_blank': return '<ruby>穴埋<rt>あなう</rt></ruby>め<ruby>問題<rt>もんだい</rt></ruby>';
+      case 'predict': return '<ruby>予測<rt>よそく</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>';
+      case 'find_error': return '<ruby>間違<rt>まちが</rt></ruby>い<ruby>探<rt>さが</rt></ruby>し<ruby>問題<rt>もんだい</rt></ruby>';
+      case 'mission': return 'ミッション<ruby>型<rt>がた</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>';
+      default: return '<ruby>問題<rt>もんだい</rt></ruby>';
     }
   };
 
@@ -78,7 +77,7 @@ const Progress: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-700 mb-8">学習進捗</h1>
+      <h1 className="text-4xl font-bold text-primary-700 mb-8"><ruby>学習<rt>がくしゅう</rt></ruby><ruby>進捗<rt>しんちょく</rt></ruby></h1>
 
       {/* User Stats */}
       {user && (
@@ -86,11 +85,11 @@ const Progress: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-2">こんにちは、{user.nickname}さん！</h2>
-              <p className="text-primary-100 text-lg">{user.grade}年生 | レベル {user.level}</p>
+              <p className="text-primary-100 text-lg">{user.grade}<ruby>年生<rt>ねんせい</rt></ruby> | レベル {user.level}</p>
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
-                <p className="text-sm font-medium mb-1">経験値</p>
+                <p className="text-sm font-medium mb-1"><ruby>経験値<rt>けいけんち</rt></ruby></p>
                 <p className="text-4xl font-bold">{user.exp} EXP</p>
               </div>
             </div>
@@ -103,7 +102,7 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">解いた問題数</p>
+              <p className="text-gray-500 text-sm font-medium"><ruby>解<rt>と</rt></ruby>いた<ruby>問題数<rt>もんだいすう</rt></ruby></p>
               <p className="text-3xl font-bold text-green-600 mt-2">{totalSolved}</p>
             </div>
             <div className="bg-green-100 rounded-full p-3">
@@ -117,7 +116,7 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">挑戦回数</p>
+              <p className="text-gray-500 text-sm font-medium"><ruby>挑戦<rt>ちょうせん</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></p>
               <p className="text-3xl font-bold text-blue-600 mt-2">{submissions.length}</p>
             </div>
             <div className="bg-blue-100 rounded-full p-3">
@@ -131,8 +130,8 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">平均スコア</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-2">{averageScore}点</p>
+              <p className="text-gray-500 text-sm font-medium"><ruby>平均<rt>へいきん</rt></ruby>スコア</p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2">{averageScore}<ruby>点<rt>てん</rt></ruby></p>
             </div>
             <div className="bg-yellow-100 rounded-full p-3">
               <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -145,19 +144,19 @@ const Progress: React.FC = () => {
 
       {/* Submission History */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">提出履歴</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6"><ruby>提出<rt>ていしゅつ</rt></ruby><ruby>履歴<rt>りれき</rt></ruby></h2>
 
         {submissions.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-gray-500 text-lg mb-4">まだ提出がありません</p>
+            <p className="text-gray-500 text-lg mb-4">まだ<ruby>提出<rt>ていしゅつ</rt></ruby>がありません</p>
             <Link
               to="/chapters"
               className="bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 inline-block"
             >
-              問題に挑戦する
+              <ruby>問題<rt>もんだい</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>する
             </Link>
           </div>
         ) : (
@@ -172,16 +171,15 @@ const Progress: React.FC = () => {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium">
-                        {getProblemTypeName(submission.problem_type)}
+                      <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeName(submission.problem_type) }}>
                       </span>
                       {submission.is_correct ? (
                         <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                          ✓ 正解
+                          ✓ <ruby>正解<rt>せいかい</rt></ruby>
                         </span>
                       ) : (
                         <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
-                          ✗ 不正解
+                          ✗ <ruby>不正解<rt>ふせいかい</rt></ruby>
                         </span>
                       )}
                     </div>
@@ -193,16 +191,16 @@ const Progress: React.FC = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <p className="text-gray-500">スコア</p>
-                        <p className="font-bold text-yellow-600">{submission.score}点</p>
+                        <p className="font-bold text-yellow-600">{submission.score}<ruby>点<rt>てん</rt></ruby></p>
                       </div>
                       <div>
-                        <p className="text-gray-500">試行回数</p>
-                        <p className="font-bold text-blue-600">{submission.total_attempts}回</p>
+                        <p className="text-gray-500"><ruby>試行<rt>しこう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></p>
+                        <p className="font-bold text-blue-600">{submission.total_attempts}<ruby>回<rt>かい</rt></ruby></p>
                       </div>
                       <div>
-                        <p className="text-gray-500">所要時間</p>
+                        <p className="text-gray-500"><ruby>所要<rt>しょよう</rt></ruby><ruby>時間<rt>じかん</rt></ruby></p>
                         <p className="font-bold text-gray-700">
-                          {submission.time_spent > 0 ? `${Math.round(submission.time_spent / 60)}分` : '-'}
+                          {submission.time_spent > 0 ? `${Math.round(submission.time_spent / 60)}<ruby>分<rt>ふん</rt></ruby>` : '-'}
                         </p>
                       </div>
                     </div>
@@ -216,7 +214,7 @@ const Progress: React.FC = () => {
                       to={`/problems/${submission.problem_id}`}
                       className="text-primary-600 hover:text-primary-700 font-medium text-sm"
                     >
-                      もう一度挑戦 →
+                      もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby> →
                     </Link>
                   </div>
                 </div>

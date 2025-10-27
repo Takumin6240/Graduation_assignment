@@ -6,7 +6,7 @@ const Register: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const [grade, setGrade] = useState(1);
+  const [grade, setGrade] = useState(3);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -78,8 +78,6 @@ const Register: React.FC = () => {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               required
             >
-              <option value={1}>小学1年生</option>
-              <option value={2}>小学2年生</option>
               <option value={3}>小学3年生</option>
               <option value={4}>小学4年生</option>
               <option value={5}>小学5年生</option>

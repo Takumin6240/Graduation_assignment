@@ -99,6 +99,15 @@ export const adminAPI = {
 
   updateCorrectAnswer: (problemId: number, correctAnswerX: number, correctAnswerY: number) =>
     api.patch(`/admin/problems/${problemId}/correct-answer`, { correctAnswerX, correctAnswerY }),
+
+  getDetailedAnalytics: () =>
+    api.get('/admin/analytics/detailed'),
+
+  exportAnalyticsCSV: () =>
+    api.get('/admin/analytics/export/csv', { responseType: 'blob' }),
+
+  exportAnalyticsJSON: () =>
+    api.get('/admin/analytics/export/json', { responseType: 'blob' }),
 };
 
 export default api;

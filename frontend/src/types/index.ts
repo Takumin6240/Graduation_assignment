@@ -75,6 +75,7 @@ export interface AuthContextType {
   loginAdmin: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string, nickname: string, grade: number) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
   loading: boolean;
