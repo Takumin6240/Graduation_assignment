@@ -751,6 +751,19 @@ async function seedDatabase() {
       const result = await client.query(`
         INSERT INTO problems (chapter_id, problem_type, title, learning_objective, description, initial_sb3_data, correct_sb3_data, correct_answer_x, correct_answer_y, max_score, difficulty_level, order_number, image_url)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, 100, $10, $11, $12)
+        ON CONFLICT (chapter_id, order_number)
+        DO UPDATE SET
+          problem_type = EXCLUDED.problem_type,
+          title = EXCLUDED.title,
+          learning_objective = EXCLUDED.learning_objective,
+          description = EXCLUDED.description,
+          initial_sb3_data = EXCLUDED.initial_sb3_data,
+          correct_sb3_data = EXCLUDED.correct_sb3_data,
+          correct_answer_x = EXCLUDED.correct_answer_x,
+          correct_answer_y = EXCLUDED.correct_answer_y,
+          difficulty_level = EXCLUDED.difficulty_level,
+          image_url = EXCLUDED.image_url,
+          updated_at = CURRENT_TIMESTAMP
         RETURNING id
       `, [
         chapterId,
@@ -807,7 +820,10 @@ async function seedDatabase() {
         await client.query(`
           INSERT INTO hints (problem_id, grade, hint_text, hint_order)
           VALUES ($1, $2, $3, $4)
-          ON CONFLICT DO NOTHING
+          ON CONFLICT (problem_id, grade, hint_order)
+          DO UPDATE SET
+            hint_text = EXCLUDED.hint_text,
+            updated_at = CURRENT_TIMESTAMP
         `, [problem3Id, hint.grade, hint.hintText, hint.order]);
       }
 

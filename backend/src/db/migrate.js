@@ -200,6 +200,28 @@ BEGIN
     ALTER TABLE problems ADD COLUMN image_url VARCHAR(500);
   END IF;
 END $$;
+
+-- Add unique constraint for problems (chapter_id, order_number) if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'problems_chapter_order_unique'
+  ) THEN
+    ALTER TABLE problems ADD CONSTRAINT problems_chapter_order_unique UNIQUE (chapter_id, order_number);
+  END IF;
+END $$;
+
+-- Add unique constraint for hints (problem_id, grade, hint_order) if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_constraint
+    WHERE conname = 'hints_problem_grade_order_unique'
+  ) THEN
+    ALTER TABLE hints ADD CONSTRAINT hints_problem_grade_order_unique UNIQUE (problem_id, grade, hint_order);
+  END IF;
+END $$;
 `;
 
 async function runMigrations() {
