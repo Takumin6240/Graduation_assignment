@@ -631,7 +631,11 @@ const exportAnalyticsCSV = async (req, res) => {
 
     // Convert to CSV
     if (data.rows.length === 0) {
-      return res.status(404).json({ error: 'エクスポートするデータがありません' });
+      // Return empty CSV with headers only
+      const emptyCSV = '生徒名,学年,チャプター,問題タイトル,問題タイプ,難易度,正解,スコア,試行回数,ヒント使用回数,所要時間（秒）,提出日時\n';
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+      res.setHeader('Content-Disposition', `attachment; filename="analytics_${Date.now()}.csv"`);
+      return res.send('\uFEFF' + emptyCSV); // BOM for Excel UTF-8 support
     }
 
     const headers = Object.keys(data.rows[0]);

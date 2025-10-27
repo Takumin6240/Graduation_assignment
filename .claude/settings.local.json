@@ -32,7 +32,18 @@
       "Bash(npm install:*)",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose restart frontend backend)",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 20)",
-      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs frontend --tail 20)"
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs frontend --tail 20)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 15)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose up -d frontend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs frontend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T frontend printenv)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, admin_username FROM admins;\")",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, admin_username, LEFT(password_hash, 10) as hash_start FROM admins;\")",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 30)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, username, nickname, admin_id FROM users LIMIT 5;\")",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT COUNT(*) as submission_count FROM submissions;\")",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 10)"
     ],
     "deny": [],
     "ask": []
