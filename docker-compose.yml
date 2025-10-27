@@ -19,7 +19,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: scratch_learning_backend
     ports:
       - "5000:5000"
@@ -39,7 +39,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     container_name: scratch_learning_frontend
     ports:
       - "3010:3000"
