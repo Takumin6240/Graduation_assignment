@@ -29,7 +29,10 @@
       "Bash(git config:*)",
       "Bash(git reset:*)",
       "Bash(git push:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose restart frontend backend)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs backend --tail 20)",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose logs frontend --tail 20)"
     ],
     "deny": [],
     "ask": []

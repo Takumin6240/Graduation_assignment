@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { problemsAPI, submissionsAPI } from '../services/api';
-import { Problem } from '../types';
+import { Problem, Hint } from '../types';
 import Loading from '../components/Loading';
 import ExpGauge from '../components/ExpGauge';
 import LevelUpModal from '../components/LevelUpModal';
@@ -23,12 +23,17 @@ const ProblemDetail: React.FC = () => {
   const [answerY, setAnswerY] = useState<string>('');
   const [showLevelUpModal, setShowLevelUpModal] = useState(false);
   const [displayedExp, setDisplayedExp] = useState(0);
+  const [hints, setHints] = useState<Hint[]>([]);
+  const [showHints, setShowHints] = useState(false);
+  const [hintUsageCount, setHintUsageCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Reset start time when problem changes
         setStartTime(Date.now());
+        setShowHints(false);
+        setHintUsageCount(0);
 
         const problemRes = await problemsAPI.getProblemDetails(Number(problemId));
         setProblem(problemRes.data.problem);
@@ -37,6 +42,15 @@ const ProblemDetail: React.FC = () => {
         if (problemRes.data.problem.chapter_id) {
           const problemsRes = await problemsAPI.getProblemsByChapter(problemRes.data.problem.chapter_id);
           setAllProblems(problemsRes.data.problems || []);
+        }
+
+        // Fetch hints for this problem
+        try {
+          const hintsRes = await problemsAPI.getHints(Number(problemId));
+          setHints(hintsRes.data.hints || []);
+        } catch (error) {
+          console.error('Failed to fetch hints:', error);
+          setHints([]);
         }
       } catch (error) {
         console.error('Failed to fetch problem:', error);
@@ -52,6 +66,14 @@ const ProblemDetail: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       setFile(e.target.files[0]);
     }
+  };
+
+  const handleToggleHints = () => {
+    if (!showHints && hintUsageCount === 0) {
+      // First time viewing hints
+      setHintUsageCount(1);
+    }
+    setShowHints(!showHints);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -83,7 +105,7 @@ const ProblemDetail: React.FC = () => {
         formData.append('sb3File', file!);
       }
 
-      formData.append('hintUsageCount', '0');
+      formData.append('hintUsageCount', String(hintUsageCount));
       formData.append('timeSpent', String(Math.floor((Date.now() - startTime) / 1000)));
 
       const response = await submissionsAPI.submitSolution(Number(problemId), formData);
@@ -393,6 +415,73 @@ const ProblemDetail: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {/* ヒントセクション */}
+        {hints.length > 0 && (
+          <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-8 mb-6 hover-lift">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-4">
+                <img
+                  src="/指示棒を持つひよこ.png"
+                  alt="ヒント"
+                  className="w-20 h-20"
+                />
+                <h3 className="text-2xl font-bold text-yellow-800">💡 ヒント</h3>
+              </div>
+              <button
+                onClick={handleToggleHints}
+                className={`${
+                  showHints
+                    ? 'bg-yellow-600 hover:bg-yellow-700'
+                    : 'bg-orange-500 hover:bg-orange-600'
+                } text-white px-6 py-3 rounded-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-lg flex items-center gap-2`}
+              >
+                {showHints ? (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                    </svg>
+                    <ruby>閉<rt>と</rt></ruby>じる
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                    ヒントを<ruby>見<rt>み</rt></ruby>る
+                  </>
+                )}
+              </button>
+            </div>
+
+            {showHints && (
+              <div className="space-y-4 animate-fadeIn">
+                {hints.map((hint, index) => (
+                  <div
+                    key={hint.id}
+                    className="bg-white rounded-lg p-6 shadow-md border-l-4 border-yellow-500"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-8 h-8 bg-yellow-500 text-white font-bold rounded-full flex items-center justify-center">
+                        {index + 1}
+                      </span>
+                      <p
+                        className="text-gray-800 text-lg leading-loose flex-1"
+                        dangerouslySetInnerHTML={{ __html: hint.hint_text }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!showHints && (
+              <p className="text-gray-700 text-center text-sm mt-2">
+                <ruby>困<rt>こま</rt></ruby>ったときはヒントを<ruby>見<rt>み</rt></ruby>てみよう！
+              </p>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-lg p-6">
           <h3 className="text-xl font-bold text-gray-800 mb-4"><ruby>解答<rt>かいとう</rt></ruby>を<ruby>提出<rt>ていしゅつ</rt></ruby></h3>
