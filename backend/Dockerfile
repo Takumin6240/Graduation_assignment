@@ -18,5 +18,5 @@ RUN mkdir -p logs
 # Expose port
 EXPOSE 5000
 
-# Run migrations and start server
-CMD ["sh", "-c", "npm run migrate && npm start"]
+# Run migrations, seed data, and start server
+CMD ["sh", "-c", "npm run migrate && node src/db/seed.js && npm start"]
