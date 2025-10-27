@@ -328,7 +328,7 @@ async function seedDatabase() {
         type: 'find_error',
         title: '<ruby>問題<rt>もんだい</rt></ruby>3: <ruby>順番<rt>じゅんばん</rt></ruby>を<ruby>直<rt>なお</rt></ruby>そう!',
         learningObjective: 'プログラムの<span style="color: #dc2626; font-weight: bold;"><ruby>間違<rt>まちが</rt></ruby>い（バグ）</span>を<ruby>見<rt>み</rt></ruby>つけて<ruby>直<rt>なお</rt></ruby>すことは、プログラマーのとても<ruby>大切<rt>たいせつ</rt></ruby>な<ruby>仕事<rt>しごと</rt></ruby>です。\n<span style="color: #2563eb; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>変<rt>か</rt></ruby>わる</span>と、<span style="color: #dc2626; font-weight: bold;"><ruby>結果<rt>けっか</rt></ruby>も<ruby>変<rt>か</rt></ruby>わってしまう</span>ことを<ruby>学<rt>まな</rt></ruby>びましょう。',
-        description: 'プログラムの<span style="color: #dc2626; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>間違<rt>まちが</rt></ruby>っています</span>！\n\n<span style="color: #16a34a; font-weight: bold;"><ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby></span>に<ruby>直<rt>なお</rt></ruby>してね：\n\n<span style="color: #ea580c; font-weight: bold;">1.</span> <span style="color: #ea580c; font-weight: bold;">250<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かす\n<span style="color: #ea580c; font-weight: bold;">2.</span> <span style="color: #ea580c; font-weight: bold;">1<ruby>秒<rt>びょう</rt></ruby></span><ruby>待<rt>ま</rt></ruby>つ\n<span style="color: #ea580c; font-weight: bold;">3.</span> <ruby>背景<rt>はいけい</rt></ruby>を「<span style="color: #ea580c; font-weight: bold;">Party</span>」に<ruby>変<rt>か</rt></ruby>える\n<span style="color: #ea580c; font-weight: bold;">4.</span> 「<span style="color: #16a34a; font-weight: bold;">こんにちは</span>」と<span style="color: #ea580c; font-weight: bold;">2<ruby>秒<rt>びょう</rt></ruby></span><ruby>言<rt>い</rt></ruby>う',
+        description: 'プログラムの<span style="color: #dc2626; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>が<ruby>間違<rt>まちが</rt></ruby>っています</span>！\n\n<span style="color: #2563eb; font-weight: bold;">やりたいこと：</span>\n<span style="color: #ea580c; font-weight: bold;">①</span> まず、<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>背景<rt>はいけい</rt></ruby>で<ruby>準備<rt>じゅんび</rt></ruby>する\n<span style="color: #ea580c; font-weight: bold;">②</span> ひよこが<ruby>左<rt>ひだり</rt></ruby>から<ruby>歩<rt>ある</rt></ruby>いて<ruby>登場<rt>とうじょう</rt></ruby>する\n<span style="color: #ea580c; font-weight: bold;">③</span> <ruby>登場<rt>とうじょう</rt></ruby>したら、<ruby>背景<rt>はいけい</rt></ruby>が<ruby>変<rt>か</rt></ruby>わって<ruby>挨拶<rt>あいさつ</rt></ruby>する\n\n<span style="color: #16a34a; font-weight: bold;">どう<ruby>直<rt>なお</rt></ruby>せばいいかな？</span>\n<ruby>順番<rt>じゅんばん</rt></ruby>を<ruby>入<rt>い</rt></ruby>れ<ruby>替<rt>か</rt></ruby>えて、<ruby>正<rt>ただ</rt></ruby>しく<ruby>動<rt>うご</rt></ruby>くようにしてみよう！',
         difficulty: 3,
         order: 3,
         imageUrl: '/はてなマークを浮かべるひよこ.png',
@@ -355,30 +355,51 @@ async function seedDatabase() {
                 fields: {}
               },
               "block3": {
-                opcode: "looks_sayforsecs",
+                opcode: "motion_gotoxy",
                 next: "block4",
                 parent: "block2",
                 inputs: {
-                  MESSAGE: [1, [10, "こんにちは"]],
-                  SECS: [1, [4, "2"]]
+                  X: [1, [4, "-200"]],
+                  Y: [1, [4, "-100"]]
                 },
                 fields: {}
               },
               "block4": {
-                opcode: "motion_movesteps",
+                opcode: "looks_sayforsecs",
                 next: "block5",
                 parent: "block3",
                 inputs: {
-                  STEPS: [1, [4, "250"]]
+                  MESSAGE: [1, [10, "こんにちは！"]],
+                  SECS: [1, [4, "2"]]
                 },
                 fields: {}
               },
               "block5": {
                 opcode: "control_wait",
-                next: null,
+                next: "block6",
                 parent: "block4",
                 inputs: {
                   DURATION: [1, [4, "1"]]
+                },
+                fields: {}
+              },
+              "block6": {
+                opcode: "motion_glidesecstoxy",
+                next: "block7",
+                parent: "block5",
+                inputs: {
+                  SECS: [1, [4, "3"]],
+                  X: [1, [4, "0"]],
+                  Y: [1, [4, "-100"]]
+                },
+                fields: {}
+              },
+              "block7": {
+                opcode: "looks_switchbackdropto",
+                next: null,
+                parent: "block6",
+                inputs: {
+                  BACKDROP: [1, [10, "背景1"]]
                 },
                 fields: {}
               }
@@ -405,38 +426,59 @@ async function seedDatabase() {
                 topLevel: true
               },
               "block2": {
-                opcode: "motion_movesteps",
+                opcode: "looks_switchbackdropto",
                 next: "block3",
                 parent: "block1",
                 inputs: {
-                  STEPS: [1, [4, "250"]]
+                  BACKDROP: [1, [10, "背景1"]]
                 },
                 fields: {}
               },
               "block3": {
-                opcode: "control_wait",
+                opcode: "motion_gotoxy",
                 next: "block4",
                 parent: "block2",
+                inputs: {
+                  X: [1, [4, "-200"]],
+                  Y: [1, [4, "-100"]]
+                },
+                fields: {}
+              },
+              "block4": {
+                opcode: "control_wait",
+                next: "block5",
+                parent: "block3",
                 inputs: {
                   DURATION: [1, [4, "1"]]
                 },
                 fields: {}
               },
-              "block4": {
+              "block5": {
+                opcode: "motion_glidesecstoxy",
+                next: "block6",
+                parent: "block4",
+                inputs: {
+                  SECS: [1, [4, "3"]],
+                  X: [1, [4, "0"]],
+                  Y: [1, [4, "-100"]]
+                },
+                fields: {}
+              },
+              "block6": {
                 opcode: "looks_switchbackdropto",
-                next: "block5",
-                parent: "block3",
+                next: "block7",
+                parent: "block5",
                 inputs: {
                   BACKDROP: [1, [10, "Party"]]
                 },
                 fields: {}
               },
-              "block5": {
+              "block7": {
                 opcode: "looks_sayforsecs",
                 next: null,
-                parent: "block4",
+                parent: "block6",
                 inputs: {
-                  MESSAGE: [1, [10, "こんにちは"]],
+                  MESSAGE: [1, [10, "こんにちは！"]],
                   SECS: [1, [4, "2"]]
                 },
                 fields: {}
