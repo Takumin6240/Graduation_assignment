@@ -772,6 +772,48 @@ async function seedDatabase() {
 
     console.log('✓ Chapter 1: 4 problems created');
 
+    // Add hints for Problem 3 (find_error type)
+    const problem3Result = await client.query(`
+      SELECT id FROM problems WHERE chapter_id = $1 AND order_number = 3
+    `, [chapterId]);
+
+    if (problem3Result.rows.length > 0) {
+      const problem3Id = problem3Result.rows[0].id;
+
+      const hints = [
+        {
+          grade: 3,
+          hintText: '<span style="color: #2563eb; font-weight: bold;">ヒント：</span>\nブロックの<span style="color: #ea580c; font-weight: bold;"><ruby>色<rt>いろ</rt></ruby></span>に<ruby>注目<rt>ちゅうもく</rt></ruby>してみよう！\n\n<ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby>は：\n🟡 → 🟣 → 🔵 → 🟠 → 🔵 → 🟣 → 🟣',
+          order: 1
+        },
+        {
+          grade: 4,
+          hintText: '<span style="color: #2563eb; font-weight: bold;">ヒント：</span>\nブロックの<ruby>色<rt>いろ</rt></ruby>と<ruby>役割<rt>やくわり</rt></ruby>を<ruby>考<rt>かんが</rt></ruby>えよう！\n\n🟡 イベント（<ruby>開始<rt>かいし</rt></ruby>）\n🟣 <ruby>見<rt>み</rt></ruby>た<ruby>目<rt>め</rt></ruby>（<ruby>背景<rt>はいけい</rt></ruby>・<ruby>言葉<rt>ことば</rt></ruby>）\n🔵 <ruby>動<rt>うご</rt></ruby>き（<ruby>位置<rt>いち</rt></ruby>）\n🟠 <ruby>制御<rt>せいぎょ</rt></ruby>（<ruby>待<rt>ま</rt></ruby>つ）',
+          order: 2
+        },
+        {
+          grade: 5,
+          hintText: '<span style="color: #2563eb; font-weight: bold;">ヒント：</span>\n<ruby>準備<rt>じゅんび</rt></ruby> → <ruby>動作<rt>どうさ</rt></ruby> → <ruby>演出<rt>えんしゅつ</rt></ruby>の<ruby>順<rt>じゅん</rt></ruby>で<ruby>考<rt>かんが</rt></ruby>えてみよう。\n\n<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>背景<rt>はいけい</rt></ruby>と<ruby>位置<rt>いち</rt></ruby>を<ruby>設定<rt>せってい</rt></ruby>してから、<ruby>動<rt>うご</rt></ruby>かして、<ruby>最後<rt>さいご</rt></ruby>に<ruby>演出<rt>えんしゅつ</rt></ruby>（<ruby>背景<rt>はいけい</rt></ruby><ruby>変更<rt>へんこう</rt></ruby>・<ruby>挨拶<rt>あいさつ</rt></ruby>）をするよ。',
+          order: 3
+        },
+        {
+          grade: 6,
+          hintText: '<span style="color: #2563eb; font-weight: bold;">ヒント：</span>\n<ruby>初期化<rt>しょきか</rt></ruby>（initialization）→ <ruby>処理<rt>しょり</rt></ruby>（process）→ <ruby>出力<rt>しゅつりょく</rt></ruby>（output）という<ruby>流<rt>なが</rt></ruby>れを<ruby>意識<rt>いしき</rt></ruby>しよう。\n\nプログラミングの<ruby>基本<rt>きほん</rt></ruby>は「IPO<ruby>モデル<rt>もでる</rt></ruby>」です。',
+          order: 4
+        }
+      ];
+
+      for (const hint of hints) {
+        await client.query(`
+          INSERT INTO hints (problem_id, grade, hint_text, hint_order)
+          VALUES ($1, $2, $3, $4)
+          ON CONFLICT DO NOTHING
+        `, [problem3Id, hint.grade, hint.hintText, hint.order]);
+      }
+
+      console.log('✓ Hints added for Problem 3');
+    }
+
     // Create Chapter 2: 分岐処理
     const chapter2Result = await client.query(`
       INSERT INTO chapters (title, description, order_number, image_url)
