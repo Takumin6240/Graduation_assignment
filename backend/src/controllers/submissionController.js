@@ -351,30 +351,30 @@ const calculateSimilarity = (data1, data2) => {
 
 // Calculate EXP based on difficulty and performance
 const calculateEarnedExp = (difficulty, score, attemptNumber, isPerfect) => {
-  // Base EXP by difficulty (1-5)
+  // Base EXP by difficulty (1-5) - 調整済み：より緩やかなレベルアップ
   const baseExpByDifficulty = {
-    1: 50,
-    2: 80,
-    3: 120,
-    4: 150,
-    5: 200
+    1: 40,   // 50 → 40
+    2: 60,   // 80 → 60
+    3: 80,   // 120 → 80
+    4: 100,  // 150 → 100
+    5: 130   // 200 → 130
   };
 
-  let baseExp = baseExpByDifficulty[difficulty] || 50;
+  let baseExp = baseExpByDifficulty[difficulty] || 40;
   let bonusExp = 0;
 
-  // Perfect score bonus
+  // Perfect score bonus - 調整済み
   if (isPerfect) {
-    bonusExp += 20;
+    bonusExp += 15;  // 20 → 15
   }
 
-  // First-try bonus
+  // First-try bonus - 調整済み
   if (attemptNumber === 1) {
-    bonusExp += 30;
+    bonusExp += 20;  // 30 → 20
   } else if (attemptNumber === 2) {
-    bonusExp += 15;
+    bonusExp += 10;  // 15 → 10
   } else {
-    bonusExp += 10;
+    bonusExp += 5;   // 10 → 5
   }
 
   // Score multiplier (proportional to score)
@@ -388,24 +388,54 @@ const calculateEarnedExp = (difficulty, score, attemptNumber, isPerfect) => {
   };
 };
 
+// Get total EXP required to reach a specific level
+const getExpForLevel = (level) => {
+  // レベル1は0 EXPから開始
+  if (level <= 1) return 0;
+
+  // レベルnに到達するのに必要な累積経験値
+  // レベル1→2: 100 EXP
+  // レベル2→3: 150 EXP
+  // レベル3→4: 200 EXP
+  // レベル4→5: 250 EXP
+  // パターン: 各レベルアップに必要なEXP = 50 + 50 * (レベル - 1)
+  let totalExp = 0;
+  for (let i = 1; i < level; i++) {
+    totalExp += 50 + 50 * i; // 100, 150, 200, 250, 300, ...
+  }
+  return totalExp;
+};
+
 // Calculate level up
 const calculateLevelUp = (currentExp, currentLevel) => {
   let newLevel = currentLevel;
-  let remainingExp = currentExp;
 
-  // Level up formula: required EXP = level * 100
-  while (remainingExp >= newLevel * 100) {
-    remainingExp -= newLevel * 100;
+  // 次のレベルに到達できるかチェック
+  while (currentExp >= getExpForLevel(newLevel + 1)) {
     newLevel++;
   }
 
-  const expToNextLevel = newLevel * 100 - remainingExp;
+  // 現在のレベルに到達するために必要だった累積経験値
+  const expForCurrentLevel = getExpForLevel(newLevel);
+
+  // 現在のレベル内で獲得した経験値（0以上である必要がある）
+  const currentLevelExp = currentExp - expForCurrentLevel;
+
+  // 次のレベルに到達するために必要な累積経験値
+  const expForNextLevelTotal = getExpForLevel(newLevel + 1);
+
+  // このレベルから次のレベルまでに必要な経験値
+  const expForNextLevel = expForNextLevelTotal - expForCurrentLevel;
+
+  // あと何EXP必要か
+  const expToNextLevel = expForNextLevel - currentLevelExp;
 
   return {
     newLevel,
     leveledUp: newLevel > currentLevel,
     expToNextLevel,
-    currentLevelExp: remainingExp
+    currentLevelExp,
+    expForNextLevel
   };
 };
 
