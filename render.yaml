@@ -8,7 +8,6 @@ services:
     region: singapore
     plan: free
     branch: main
-    healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
