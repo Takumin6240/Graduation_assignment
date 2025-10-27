@@ -37,10 +37,7 @@ services:
     branch: main
     envVars:
       - key: REACT_APP_API_URL
-        fromService:
-          type: web
-          name: scratch-learning-backend
-          property: host
+        sync: false
 
 databases:
   # PostgreSQL Database

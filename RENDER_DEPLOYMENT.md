@@ -106,32 +106,40 @@ Build completed successfully
 
 ---
 
-## ステップ5: 環境変数の調整
+## ステップ5: 環境変数の設定（重要）
 
-### 5-1. Frontend URL の修正
+⚠️ **このステップは必須です。環境変数を正しく設定しないとアプリが動作しません。**
 
-`FRONTEND_URL`には`https://`プレフィックスが必要です：
+### 5-1. Backend の FRONTEND_URL を設定
 
 1. **Backend サービス** を開く
 2. **「Environment」** タブをクリック
-3. `FRONTEND_URL`を編集：
+3. `FRONTEND_URL`を手動で追加：
    ```
-   https://scratch-learning-frontend.onrender.com
+   FRONTEND_URL=https://scratch-learning-frontend.onrender.com
    ```
    （実際のフロントエンドURLに置き換えてください）
 4. **「Save Changes」** をクリック
 5. 自動的に再デプロイされます
 
-### 5-2. API URL の確認
+### 5-2. Frontend の REACT_APP_API_URL を設定
+
+⚠️ **最重要**: Reactアプリはビルド時に環境変数を埋め込むため、この設定が必須です。
 
 1. **Frontend サービス** を開く
 2. **「Environment」** タブをクリック
-3. `REACT_APP_API_URL`が以下の形式になっているか確認：
+3. `REACT_APP_API_URL`を手動で追加：
    ```
-   https://scratch-learning-backend.onrender.com
+   REACT_APP_API_URL=https://scratch-learning-backend.onrender.com
    ```
+   （実際のバックエンドURLに置き換えてください）
+4. **「Save Changes」** をクリック
+5. **Manual Deploy** → **「Deploy latest commit」** をクリックして再ビルド
 
-⚠️ **重要**: `https://`が含まれ、末尾に`/`がないことを確認してください
+⚠️ **重要事項**:
+- `https://`プレフィックスを必ず含める
+- 末尾に`/`を含めない
+- フロントエンドは環境変数変更後に**必ず再デプロイ**が必要（ビルド時に環境変数が埋め込まれるため）
 
 ---
 
