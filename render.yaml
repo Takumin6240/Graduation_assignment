@@ -21,7 +21,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: FRONTEND_URL
-        value: https://scratch-learning-frontend.onrender.com
+        value: https://scratch-learning-frontend-jhut.onrender.com
 
   # Frontend Web Service
   - type: web
