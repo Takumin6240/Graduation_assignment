@@ -77,7 +77,7 @@ const Progress: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-700 mb-8"><ruby>学習<rt>がくしゅう</rt></ruby><ruby>進捗<rt>しんちょく</rt></ruby></h1>
+      <h1 className="text-4xl font-bold text-primary-700 mb-8" dangerouslySetInnerHTML={{ __html: '<ruby>学習<rt>がくしゅう</rt></ruby><ruby>進捗<rt>しんちょく</rt></ruby>' }}></h1>
 
       {/* User Stats */}
       {user && (
@@ -85,11 +85,11 @@ const Progress: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-2">こんにちは、{user.nickname}さん！</h2>
-              <p className="text-primary-100 text-lg">{user.grade}<ruby>年生<rt>ねんせい</rt></ruby> | レベル {user.level}</p>
+              <p className="text-primary-100 text-lg" dangerouslySetInnerHTML={{ __html: `${user.grade}<ruby>年生<rt>ねんせい</rt></ruby> | レベル ${user.level}` }}></p>
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
-                <p className="text-sm font-medium mb-1"><ruby>経験値<rt>けいけんち</rt></ruby></p>
+                <p className="text-sm font-medium mb-1" dangerouslySetInnerHTML={{ __html: '<ruby>経験値<rt>けいけんち</rt></ruby>' }}></p>
                 <p className="text-4xl font-bold">{user.exp} EXP</p>
               </div>
             </div>
@@ -102,7 +102,7 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium"><ruby>解<rt>と</rt></ruby>いた<ruby>問題数<rt>もんだいすう</rt></ruby></p>
+              <p className="text-gray-500 text-sm font-medium" dangerouslySetInnerHTML={{ __html: '<ruby>解<rt>と</rt></ruby>いた<ruby>問題数<rt>もんだいすう</rt></ruby>' }}></p>
               <p className="text-3xl font-bold text-green-600 mt-2">{totalSolved}</p>
             </div>
             <div className="bg-green-100 rounded-full p-3">
@@ -116,7 +116,7 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium"><ruby>挑戦<rt>ちょうせん</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></p>
+              <p className="text-gray-500 text-sm font-medium" dangerouslySetInnerHTML={{ __html: '<ruby>挑戦<rt>ちょうせん</rt></ruby><ruby>回数<rt>かいすう</rt></ruby>' }}></p>
               <p className="text-3xl font-bold text-blue-600 mt-2">{submissions.length}</p>
             </div>
             <div className="bg-blue-100 rounded-full p-3">
@@ -130,8 +130,8 @@ const Progress: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium"><ruby>平均<rt>へいきん</rt></ruby>スコア</p>
-              <p className="text-3xl font-bold text-yellow-600 mt-2">{averageScore}<ruby>点<rt>てん</rt></ruby></p>
+              <p className="text-gray-500 text-sm font-medium" dangerouslySetInnerHTML={{ __html: '<ruby>平均<rt>へいきん</rt></ruby>スコア' }}></p>
+              <p className="text-3xl font-bold text-yellow-600 mt-2" dangerouslySetInnerHTML={{ __html: `${averageScore}<ruby>点<rt>てん</rt></ruby>` }}></p>
             </div>
             <div className="bg-yellow-100 rounded-full p-3">
               <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,19 +144,19 @@ const Progress: React.FC = () => {
 
       {/* Submission History */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6"><ruby>提出<rt>ていしゅつ</rt></ruby><ruby>履歴<rt>りれき</rt></ruby></h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-6" dangerouslySetInnerHTML={{ __html: '<ruby>提出<rt>ていしゅつ</rt></ruby><ruby>履歴<rt>りれき</rt></ruby>' }}></h2>
 
         {submissions.length === 0 ? (
           <div className="text-center py-12">
             <svg className="mx-auto w-24 h-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <p className="text-gray-500 text-lg mb-4">まだ<ruby>提出<rt>ていしゅつ</rt></ruby>がありません</p>
+            <p className="text-gray-500 text-lg mb-4" dangerouslySetInnerHTML={{ __html: 'まだ<ruby>提出<rt>ていしゅつ</rt></ruby>がありません' }}></p>
             <Link
               to="/chapters"
               className="bg-primary-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-primary-700 inline-block"
+              dangerouslySetInnerHTML={{ __html: '<ruby>問題<rt>もんだい</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>する' }}
             >
-              <ruby>問題<rt>もんだい</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>する
             </Link>
           </div>
         ) : (
@@ -174,12 +174,10 @@ const Progress: React.FC = () => {
                       <span className="bg-primary-100 text-primary-800 px-3 py-1 rounded-full text-sm font-medium" dangerouslySetInnerHTML={{ __html: getProblemTypeName(submission.problem_type) }}>
                       </span>
                       {submission.is_correct ? (
-                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold">
-                          ✓ <ruby>正解<rt>せいかい</rt></ruby>
+                        <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-semibold" dangerouslySetInnerHTML={{ __html: '✓ <ruby>正解<rt>せいかい</rt></ruby>' }}>
                         </span>
                       ) : (
-                        <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold">
-                          ✗ <ruby>不正解<rt>ふせいかい</rt></ruby>
+                        <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-semibold" dangerouslySetInnerHTML={{ __html: '✗ <ruby>不正解<rt>ふせいかい</rt></ruby>' }}>
                         </span>
                       )}
                     </div>
@@ -191,16 +189,19 @@ const Progress: React.FC = () => {
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                       <div>
                         <p className="text-gray-500">スコア</p>
-                        <p className="font-bold text-yellow-600">{submission.score}<ruby>点<rt>てん</rt></ruby></p>
+                        <p className="font-bold text-yellow-600" dangerouslySetInnerHTML={{ __html: `${submission.score}<ruby>点<rt>てん</rt></ruby>` }}></p>
                       </div>
                       <div>
-                        <p className="text-gray-500"><ruby>試行<rt>しこう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby></p>
-                        <p className="font-bold text-blue-600">{submission.total_attempts}<ruby>回<rt>かい</rt></ruby></p>
+                        <p className="text-gray-500" dangerouslySetInnerHTML={{ __html: '<ruby>試行<rt>しこう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby>' }}></p>
+                        <p className="font-bold text-blue-600" dangerouslySetInnerHTML={{ __html: `${submission.total_attempts}<ruby>回<rt>かい</rt></ruby>` }}></p>
                       </div>
                       <div>
-                        <p className="text-gray-500"><ruby>所要<rt>しょよう</rt></ruby><ruby>時間<rt>じかん</rt></ruby></p>
-                        <p className="font-bold text-gray-700">
-                          {submission.time_spent > 0 ? `${Math.round(submission.time_spent / 60)}<ruby>分<rt>ふん</rt></ruby>` : '-'}
+                        <p className="text-gray-500" dangerouslySetInnerHTML={{ __html: '<ruby>所要<rt>しょよう</rt></ruby><ruby>時間<rt>じかん</rt></ruby>' }}></p>
+                        <p className="font-bold text-gray-700" dangerouslySetInnerHTML={{
+                          __html: submission.time_spent > 0
+                            ? `${Math.floor(submission.time_spent / 60)}<ruby>分<rt>ふん</rt></ruby>${submission.time_spent % 60}<ruby>秒<rt>びょう</rt></ruby>`
+                            : '-'
+                        }}>
                         </p>
                       </div>
                     </div>
@@ -213,8 +214,8 @@ const Progress: React.FC = () => {
                     <Link
                       to={`/problems/${submission.problem_id}`}
                       className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+                      dangerouslySetInnerHTML={{ __html: 'もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby> →' }}
                     >
-                      もう<ruby>一度<rt>いちど</rt></ruby><ruby>挑戦<rt>ちょうせん</rt></ruby> →
                     </Link>
                   </div>
                 </div>
