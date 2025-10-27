@@ -51,5 +51,8 @@ uploads/
 # Railway
 .railway/
 
+# Vercel
+.vercel
+
 # Scratch files
 *.sb3

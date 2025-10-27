@@ -46,7 +46,8 @@
 - React Router v6
 
 ### インフラ
-- Docker + Docker Compose
+- **開発環境**: Docker + Docker Compose
+- **本番環境**: Render (Frontend + Backend + PostgreSQL)
 
 ## セットアップ手順
 

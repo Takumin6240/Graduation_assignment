@@ -23,7 +23,11 @@
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T backend node src/db/seed.js)",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, title, description FROM problems WHERE chapter_id = 1 AND order_number = 1;\")",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec:*)",
-      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT description FROM problems WHERE chapter_id = 1 AND order_number = 4;\")"
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT description FROM problems WHERE chapter_id = 1 AND order_number = 4;\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git config:*)",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
