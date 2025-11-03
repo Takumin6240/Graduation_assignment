@@ -77,7 +77,7 @@ const Progress: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-700 mb-8" dangerouslySetInnerHTML={{ __html: '<ruby>学習<rt>がくしゅう</rt></ruby><ruby>進捗<rt>しんちょく</rt></ruby>' }}></h1>
+      <h1 className="text-4xl font-bold text-primary-700 mb-8" dangerouslySetInnerHTML={{ __html: '<ruby>自分<rt>じぶん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>' }}></h1>
 
       {/* User Stats */}
       {user && (
