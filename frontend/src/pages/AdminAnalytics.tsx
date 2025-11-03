@@ -15,6 +15,7 @@ interface ProblemAnalytic {
   unique_students: number;
   total_submissions: number;
   correct_submissions: number;
+  correct_rate: number;
   avg_score: number;
   avg_time_spent_seconds: number;
   avg_attempts_to_solve: number;
@@ -42,17 +43,20 @@ interface StudentAnalytic {
   registration_date: string;
   problems_attempted: number;
   problems_solved: number;
+  total_submissions: number;
+  correct_submissions: number;
+  correct_rate: number;
   avg_score: number;
   avg_attempts: number;
   total_time_spent: number;
-  fill_blank_solved: number;
-  fill_blank_attempted: number;
-  predict_solved: number;
-  predict_attempted: number;
-  find_error_solved: number;
-  find_error_attempted: number;
-  mission_solved: number;
-  mission_attempted: number;
+  fill_blank_correct: number;
+  fill_blank_submissions: number;
+  predict_correct: number;
+  predict_submissions: number;
+  find_error_correct: number;
+  find_error_submissions: number;
+  mission_correct: number;
+  mission_submissions: number;
 }
 
 interface ProblemTypeAnalytic {
@@ -60,6 +64,7 @@ interface ProblemTypeAnalytic {
   students_attempted: number;
   total_submissions: number;
   correct_submissions: number;
+  correct_rate: number;
   avg_score: number;
   avg_time_spent: number;
   avg_attempts: number;
@@ -72,6 +77,7 @@ interface TimeSeriesData {
   submissions: number;
   correct_submissions: number;
   active_students: number;
+  correct_rate: number;
   avg_score: number;
 }
 
@@ -343,9 +349,7 @@ const AdminAnalytics: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {analytics.problemTypeAnalysis.map((type) => {
                 const typeInfo = getProblemTypeLabel(type.problem_type);
-                const successRate = type.total_submissions > 0
-                  ? Math.round((Number(type.correct_submissions) / Number(type.total_submissions)) * 100)
-                  : 0;
+                const correctRate = Number(type.correct_rate);
 
                 return (
                   <div key={type.problem_type} className="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition">
@@ -359,12 +363,12 @@ const AdminAnalytics: React.FC = () => {
                         <span className="font-bold">{type.students_attempted}人</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">提出数:</span>
+                        <span className="text-gray-600">提出回数:</span>
                         <span className="font-bold">{type.total_submissions}回</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">正解率:</span>
-                        <span className="font-bold text-green-600">{successRate}%</span>
+                        <span className="font-bold text-green-600">{correctRate.toFixed(1)}%</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">平均試行:</span>
@@ -476,9 +480,7 @@ const AdminAnalytics: React.FC = () => {
 
           {analytics.problemAnalytics.map((problem) => {
             const typeInfo = getProblemTypeLabel(problem.problem_type);
-            const successRate = problem.total_submissions > 0
-              ? Math.round((Number(problem.correct_submissions) / Number(problem.total_submissions)) * 100)
-              : 0;
+            const correctRate = Number(problem.correct_rate);
             const firstAttemptRate = problem.first_attempt_total > 0
               ? Math.round((Number(problem.first_attempt_success) / Number(problem.first_attempt_total)) * 100)
               : 0;
@@ -504,18 +506,19 @@ const AdminAnalytics: React.FC = () => {
                     <p className="text-gray-600 text-sm" dangerouslySetInnerHTML={{ __html: problem.chapter_title }}></p>
                   </div>
                   <div className={`px-6 py-3 rounded-lg text-center ${
-                    successRate >= 80 ? 'bg-green-100' :
-                    successRate >= 50 ? 'bg-yellow-100' :
+                    correctRate >= 80 ? 'bg-green-100' :
+                    correctRate >= 50 ? 'bg-yellow-100' :
                     'bg-red-100'
                   }`}>
                     <div className={`text-3xl font-bold ${
-                      successRate >= 80 ? 'text-green-700' :
-                      successRate >= 50 ? 'text-yellow-700' :
+                      correctRate >= 80 ? 'text-green-700' :
+                      correctRate >= 50 ? 'text-yellow-700' :
                       'text-red-700'
                     }`}>
-                      {successRate}%
+                      {correctRate.toFixed(1)}%
                     </div>
-                    <div className="text-xs text-gray-600 mt-1">全体正解率</div>
+                    <div className="text-xs text-gray-600 mt-1">正解率</div>
+                    <div className="text-xs text-gray-500 mt-1">(提出回数ベース)</div>
                   </div>
                 </div>
 
@@ -526,11 +529,11 @@ const AdminAnalytics: React.FC = () => {
                     <p className="text-2xl font-bold text-blue-700">{problem.unique_students}</p>
                   </div>
                   <div className="bg-purple-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">総提出数</p>
+                    <p className="text-xs text-gray-600 mb-1">提出回数</p>
                     <p className="text-2xl font-bold text-purple-700">{problem.total_submissions}</p>
                   </div>
                   <div className="bg-green-50 rounded-lg p-3">
-                    <p className="text-xs text-gray-600 mb-1">正解数</p>
+                    <p className="text-xs text-gray-600 mb-1">正解回数</p>
                     <p className="text-2xl font-bold text-green-700">{problem.correct_submissions}</p>
                   </div>
                   <div className="bg-yellow-50 rounded-lg p-3">
@@ -601,10 +604,10 @@ const AdminAnalytics: React.FC = () => {
                   <div className="bg-gray-50 rounded-lg p-3">
                     <p className="text-sm font-medium text-gray-700 mb-2">📊 問題の評価</p>
                     <div className="text-xs space-y-1">
-                      {successRate < 40 && (
+                      {correctRate < 40 && (
                         <p className="text-red-600 font-medium">⚠️ 難易度が高すぎる可能性</p>
                       )}
-                      {successRate > 90 && (
+                      {correctRate > 90 && (
                         <p className="text-blue-600 font-medium">✅ 難易度が適切または易しい</p>
                       )}
                       {firstAttemptRate < 30 && (
@@ -630,29 +633,27 @@ const AdminAnalytics: React.FC = () => {
 
           <div className="grid gap-6">
             {analytics.studentAnalysis.map((student) => {
-              const successRate = student.problems_attempted > 0
-                ? Math.round((student.problems_solved / student.problems_attempted) * 100)
-                : 0;
+              const correctRate = Number(student.correct_rate);
 
-              const fillBlankRate = student.fill_blank_attempted > 0
-                ? Math.round((student.fill_blank_solved / student.fill_blank_attempted) * 100)
+              const fillBlankRate = student.fill_blank_submissions > 0
+                ? Math.round((student.fill_blank_correct / student.fill_blank_submissions) * 100)
                 : 0;
-              const predictRate = student.predict_attempted > 0
-                ? Math.round((student.predict_solved / student.predict_attempted) * 100)
+              const predictRate = student.predict_submissions > 0
+                ? Math.round((student.predict_correct / student.predict_submissions) * 100)
                 : 0;
-              const findErrorRate = student.find_error_attempted > 0
-                ? Math.round((student.find_error_solved / student.find_error_attempted) * 100)
+              const findErrorRate = student.find_error_submissions > 0
+                ? Math.round((student.find_error_correct / student.find_error_submissions) * 100)
                 : 0;
-              const missionRate = student.mission_attempted > 0
-                ? Math.round((student.mission_solved / student.mission_attempted) * 100)
+              const missionRate = student.mission_submissions > 0
+                ? Math.round((student.mission_correct / student.mission_submissions) * 100)
                 : 0;
 
               const problemTypes = [
-                { name: '穴埋め', rate: fillBlankRate, icon: '📝', attempted: student.fill_blank_attempted },
-                { name: '予測', rate: predictRate, icon: '🔮', attempted: student.predict_attempted },
-                { name: 'バグ発見', rate: findErrorRate, icon: '🐛', attempted: student.find_error_attempted },
-                { name: 'ミッション', rate: missionRate, icon: '🚀', attempted: student.mission_attempted },
-              ].filter(t => t.attempted > 0);
+                { name: '穴埋め', rate: fillBlankRate, icon: '📝', submissions: student.fill_blank_submissions, correct: student.fill_blank_correct },
+                { name: '予測', rate: predictRate, icon: '🔮', submissions: student.predict_submissions, correct: student.predict_correct },
+                { name: 'バグ発見', rate: findErrorRate, icon: '🐛', submissions: student.find_error_submissions, correct: student.find_error_correct },
+                { name: 'ミッション', rate: missionRate, icon: '🚀', submissions: student.mission_submissions, correct: student.mission_correct },
+              ].filter(t => t.submissions > 0);
 
               const weakestType = problemTypes.reduce((min, type) => type.rate < min.rate ? type : min, problemTypes[0]);
               const strongestType = problemTypes.reduce((max, type) => type.rate > max.rate ? type : max, problemTypes[0]);
@@ -672,30 +673,35 @@ const AdminAnalytics: React.FC = () => {
                       </div>
                     </div>
                     <div className={`px-6 py-3 rounded-lg text-center ${
-                      successRate >= 80 ? 'bg-green-100' :
-                      successRate >= 50 ? 'bg-yellow-100' :
+                      correctRate >= 80 ? 'bg-green-100' :
+                      correctRate >= 50 ? 'bg-yellow-100' :
                       'bg-red-100'
                     }`}>
                       <div className={`text-3xl font-bold ${
-                        successRate >= 80 ? 'text-green-700' :
-                        successRate >= 50 ? 'text-yellow-700' :
+                        correctRate >= 80 ? 'text-green-700' :
+                        correctRate >= 50 ? 'text-yellow-700' :
                         'text-red-700'
                       }`}>
-                        {successRate}%
+                        {correctRate.toFixed(1)}%
                       </div>
                       <div className="text-xs text-gray-600 mt-1">正解率</div>
+                      <div className="text-xs text-gray-500 mt-1">(提出ベース)</div>
                     </div>
                   </div>
 
                   {/* Overall Stats */}
-                  <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
                     <div className="bg-blue-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-blue-700">{student.problems_attempted}</p>
+                      <p className="text-2xl font-bold text-blue-700">{student.problems_attempted}問</p>
                       <p className="text-xs text-gray-600">挑戦した問題</p>
                     </div>
                     <div className="bg-green-50 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-green-700">{student.problems_solved}</p>
+                      <p className="text-2xl font-bold text-green-700">{student.problems_solved}問</p>
                       <p className="text-xs text-gray-600">正解した問題</p>
+                    </div>
+                    <div className="bg-indigo-50 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-indigo-700">{student.total_submissions}回</p>
+                      <p className="text-xs text-gray-600">総提出回数</p>
                     </div>
                     <div className="bg-yellow-50 rounded-lg p-3 text-center">
                       <p className="text-2xl font-bold text-yellow-700">{Number(student.avg_score).toFixed(0)}</p>
@@ -713,13 +719,13 @@ const AdminAnalytics: React.FC = () => {
 
                   {/* Problem Type Performance */}
                   <div className="mb-4">
-                    <h4 className="text-sm font-bold text-gray-700 mb-3">問題タイプ別の成績</h4>
+                    <h4 className="text-sm font-bold text-gray-700 mb-3">問題タイプ別の成績（提出ベース）</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
-                        { name: '穴埋め', icon: '📝', rate: fillBlankRate, solved: student.fill_blank_solved, attempted: student.fill_blank_attempted },
-                        { name: '予測', icon: '🔮', rate: predictRate, solved: student.predict_solved, attempted: student.predict_attempted },
-                        { name: 'バグ発見', icon: '🐛', rate: findErrorRate, solved: student.find_error_solved, attempted: student.find_error_attempted },
-                        { name: 'ミッション', icon: '🚀', rate: missionRate, solved: student.mission_solved, attempted: student.mission_attempted },
+                        { name: '穴埋め', icon: '📝', rate: fillBlankRate, correct: student.fill_blank_correct, submissions: student.fill_blank_submissions },
+                        { name: '予測', icon: '🔮', rate: predictRate, correct: student.predict_correct, submissions: student.predict_submissions },
+                        { name: 'バグ発見', icon: '🐛', rate: findErrorRate, correct: student.find_error_correct, submissions: student.find_error_submissions },
+                        { name: 'ミッション', icon: '🚀', rate: missionRate, correct: student.mission_correct, submissions: student.mission_submissions },
                       ].map((type) => (
                         <div key={type.name} className="border-2 border-gray-200 rounded-lg p-3">
                           <div className="flex items-center gap-2 mb-2">
@@ -732,9 +738,9 @@ const AdminAnalytics: React.FC = () => {
                               type.rate >= 50 ? 'text-yellow-600' :
                               'text-red-600'
                             }`}>
-                              {type.attempted > 0 ? `${type.rate}%` : '-'}
+                              {type.submissions > 0 ? `${type.rate}%` : '-'}
                             </div>
-                            <div className="text-xs text-gray-600">{type.solved}/{type.attempted}</div>
+                            <div className="text-xs text-gray-600">{type.correct}正解/{type.submissions}提出</div>
                           </div>
                         </div>
                       ))}
@@ -757,7 +763,7 @@ const AdminAnalytics: React.FC = () => {
                           </p>
                         </div>
                       </div>
-                      {successRate < 50 && (
+                      {correctRate < 50 && (
                         <p className="text-orange-700 font-medium mt-2 text-sm">
                           💭 推奨: {weakestType.name}問題の復習とヒントの活用を促してください
                         </p>
@@ -882,9 +888,7 @@ const AdminAnalytics: React.FC = () => {
                       ? new Date(item.month_start).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long' })
                       : '';
 
-                    const successRate = item.submissions > 0
-                      ? Math.round((Number(item.correct_submissions) / Number(item.submissions)) * 100)
-                      : 0;
+                    const correctRate = Number(item.correct_rate);
 
                     return (
                       <div key={index} className="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition">
@@ -894,34 +898,34 @@ const AdminAnalytics: React.FC = () => {
                             <p className="text-sm text-gray-600">アクティブ生徒: {item.active_students}人</p>
                           </div>
                           <div className="text-right">
-                            <p className="text-2xl font-bold text-primary-600">{item.submissions}件</p>
-                            <p className="text-xs text-gray-600">提出</p>
+                            <p className="text-2xl font-bold text-primary-600">{item.submissions}回</p>
+                            <p className="text-xs text-gray-600">提出回数</p>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-3 gap-3 mb-3">
                           <div className="bg-green-50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-green-700">{item.correct_submissions}</p>
-                            <p className="text-xs text-gray-600">正解</p>
+                            <p className="text-lg font-bold text-green-700">{item.correct_submissions}回</p>
+                            <p className="text-xs text-gray-600">正解回数</p>
                           </div>
                           <div className="bg-yellow-50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-yellow-700">{successRate}%</p>
+                            <p className="text-lg font-bold text-yellow-700">{correctRate.toFixed(1)}%</p>
                             <p className="text-xs text-gray-600">正解率</p>
                           </div>
                           <div className="bg-blue-50 rounded p-2 text-center">
-                            <p className="text-lg font-bold text-blue-700">{Number(item.avg_score).toFixed(0)}</p>
-                            <p className="text-xs text-gray-600">平均点</p>
+                            <p className="text-lg font-bold text-blue-700">{Number(item.avg_score || 0).toFixed(0)}点</p>
+                            <p className="text-xs text-gray-600">平均スコア</p>
                           </div>
                         </div>
 
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className={`h-2 rounded-full transition-all duration-500 ${
-                              successRate >= 80 ? 'bg-green-500' :
-                              successRate >= 50 ? 'bg-yellow-500' :
+                              correctRate >= 80 ? 'bg-green-500' :
+                              correctRate >= 50 ? 'bg-yellow-500' :
                               'bg-red-500'
                             }`}
-                            style={{ width: `${successRate}%` }}
+                            style={{ width: `${correctRate}%` }}
                           ></div>
                         </div>
                       </div>

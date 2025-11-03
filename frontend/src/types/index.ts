@@ -3,8 +3,8 @@ export interface User {
   username: string;
   nickname: string;
   grade: number;
-  level: number;
-  exp: number;
+  rank: number;
+  points: number;
   created_at?: string;
 }
 

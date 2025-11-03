@@ -13,7 +13,9 @@ const {
   updateCorrectAnswer,
   getDetailedAnalytics,
   exportAnalyticsCSV,
-  exportAnalyticsJSON
+  exportAnalyticsJSON,
+  getErrorAnalysisByProblem,
+  getErrorAnalysisDashboard
 } = require('../controllers/adminController');
 const { adminAuthMiddleware } = require('../middleware/auth');
 
@@ -41,6 +43,8 @@ router.get('/users/:userId', getUserDetails);
 router.get('/statistics', getStatistics);
 router.get('/analytics/problems', getProblemAnalytics);
 router.get('/analytics/detailed', getDetailedAnalytics);
+router.get('/analytics/errors/dashboard', getErrorAnalysisDashboard);
+router.get('/analytics/errors/problem/:problemId', getErrorAnalysisByProblem);
 router.get('/analytics/export/csv', exportAnalyticsCSV);
 router.get('/analytics/export/json', exportAnalyticsJSON);
 router.get('/problems', getAllProblems);

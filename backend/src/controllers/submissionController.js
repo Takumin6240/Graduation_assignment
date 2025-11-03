@@ -1,6 +1,7 @@
 const pool = require('../config/database');
 const { log } = require('../utils/logger');
 const JSZip = require('jszip');
+const { evaluateScratchProgram } = require('../services/scratchGradingEngine');
 
 // Parse SB3 file (Scratch file is a ZIP containing project.json)
 const parseSB3File = async (fileBuffer) => {
@@ -136,8 +137,43 @@ const deepEqual = (obj1, obj2) => {
   return true;
 };
 
-// Advanced comparison logic for Scratch programs
+// Advanced comparison logic for Scratch programs (v2.0 - 新しい採点エンジン使用)
 const compareScratchPrograms = (submittedData, correctData, problemType = null) => {
+  if (!submittedData || !correctData) {
+    return { isCorrect: false, score: 0, message: 'データが不正です', feedback: 'データが不正です' };
+  }
+
+  // 新しい採点エンジンを使用
+  const result = evaluateScratchProgram(submittedData, correctData);
+
+  // フィードバックを文字列形式に変換
+  let feedbackText = result.feedback.summary;
+
+  if (result.feedback.details && result.feedback.details.length > 0) {
+    feedbackText += '\n\n【詳細】\n';
+    for (const detail of result.feedback.details) {
+      feedbackText += `${detail.icon} ${detail.message}\n`;
+    }
+  }
+
+  if (result.feedback.hints && result.feedback.hints.length > 0) {
+    feedbackText += '\n【ヒント】\n';
+    for (const hint of result.feedback.hints) {
+      feedbackText += `💡 ${hint}\n`;
+    }
+  }
+
+  return {
+    isCorrect: result.isCorrect,
+    score: result.score,
+    message: result.isCorrect ? '正解です！' : '不正解です',
+    feedback: feedbackText,
+    feedbackData: result.feedback  // 構造化されたフィードバック（フロントエンド用）
+  };
+};
+
+// Legacy comparison logic for Scratch programs (旧バージョン - 参考用に残す)
+const compareScratchProgramsLegacy = (submittedData, correctData, problemType = null) => {
   if (!submittedData || !correctData) {
     return { isCorrect: false, score: 0, message: 'データが不正です' };
   }
@@ -388,54 +424,54 @@ const calculateEarnedExp = (difficulty, score, attemptNumber, isPerfect) => {
   };
 };
 
-// Get total EXP required to reach a specific level
-const getExpForLevel = (level) => {
-  // レベル1は0 EXPから開始
-  if (level <= 1) return 0;
+// Get total points required to reach a specific rank
+const getPointsForRank = (rank) => {
+  // ランク1は0ポイントから開始
+  if (rank <= 1) return 0;
 
-  // レベルnに到達するのに必要な累積経験値
-  // レベル1→2: 100 EXP
-  // レベル2→3: 150 EXP
-  // レベル3→4: 200 EXP
-  // レベル4→5: 250 EXP
-  // パターン: 各レベルアップに必要なEXP = 50 + 50 * (レベル - 1)
-  let totalExp = 0;
-  for (let i = 1; i < level; i++) {
-    totalExp += 50 + 50 * i; // 100, 150, 200, 250, 300, ...
+  // ランクnに到達するのに必要な累積ポイント
+  // ランク1→2: 100ポイント
+  // ランク2→3: 150ポイント
+  // ランク3→4: 200ポイント
+  // ランク4→5: 250ポイント
+  // パターン: 各ランクアップに必要なポイント = 50 + 50 * (ランク - 1)
+  let totalPoints = 0;
+  for (let i = 1; i < rank; i++) {
+    totalPoints += 50 + 50 * i; // 100, 150, 200, 250, 300, ...
   }
-  return totalExp;
+  return totalPoints;
 };
 
-// Calculate level up
-const calculateLevelUp = (currentExp, currentLevel) => {
-  let newLevel = currentLevel;
+// Calculate rank up
+const calculateRankUp = (currentPoints, currentRank) => {
+  let newRank = currentRank;
 
-  // 次のレベルに到達できるかチェック
-  while (currentExp >= getExpForLevel(newLevel + 1)) {
-    newLevel++;
+  // 次のランクに到達できるかチェック
+  while (currentPoints >= getPointsForRank(newRank + 1)) {
+    newRank++;
   }
 
-  // 現在のレベルに到達するために必要だった累積経験値
-  const expForCurrentLevel = getExpForLevel(newLevel);
+  // 現在のランクに到達するために必要だった累積ポイント
+  const pointsForCurrentRank = getPointsForRank(newRank);
 
-  // 現在のレベル内で獲得した経験値（0以上である必要がある）
-  const currentLevelExp = currentExp - expForCurrentLevel;
+  // 現在のランク内で獲得したポイント（0以上である必要がある）
+  const currentRankPoints = currentPoints - pointsForCurrentRank;
 
-  // 次のレベルに到達するために必要な累積経験値
-  const expForNextLevelTotal = getExpForLevel(newLevel + 1);
+  // 次のランクに到達するために必要な累積ポイント
+  const pointsForNextRankTotal = getPointsForRank(newRank + 1);
 
-  // このレベルから次のレベルまでに必要な経験値
-  const expForNextLevel = expForNextLevelTotal - expForCurrentLevel;
+  // このランクから次のランクまでに必要なポイント
+  const pointsForNextRank = pointsForNextRankTotal - pointsForCurrentRank;
 
-  // あと何EXP必要か
-  const expToNextLevel = expForNextLevel - currentLevelExp;
+  // あと何ポイント必要か
+  const pointsToNextRank = pointsForNextRank - currentRankPoints;
 
   return {
-    newLevel,
-    leveledUp: newLevel > currentLevel,
-    expToNextLevel,
-    currentLevelExp,
-    expForNextLevel
+    newRank,
+    rankedUp: newRank > currentRank,
+    pointsToNextRank,
+    currentRankPoints,
+    pointsForNextRank
   };
 };
 
@@ -529,72 +565,90 @@ const submitSolution = async (req, res) => {
     );
     const attemptNumber = parseInt(attemptResult.rows[0].count) + 1;
 
-    // Record attempt
+    // Get feedback message for this attempt
+    let feedbackMessage = message;
+    if (problem.problem_type !== 'predict' && !isCorrect) {
+      // For SB3 problems, include detailed feedback
+      const result = compareScratchPrograms(submittedData, problem.correct_sb3_data);
+      feedbackMessage = result.feedback || message;
+    }
+
+    // Record attempt with error_message (feedback for incorrect attempts)
     await pool.query(
       `INSERT INTO submission_attempts
-       (user_id, problem_id, attempt_number, attempted_sb3_data, is_correct_attempt, hint_viewed)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
-      [userId, problemId, attemptNumber, submittedData, isCorrect, hintUsageCount > 0]
+       (user_id, problem_id, attempt_number, attempted_sb3_data, is_correct_attempt, error_message, hint_viewed)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [userId, problemId, attemptNumber, submittedData, isCorrect, isCorrect ? null : feedbackMessage, hintUsageCount > 0]
     );
 
-    // Calculate EXP and level
-    let expData = null;
+    // Calculate points and rank
+    let pointsData = null;
 
-    // If correct or best score, update/insert submission
+    // Get user's current rank and points
+    const userResult = await pool.query(
+      'SELECT rank, points FROM users WHERE id = $1',
+      [userId]
+    );
+    const currentUser = userResult.rows[0];
+
+    // Always update/insert submission (for both correct and incorrect)
+    await pool.query(
+      `INSERT INTO submissions
+       (user_id, problem_id, is_correct, score, total_attempts, hint_usage_count, time_spent, final_sb3_data)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       ON CONFLICT (user_id, problem_id)
+       DO UPDATE SET
+         is_correct = CASE WHEN $3 = true THEN true ELSE submissions.is_correct END,
+         score = GREATEST(submissions.score, $4),
+         total_attempts = submissions.total_attempts + 1,
+         hint_usage_count = $6,
+         time_spent = $7,
+         final_sb3_data = $8,
+         completed_at = CURRENT_TIMESTAMP`,
+      [userId, problemId, isCorrect, score, attemptNumber, hintUsageCount, timeSpent, submittedData]
+    );
+
+    // If correct, calculate and award points
     if (isCorrect) {
-      // Get user's current level and exp
-      const userResult = await pool.query(
-        'SELECT level, exp FROM users WHERE id = $1',
-        [userId]
-      );
-
-      const currentUser = userResult.rows[0];
       const difficulty = problem.difficulty_level || 1;
       const isPerfect = score === 100;
 
-      // Calculate earned EXP
-      const expCalc = calculateEarnedExp(difficulty, score, attemptNumber, isPerfect);
-      const newTotalExp = currentUser.exp + expCalc.earnedExp;
+      // Calculate earned points (using same calculation as before)
+      const pointsCalc = calculateEarnedExp(difficulty, score, attemptNumber, isPerfect);
+      const newTotalPoints = currentUser.points + pointsCalc.earnedExp;
 
-      // Calculate level up
-      const levelData = calculateLevelUp(newTotalExp, currentUser.level);
+      // Calculate rank up
+      const rankData = calculateRankUp(newTotalPoints, currentUser.rank);
 
+      // Update user points and rank
       await pool.query(
-        `INSERT INTO submissions
-         (user_id, problem_id, is_correct, score, total_attempts, hint_usage_count, time_spent, final_sb3_data)
-         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-         ON CONFLICT (user_id, problem_id)
-         DO UPDATE SET
-           is_correct = $3,
-           score = GREATEST(submissions.score, $4),
-           total_attempts = submissions.total_attempts + 1,
-           hint_usage_count = $6,
-           time_spent = $7,
-           final_sb3_data = $8,
-           completed_at = CURRENT_TIMESTAMP`,
-        [userId, problemId, isCorrect, score, attemptNumber, hintUsageCount, timeSpent, submittedData]
+        'UPDATE users SET points = $1, rank = $2 WHERE id = $3',
+        [newTotalPoints, rankData.newRank, userId]
       );
 
-      // Update user EXP and level
-      await pool.query(
-        'UPDATE users SET exp = $1, level = $2 WHERE id = $3',
-        [newTotalExp, levelData.newLevel, userId]
-      );
-
-      // Prepare exp data for response
-      expData = {
-        earnedExp: expCalc.earnedExp,
-        baseExp: expCalc.baseExp,
-        bonusExp: expCalc.bonusExp,
-        totalExp: newTotalExp,
-        previousLevel: currentUser.level,
-        newLevel: levelData.newLevel,
-        leveledUp: levelData.leveledUp,
-        expToNextLevel: levelData.expToNextLevel,
-        currentLevelExp: levelData.currentLevelExp
+      // Prepare points data for response
+      pointsData = {
+        earnedPoints: pointsCalc.earnedExp,
+        basePoints: pointsCalc.baseExp,
+        bonusPoints: pointsCalc.bonusExp,
+        totalPoints: newTotalPoints,
+        previousRank: currentUser.rank,
+        newRank: rankData.newRank,
+        rankedUp: rankData.rankedUp,
+        pointsToNextRank: rankData.pointsToNextRank,
+        currentRankPoints: rankData.currentRankPoints
       };
 
-      log(`User ${userId} solved problem ${problemId} (Score: ${score}, Earned: ${expCalc.earnedExp} EXP, Level: ${levelData.newLevel})`);
+      log(`User ${userId} solved problem ${problemId} (Score: ${score}, Earned: ${pointsCalc.earnedExp} Points, Rank: ${rankData.newRank})`);
+    } else {
+      log(`User ${userId} attempted problem ${problemId} (Score: ${score}, Incorrect)`);
+    }
+
+    // フィードバックデータを取得（新しい採点エンジンから）
+    let feedbackData = null;
+    if (problem.problem_type !== 'predict' && submittedData) {
+      const result = compareScratchPrograms(submittedData, problem.correct_sb3_data);
+      feedbackData = result.feedbackData;
     }
 
     res.json({
@@ -603,7 +657,8 @@ const submitSolution = async (req, res) => {
       message,
       attemptNumber,
       totalAttempts: attemptNumber,
-      expData
+      pointsData,
+      feedback: feedbackData  // 構造化されたフィードバック
     });
   } catch (error) {
     log(`Submit solution error: ${error.message}`, 'ERROR');

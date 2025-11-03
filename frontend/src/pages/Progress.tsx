@@ -85,12 +85,12 @@ const Progress: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-3xl font-bold mb-2">こんにちは、{user.nickname}さん！</h2>
-              <p className="text-primary-100 text-lg" dangerouslySetInnerHTML={{ __html: `${user.grade}<ruby>年生<rt>ねんせい</rt></ruby> | レベル ${user.level}` }}></p>
+              <p className="text-primary-100 text-lg" dangerouslySetInnerHTML={{ __html: `${user.grade}<ruby>年生<rt>ねんせい</rt></ruby> | ランク ${user.rank}` }}></p>
             </div>
             <div className="text-right">
               <div className="bg-white bg-opacity-20 rounded-lg p-4 backdrop-blur-sm">
-                <p className="text-sm font-medium mb-1" dangerouslySetInnerHTML={{ __html: '<ruby>経験値<rt>けいけんち</rt></ruby>' }}></p>
-                <p className="text-4xl font-bold">{user.exp} EXP</p>
+                <p className="text-sm font-medium mb-1">ポイント</p>
+                <p className="text-4xl font-bold">{user.points} ポイント</p>
               </div>
             </div>
           </div>

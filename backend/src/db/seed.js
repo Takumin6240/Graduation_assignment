@@ -19,7 +19,7 @@ async function seedDatabase() {
     // Create Chapter 1
     const chapterResult = await client.query(`
       INSERT INTO chapters (title, description, order_number, image_url)
-      VALUES ('Chapter 1: <ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby> - <ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>しよう', 'この<ruby>章<rt>しょう</rt></ruby>では、プログラミングの<ruby>基本<rt>きほん</rt></ruby>となる「<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>」について<ruby>学<rt>まな</rt></ruby>んでいきます。
+      VALUES ('Chapter 1: <ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby> - <ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>しよう', 'この<ruby>章<rt>しょう</rt></ruby>では、プログラミングの<ruby>基本<rt>きほん</rt></ruby>となる「<ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby>」について<ruby>学<rt>まな</rt></ruby>んでいきます。
 <ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>きながら、<ruby>少<rt>すこ</rt></ruby>しずつ<ruby>理解<rt>りかい</rt></ruby>していきましょう!', 1, '/たまごの殻からコンニチハ！するひよこ.png')
       ON CONFLICT DO NOTHING
       RETURNING id
@@ -39,8 +39,8 @@ async function seedDatabase() {
       {
         type: 'fill_blank',
         title: '<ruby>問題<rt>もんだい</rt></ruby>1: ひよこを<ruby>歩<rt>ある</rt></ruby>かせよう',
-        learningObjective: 'プログラミングの<ruby>基本<rt>きほん</rt></ruby>は<span style="color: #2563eb; font-weight: bold;">「<ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>すること」</span>です。\nプログラムは<ruby>基本<rt>きほん</rt></ruby><span style="color: #dc2626; font-weight: bold;"><ruby>上<rt>うえ</rt></ruby>から<ruby>順<rt>じゅん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>される</span>ため、<span style="color: #2563eb; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby></span>はとても<ruby>重要<rt>じゅうよう</rt></ruby>です。<ruby>実際<rt>じっさい</rt></ruby>に<ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>いて<ruby>確認<rt>かくにん</rt></ruby>してみましょう。',
-        description: 'ひよこを<ruby>動<rt>うご</rt></ruby>かして、<ruby>挨拶<rt>あいさつ</rt></ruby>させよう！\n\n<span style="color: #2563eb; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>命令<rt>めいれい</rt></ruby>を<ruby>並<rt>なら</rt></ruby>べてね：</span>\n\n<span style="color: #ea580c; font-weight: bold;">1.</span> <span style="color: #ea580c; font-weight: bold;">50<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かす\n<span style="color: #ea580c; font-weight: bold;">2.</span> <span style="color: #ea580c; font-weight: bold;">1<ruby>秒<rt>びょう</rt></ruby></span><ruby>待<rt>ま</rt></ruby>つ\n<span style="color: #ea580c; font-weight: bold;">3.</span> 「<span style="color: #16a34a; font-weight: bold;">こんにちは</span>」と<span style="color: #ea580c; font-weight: bold;">2<ruby>秒<rt>びょう</rt></ruby></span><ruby>言<rt>い</rt></ruby>う\n<span style="color: #ea580c; font-weight: bold;">4.</span> <span style="color: #ea580c; font-weight: bold;">100<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かす',
+        learningObjective: '💡 <span style="color: #2563eb; font-weight: bold;">プログラミングの<ruby>基本<rt>きほん</rt></ruby>！</span>\nプログラムは<span style="color: #dc2626; font-weight: bold;"><ruby>上<rt>うえ</rt></ruby>から<ruby>順番<rt>じゅんばん</rt></ruby>に</span><ruby>実行<rt>じっこう</rt></ruby>されます。\nこの<ruby>考<rt>かんが</rt></ruby>え<ruby>方<rt>かた</rt></ruby>を<span style="color: #16a34a; font-weight: bold;">「<ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby>」</span>といいます。\n<ruby>命令<rt>めいれい</rt></ruby>の<ruby>順番<rt>じゅんばん</rt></ruby>がとても<ruby>大切<rt>たいせつ</rt></ruby>です！\n\nプログラミングの<ruby>基本<rt>きほん</rt></ruby>は<span style="color: #2563eb; font-weight: bold;">「<ruby>命令<rt>めいれい</rt></ruby>を<ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>実行<rt>じっこう</rt></ruby>すること」</span>です。<ruby>実際<rt>じっさい</rt></ruby>に<ruby>問題<rt>もんだい</rt></ruby>を<ruby>解<rt>と</rt></ruby>いて<ruby>確認<rt>かくにん</rt></ruby>してみましょう。',
+        description: 'ひよこを<ruby>動<rt>うご</rt></ruby>かして、あいさつさせよう！\n\n<span style="color: #2563eb; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>命令<rt>めいれい</rt></ruby>を<ruby>並<rt>なら</rt></ruby>べてね：</span>\n\n<span style="color: #ea580c; font-weight: bold;">1.</span> <span style="color: #ea580c; font-weight: bold;">50<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かす\n<span style="color: #ea580c; font-weight: bold;">2.</span> <span style="color: #ea580c; font-weight: bold;">1<ruby>秒<rt>びょう</rt></ruby></span><ruby>待<rt>ま</rt></ruby>つ\n<span style="color: #ea580c; font-weight: bold;">3.</span> 「<span style="color: #16a34a; font-weight: bold;">こんにちは</span>」と<span style="color: #ea580c; font-weight: bold;">2<ruby>秒<rt>びょう</rt></ruby></span><ruby>言<rt>い</rt></ruby>う\n<span style="color: #ea580c; font-weight: bold;">4.</span> <span style="color: #ea580c; font-weight: bold;">100<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かす',
         difficulty: 1,
         order: 1,
         imageUrl: '/右に向かって走るひよこ.png',
@@ -657,8 +657,8 @@ async function seedDatabase() {
       },
       {
         type: 'mission',
-        title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: <ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>マスター',
-        learningObjective: 'Chapter 1で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;"><ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby></span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<ruby>命令<rt>めいれい</rt></ruby>を<span style="color: #dc2626; font-weight: bold;"><ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby></span>で<ruby>並<rt>なら</rt></ruby>べることが、プログラミングの<ruby>基本<rt>きほん</rt></ruby>です。',
+        title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: <ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby>マスター',
+        learningObjective: 'Chapter 1で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;"><ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby></span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<ruby>命令<rt>めいれい</rt></ruby>を<span style="color: #dc2626; font-weight: bold;"><ruby>正<rt>ただ</rt></ruby>しい<ruby>順番<rt>じゅんばん</rt></ruby></span>で<ruby>並<rt>なら</rt></ruby>べることが、プログラミングの<ruby>基本<rt>きほん</rt></ruby>です。',
         description: 'ひよこが<span style="color: #16a34a; font-weight: bold;"><ruby>家<rt>いえ</rt></ruby></span>に<ruby>帰<rt>かえ</rt></ruby>るプログラムを<ruby>作<rt>つく</rt></ruby>ろう！\n\n<span style="color: #2563eb; font-weight: bold;"><ruby>順番<rt>じゅんばん</rt></ruby>に<ruby>命令<rt>めいれい</rt></ruby>を<ruby>並<rt>なら</rt></ruby>べてね：</span>\n\n<span style="color: #ea580c; font-weight: bold;">1.</span> ひよこを<span style="color: #ea580c; font-weight: bold;">X<ruby>座標<rt>ざひょう</rt></ruby>-120、Y<ruby>座標<rt>ざひょう</rt></ruby>-120</span>の<ruby>場所<rt>ばしょ</rt></ruby>に<ruby>移動<rt>いどう</rt></ruby>させる\n<span style="color: #ea580c; font-weight: bold;">2.</span> <ruby>背景<rt>はいけい</rt></ruby>を「<span style="color: #ea580c; font-weight: bold;">Bedroom 2</span>」に<ruby>変<rt>か</rt></ruby>える（<ruby>家<rt>いえ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>だよ！）\n<span style="color: #ea580c; font-weight: bold;">3.</span> ひよこの<span style="color: #ea580c; font-weight: bold;">X<ruby>座標<rt>ざひょう</rt></ruby>を-200</span>に<ruby>変<rt>か</rt></ruby>える\n<span style="color: #ea580c; font-weight: bold;">4.</span> もう<ruby>一度<rt>いちど</rt></ruby>ひよこを<span style="color: #ea580c; font-weight: bold;">X<ruby>座標<rt>ざひょう</rt></ruby>-120、Y<ruby>座標<rt>ざひょう</rt></ruby>-120</span>に<ruby>移動<rt>いどう</rt></ruby>させる\n<span style="color: #ea580c; font-weight: bold;">5.</span> 「<span style="color: #16a34a; font-weight: bold;">ただいま！</span>」と<span style="color: #ea580c; font-weight: bold;">3<ruby>秒<rt>びょう</rt></ruby></span><ruby>言<rt>い</rt></ruby>う',
         difficulty: 3,
         order: 5,
@@ -830,10 +830,10 @@ async function seedDatabase() {
       console.log('✓ Hints added for Problem 3');
     }
 
-    // Create Chapter 2: 分岐処理
+    // Create Chapter 2: 条件わけ
     const chapter2Result = await client.query(`
       INSERT INTO chapters (title, description, order_number, image_url)
-      VALUES ('Chapter 2: <ruby>分岐<rt>ぶんき</rt></ruby><ruby>処理<rt>しょり</rt></ruby> - <ruby>条件<rt>じょうけん</rt></ruby>によって<ruby>動<rt>うご</rt></ruby>きを<ruby>変<rt>か</rt></ruby>えよう', 'この<ruby>章<rt>しょう</rt></ruby>では、「<ruby>分岐<rt>ぶんき</rt></ruby><ruby>処理<rt>しょり</rt></ruby>」について<ruby>学<rt>まな</rt></ruby>んでいきます。
+      VALUES ('Chapter 2: <ruby>条件<rt>じょうけん</rt></ruby>わけ - <ruby>条件<rt>じょうけん</rt></ruby>によって<ruby>動<rt>うご</rt></ruby>きを<ruby>変<rt>か</rt></ruby>えよう', 'この<ruby>章<rt>しょう</rt></ruby>では、「<ruby>条件<rt>じょうけん</rt></ruby>わけ」について<ruby>学<rt>まな</rt></ruby>んでいきます。
 <ruby>条件<rt>じょうけん</rt></ruby>によってプログラムの<ruby>動<rt>うご</rt></ruby>きを<ruby>変<rt>か</rt></ruby>えることができるようになります！', 2, '/座って本を読むひよこ.png')
       ON CONFLICT DO NOTHING
       RETURNING id
@@ -1277,8 +1277,8 @@ async function seedDatabase() {
         },
         {
           type: 'mission',
-          title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: <ruby>分岐<rt>ぶんき</rt></ruby><ruby>処理<rt>しょり</rt></ruby>マスター',
-          learningObjective: 'Chapter 2で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;"><ruby>分岐<rt>ぶんき</rt></ruby><ruby>処理<rt>しょり</rt></ruby></span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<span style="color: #16a34a; font-weight: bold;">「もし～なら」</span>という<ruby>条件<rt>じょうけん</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って、プログラムの<ruby>動<rt>うご</rt></ruby>きを<ruby>変<rt>か</rt></ruby>えることができます。',
+          title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: <ruby>条件<rt>じょうけん</rt></ruby>わけマスター',
+          learningObjective: 'Chapter 2で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;"><ruby>条件<rt>じょうけん</rt></ruby>わけ</span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<span style="color: #16a34a; font-weight: bold;">「もし～なら」</span>という<ruby>条件<rt>じょうけん</rt></ruby>を<ruby>使<rt>つか</rt></ruby>って、プログラムの<ruby>動<rt>うご</rt></ruby>きを<ruby>変<rt>か</rt></ruby>えることができます。',
           description: 'ひよこが<span style="color: #16a34a; font-weight: bold;"><ruby>宝物<rt>たからもの</rt></ruby></span>を<ruby>探<rt>さが</rt></ruby>すプログラムを<ruby>作<rt>つく</rt></ruby>ろう！\n\n<span style="color: #2563eb; font-weight: bold;"><ruby>条件<rt>じょうけん</rt></ruby>1:</span> X<ruby>座標<rt>ざひょう</rt></ruby>が<span style="color: #ea580c; font-weight: bold;">100</span>より<ruby>大<rt>おお</rt></ruby>きいなら「<ruby>近<rt>ちか</rt></ruby>づいてきた！」と<ruby>言<rt>い</rt></ruby>う\n<span style="color: #2563eb; font-weight: bold;"><ruby>条件<rt>じょうけん</rt></ruby>2:</span> Y<ruby>座標<rt>ざひょう</rt></ruby>が<span style="color: #ea580c; font-weight: bold;">50</span>より<ruby>大<rt>おお</rt></ruby>きいなら「<ruby>宝物<rt>たからもの</rt></ruby>を<ruby>見<rt>み</rt></ruby>つけた！」と<ruby>言<rt>い</rt></ruby>う\n\n<ruby>最初<rt>さいしょ</rt></ruby>に<ruby>右<rt>みぎ</rt></ruby>に<span style="color: #ea580c; font-weight: bold;">120<ruby>歩<rt>ほ</rt></ruby></span>、<ruby>上<rt>うえ</rt></ruby>に<span style="color: #ea580c; font-weight: bold;">60<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>かしてから、<ruby>条件<rt>じょうけん</rt></ruby>を<ruby>確認<rt>かくにん</rt></ruby>してね！',
           difficulty: 4,
           order: 5,
@@ -1425,10 +1425,10 @@ async function seedDatabase() {
       console.log('✓ Chapter 2: 4 problems created');
     }
 
-    // Create Chapter 3: 反復処理
+    // Create Chapter 3: くり返し
     const chapter3Result = await client.query(`
       INSERT INTO chapters (title, description, order_number, image_url)
-      VALUES ('Chapter 3: <ruby>反復<rt>はんぷく</rt></ruby><ruby>処理<rt>しょり</rt></ruby> - <ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>して<ruby>効率的<rt>こうりつてき</rt></ruby>に<ruby>動<rt>うご</rt></ruby>かそう', 'この<ruby>章<rt>しょう</rt></ruby>では、「<ruby>反復<rt>はんぷく</rt></ruby><ruby>処理<rt>しょり</rt></ruby>（ループ）」について<ruby>学<rt>まな</rt></ruby>んでいきます。
+      VALUES ('Chapter 3: くり<ruby>返<rt>かえ</rt></ruby>し - <ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>して<ruby>効率的<rt>こうりつてき</rt></ruby>に<ruby>動<rt>うご</rt></ruby>かそう', 'この<ruby>章<rt>しょう</rt></ruby>では、「くり<ruby>返<rt>かえ</rt></ruby>し（ループ）」について<ruby>学<rt>まな</rt></ruby>んでいきます。
 <ruby>同<rt>おな</rt></ruby>じ<ruby>動<rt>うご</rt></ruby>きを<ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>すことで、<ruby>効率的<rt>こうりつてき</rt></ruby>なプログラムが<ruby>作<rt>つく</rt></ruby>れます！', 3, '/ノートパソコンを開いて作業をするひよこ.png')
       ON CONFLICT DO NOTHING
       RETURNING id
@@ -1818,8 +1818,8 @@ async function seedDatabase() {
         },
         {
           type: 'mission',
-          title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: <ruby>反復<rt>はんぷく</rt></ruby><ruby>処理<rt>しょり</rt></ruby>マスター',
-          learningObjective: 'Chapter 3で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;"><ruby>反復<rt>はんぷく</rt></ruby><ruby>処理<rt>しょり</rt></ruby>（ループ）</span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<span style="color: #16a34a; font-weight: bold;"><ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>し</span>を<ruby>使<rt>つか</rt></ruby>うことで、<ruby>同<rt>おな</rt></ruby>じ<ruby>動<rt>うご</rt></ruby>きを<ruby>効率的<rt>こうりつてき</rt></ruby>にプログラムできます。',
+          title: '<ruby>まとめ<rt></rt></ruby><ruby>問題<rt>もんだい</rt></ruby>: くり<ruby>返<rt>かえ</rt></ruby>しマスター',
+          learningObjective: 'Chapter 3で<ruby>学<rt>まな</rt></ruby>んだ<span style="color: #2563eb; font-weight: bold;">くり<ruby>返<rt>かえ</rt></ruby>し（ループ）</span>の<ruby>知識<rt>ちしき</rt></ruby>を<ruby>総<rt>そう</rt></ruby><ruby>復習<rt>ふくしゅう</rt></ruby>しましょう！\n<span style="color: #16a34a; font-weight: bold;"><ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>し</span>を<ruby>使<rt>つか</rt></ruby>うことで、<ruby>同<rt>おな</rt></ruby>じ<ruby>動<rt>うご</rt></ruby>きを<ruby>効率的<rt>こうりつてき</rt></ruby>にプログラムできます。',
           description: 'ひよこで<span style="color: #16a34a; font-weight: bold;"><ruby>六角形<rt>ろっかくけい</rt></ruby></span>（6<ruby>角形<rt>かくけい</rt></ruby>）を<ruby>描<rt>か</rt></ruby>くプログラムを<ruby>作<rt>つく</rt></ruby>ろう！\n\n<span style="color: #2563eb; font-weight: bold;"><ruby>六角形<rt>ろっかくけい</rt></ruby>を<ruby>描<rt>か</rt></ruby>く<ruby>方法<rt>ほうほう</rt></ruby>:</span>\n<span style="color: #ea580c; font-weight: bold;">6<ruby>回<rt>かい</rt></ruby></span><ruby>繰<rt>く</rt></ruby>り<ruby>返<rt>かえ</rt></ruby>す\n  ・<span style="color: #ea580c; font-weight: bold;">60<ruby>歩<rt>ほ</rt></ruby></span><ruby>動<rt>うご</rt></ruby>く\n  ・<ruby>右<rt>みぎ</rt></ruby>に<span style="color: #ea580c; font-weight: bold;">60<ruby>度<rt>ど</rt></ruby></span><ruby>回<rt>まわ</rt></ruby>る\n\n<ruby>最初<rt>さいしょ</rt></ruby>に<span style="color: #16a34a; font-weight: bold;">「ペンを<ruby>下<rt>お</rt></ruby>ろす」</span>ブロックも<ruby>忘<rt>わす</rt></ruby>れずに！',
           difficulty: 4,
           order: 5,
@@ -1918,7 +1918,7 @@ async function seedDatabase() {
     // Create Chapter 4: 総合演習
     const chapter4Result = await client.query(`
       INSERT INTO chapters (title, description, order_number, image_url)
-      VALUES ('Chapter 4: <ruby>総合<rt>そうごう</rt></ruby><ruby>演習<rt>えんしゅう</rt></ruby> - これまでの<ruby>学<rt>まな</rt></ruby>びを<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせよう', 'この<ruby>章<rt>しょう</rt></ruby>では、これまで<ruby>学<rt>まな</rt></ruby>んだ<ruby>順次<rt>じゅんじ</rt></ruby><ruby>処理<rt>しょり</rt></ruby>、<ruby>分岐<rt>ぶんき</rt></ruby><ruby>処理<rt>しょり</rt></ruby>、<ruby>反復<rt>はんぷく</rt></ruby><ruby>処理<rt>しょり</rt></ruby>を<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせた<ruby>総合<rt>そうごう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>します！', 4, '/パソコンを開いてメガネをカチャカチャするエリート風ひよこ.png')
+      VALUES ('Chapter 4: <ruby>総合<rt>そうごう</rt></ruby><ruby>演習<rt>えんしゅう</rt></ruby> - これまでの<ruby>学<rt>まな</rt></ruby>びを<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせよう', 'この<ruby>章<rt>しょう</rt></ruby>では、これまで<ruby>学<rt>まな</rt></ruby>んだ<ruby>順次<rt>じゅんじ</rt></ruby><ruby>実行<rt>じっこう</rt></ruby>、<ruby>条件<rt>じょうけん</rt></ruby>わけ、くり<ruby>返<rt>かえ</rt></ruby>しを<ruby>組<rt>く</rt></ruby>み<ruby>合<rt>あ</rt></ruby>わせた<ruby>総合<rt>そうごう</rt></ruby><ruby>問題<rt>もんだい</rt></ruby>に<ruby>挑戦<rt>ちょうせん</rt></ruby>します！', 4, '/パソコンを開いてメガネをカチャカチャするエリート風ひよこ.png')
       ON CONFLICT DO NOTHING
       RETURNING id
     `);

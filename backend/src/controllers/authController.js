@@ -41,7 +41,7 @@ const registerStudent = async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (username, password_hash, nickname, grade)
        VALUES ($1, $2, $3, $4)
-       RETURNING id, username, nickname, grade, level, exp, created_at`,
+       RETURNING id, username, nickname, grade, rank, points, created_at`,
       [username, passwordHash, nickname, grade]
     );
 
@@ -60,8 +60,8 @@ const registerStudent = async (req, res) => {
         username: user.username,
         nickname: user.nickname,
         grade: user.grade,
-        level: user.level,
-        exp: user.exp
+        rank: user.rank,
+        points: user.points
       }
     });
   } catch (error) {
@@ -111,8 +111,8 @@ const loginStudent = async (req, res) => {
         username: user.username,
         nickname: user.nickname,
         grade: user.grade,
-        level: user.level,
-        exp: user.exp
+        rank: user.rank,
+        points: user.points
       }
     });
   } catch (error) {
@@ -224,7 +224,7 @@ const registerAdmin = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, username, nickname, grade, level, exp, created_at FROM users WHERE id = $1',
+      'SELECT id, username, nickname, grade, rank, points, created_at FROM users WHERE id = $1',
       [req.user.userId]
     );
 

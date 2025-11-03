@@ -17,8 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash VARCHAR(255) NOT NULL,
   nickname VARCHAR(50) NOT NULL,
   admin_id INTEGER REFERENCES admins(id) ON DELETE SET NULL,
-  level INTEGER DEFAULT 1,
-  exp INTEGER DEFAULT 0,
+  rank INTEGER DEFAULT 1,
+  points INTEGER DEFAULT 0,
   grade INTEGER CHECK (grade >= 3 AND grade <= 6),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -220,6 +220,36 @@ BEGIN
     WHERE conname = 'hints_problem_grade_order_unique'
   ) THEN
     ALTER TABLE hints ADD CONSTRAINT hints_problem_grade_order_unique UNIQUE (problem_id, grade, hint_order);
+  END IF;
+END $$;
+
+-- Migrate from level/exp to rank/points
+DO $$
+BEGIN
+  -- Add rank column if it doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='rank') THEN
+    ALTER TABLE users ADD COLUMN rank INTEGER DEFAULT 1;
+    -- Copy data from level to rank if level exists
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='level') THEN
+      UPDATE users SET rank = level WHERE level IS NOT NULL;
+    END IF;
+  END IF;
+
+  -- Add points column if it doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='points') THEN
+    ALTER TABLE users ADD COLUMN points INTEGER DEFAULT 0;
+    -- Copy data from exp to points if exp exists
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='exp') THEN
+      UPDATE users SET points = exp WHERE exp IS NOT NULL;
+    END IF;
+  END IF;
+
+  -- Drop old columns if they exist
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='level') THEN
+    ALTER TABLE users DROP COLUMN level;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name='users' AND column_name='exp') THEN
+    ALTER TABLE users DROP COLUMN exp;
   END IF;
 END $$;
 `;

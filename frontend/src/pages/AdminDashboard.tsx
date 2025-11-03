@@ -5,7 +5,10 @@ import Loading from '../components/Loading';
 interface Statistics {
   totalUsers: number;
   totalSubmissions: number;
-  correctSubmissions: number;
+  problemsAttempted: number;
+  problemsSolved: number;
+  averageAttempts: number;
+  correctRate: string;
   averageScore: number;
   gradeDistribution: { grade: number; count: number }[];
   recentActivity: any[];
@@ -44,16 +47,12 @@ const AdminDashboard: React.FC = () => {
     );
   }
 
-  const successRate = statistics.totalSubmissions > 0
-    ? Math.round((statistics.correctSubmissions / statistics.totalSubmissions) * 100)
-    : 0;
-
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold text-primary-700 mb-8">管理者ダッシュボード</h1>
+      <h1 className="text-4xl font-bold text-primary-700 mb-8">管理者ダッシュボード - 学習分析</h1>
 
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      {/* Summary Cards - Row 1 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -74,12 +73,30 @@ const AdminDashboard: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">総提出数</p>
-              <p className="text-3xl font-bold text-blue-700 mt-2">
+              <p className="text-sm text-gray-400 mt-0.5">(アップロード回数)</p>
+              <p className="text-3xl font-bold text-blue-700 mt-1">
                 {statistics.totalSubmissions}
               </p>
             </div>
             <div className="bg-blue-100 rounded-full p-3">
               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">挑戦した問題</p>
+              <p className="text-sm text-gray-400 mt-0.5">(異なる問題数)</p>
+              <p className="text-3xl font-bold text-purple-700 mt-1">
+                {statistics.problemsAttempted}
+              </p>
+            </div>
+            <div className="bg-purple-100 rounded-full p-3">
+              <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
@@ -89,9 +106,10 @@ const AdminDashboard: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm font-medium">正解率</p>
-              <p className="text-3xl font-bold text-green-700 mt-2">
-                {successRate}%
+              <p className="text-gray-500 text-sm font-medium">正解した問題</p>
+              <p className="text-sm text-gray-400 mt-0.5">(最終的に正解)</p>
+              <p className="text-3xl font-bold text-green-700 mt-1">
+                {statistics.problemsSolved}
               </p>
             </div>
             <div className="bg-green-100 rounded-full p-3">
@@ -101,12 +119,50 @@ const AdminDashboard: React.FC = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Summary Cards - Row 2 */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">平均試行回数</p>
+              <p className="text-sm text-gray-400 mt-0.5">(問題ごと)</p>
+              <p className="text-3xl font-bold text-orange-700 mt-1">
+                {statistics.averageAttempts.toFixed(1)}回
+              </p>
+            </div>
+            <div className="bg-orange-100 rounded-full p-3">
+              <svg className="w-8 h-8 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-sm font-medium">正解率</p>
+              <p className="text-sm text-gray-400 mt-0.5">(提出回数ベース)</p>
+              <p className="text-3xl font-bold text-teal-700 mt-1">
+                {statistics.correctRate}%
+              </p>
+            </div>
+            <div className="bg-teal-100 rounded-full p-3">
+              <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+          </div>
+        </div>
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm font-medium">平均スコア</p>
-              <p className="text-3xl font-bold text-yellow-700 mt-2">
+              <p className="text-sm text-gray-400 mt-0.5">(最終提出)</p>
+              <p className="text-3xl font-bold text-yellow-700 mt-1">
                 {Math.round(statistics.averageScore)}点
               </p>
             </div>

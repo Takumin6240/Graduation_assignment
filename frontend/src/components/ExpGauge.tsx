@@ -1,25 +1,25 @@
 import React, { useEffect, useState } from 'react';
 
-interface ExpGaugeProps {
-  currentExp: number;
-  expToNextLevel: number;
-  level: number;
+interface PointsGaugeProps {
+  currentPoints: number;
+  pointsToNextRank: number;
+  rank: number;
   animate?: boolean;
   showLabel?: boolean;
   size?: 'small' | 'medium' | 'large';
 }
 
-const ExpGauge: React.FC<ExpGaugeProps> = ({
-  currentExp,
-  expToNextLevel,
-  level,
+const PointsGauge: React.FC<PointsGaugeProps> = ({
+  currentPoints,
+  pointsToNextRank,
+  rank,
   animate = true,
   showLabel = true,
   size = 'medium'
 }) => {
   const [animatedWidth, setAnimatedWidth] = useState(0);
-  const totalExpForLevel = level * 100;
-  const progressPercentage = (currentExp / totalExpForLevel) * 100;
+  const totalPointsForRank = rank * 100;
+  const progressPercentage = (currentPoints / totalPointsForRank) * 100;
 
   useEffect(() => {
     if (animate) {
@@ -50,10 +50,10 @@ const ExpGauge: React.FC<ExpGaugeProps> = ({
       {showLabel && (
         <div className={`flex justify-between mb-1 ${textSizeClasses[size]}`}>
           <span className="font-bold text-gray-700">
-            <ruby>レベル<rt>れべる</rt></ruby> {level}
+            ランク {rank}
           </span>
           <span className="text-gray-600">
-            {currentExp} / {totalExpForLevel} EXP
+            {currentPoints} / {totalPointsForRank} ポイント
           </span>
         </div>
       )}
@@ -68,11 +68,11 @@ const ExpGauge: React.FC<ExpGaugeProps> = ({
       </div>
       {showLabel && (
         <div className={`text-right mt-1 ${textSizeClasses[size]} text-gray-500`}>
-          <ruby>次<rt>つぎ</rt></ruby>のレベルまで <span className="font-bold text-primary-600">{expToNextLevel}</span> EXP
+          <ruby>次<rt>つぎ</rt></ruby>のランクまで <span className="font-bold text-primary-600">{pointsToNextRank}</span> ポイント
         </div>
       )}
     </div>
   );
 };
 
-export default ExpGauge;
+export default PointsGauge;

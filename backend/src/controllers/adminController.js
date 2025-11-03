@@ -35,7 +35,7 @@ const createStudent = async (req, res) => {
     const result = await pool.query(
       `INSERT INTO users (username, password_hash, nickname, grade, admin_id)
        VALUES ($1, $2, $3, $4, $5)
-       RETURNING id, username, nickname, grade, level, exp, created_at`,
+       RETURNING id, username, nickname, grade, rank, points, created_at`,
       [username, passwordHash, nickname, grade, adminId]
     );
 
@@ -50,8 +50,8 @@ const createStudent = async (req, res) => {
         username: user.username,
         nickname: user.nickname,
         grade: user.grade,
-        level: user.level,
-        exp: user.exp
+        rank: user.rank,
+        points: user.points
       }
     });
   } catch (error) {
@@ -71,8 +71,8 @@ const getAllUsers = async (req, res) => {
         u.username,
         u.nickname,
         u.grade,
-        u.level,
-        u.exp,
+        u.rank,
+        u.points,
         u.created_at,
         COUNT(DISTINCT s.id) as total_submissions,
         COUNT(DISTINCT CASE WHEN s.is_correct THEN s.id END) as correct_submissions
@@ -98,7 +98,7 @@ const getUserDetails = async (req, res) => {
   try {
     // Get user info (verify it belongs to this admin)
     const userResult = await pool.query(
-      'SELECT id, username, nickname, grade, level, exp, created_at FROM users WHERE id = $1 AND admin_id = $2',
+      'SELECT id, username, nickname, grade, rank, points, created_at FROM users WHERE id = $1 AND admin_id = $2',
       [userId, adminId]
     );
 
@@ -149,23 +149,47 @@ const getStatistics = async (req, res) => {
       [adminId]
     );
 
-    // Total submissions (for this admin's students)
+    // Total submissions (all uploads from submission_attempts)
     const submissionsResult = await pool.query(
-      `SELECT COUNT(*) as total FROM submissions s
-       JOIN users u ON s.user_id = u.id
+      `SELECT COUNT(*) as total FROM submission_attempts sa
+       JOIN users u ON sa.user_id = u.id
        WHERE u.admin_id = $1`,
       [adminId]
     );
 
-    // Correct submissions (for this admin's students)
-    const correctResult = await pool.query(
+    // Problems attempted (unique problems tried)
+    const problemsAttemptedResult = await pool.query(
+      `SELECT COUNT(DISTINCT sa.problem_id) as total FROM submission_attempts sa
+       JOIN users u ON sa.user_id = u.id
+       WHERE u.admin_id = $1`,
+      [adminId]
+    );
+
+    // Problems solved (unique problems with correct final submission)
+    const problemsSolvedResult = await pool.query(
       `SELECT COUNT(*) as total FROM submissions s
        JOIN users u ON s.user_id = u.id
        WHERE u.admin_id = $1 AND s.is_correct = true`,
       [adminId]
     );
 
-    // Average score (for this admin's students)
+    // Correct attempts (from submission_attempts) - for correct submission rate
+    const correctAttemptsResult = await pool.query(
+      `SELECT COUNT(*) as total FROM submission_attempts sa
+       JOIN users u ON sa.user_id = u.id
+       WHERE u.admin_id = $1 AND sa.is_correct_attempt = true`,
+      [adminId]
+    );
+
+    // Average attempts per problem (from final submissions)
+    const avgAttemptsResult = await pool.query(
+      `SELECT AVG(s.total_attempts) as avg FROM submissions s
+       JOIN users u ON s.user_id = u.id
+       WHERE u.admin_id = $1`,
+      [adminId]
+    );
+
+    // Average score (from final submissions)
     const avgScoreResult = await pool.query(
       `SELECT AVG(s.score) as avg FROM submissions s
        JOIN users u ON s.user_id = u.id
@@ -189,21 +213,30 @@ const getStatistics = async (req, res) => {
       ORDER BY grade
     `, [adminId]);
 
-    // Recent activity (last 7 days, for this admin's students)
+    // Recent activity (last 7 days, for this admin's students) - from submission_attempts
     const recentActivityResult = await pool.query(`
-      SELECT DATE(s.completed_at) as date, COUNT(*) as submissions
-      FROM submissions s
-      JOIN users u ON s.user_id = u.id
-      WHERE u.admin_id = $1 AND s.completed_at >= NOW() - INTERVAL '7 days'
-      GROUP BY DATE(s.completed_at)
+      SELECT DATE(sa.timestamp) as date, COUNT(*) as submissions
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1 AND sa.timestamp >= NOW() - INTERVAL '7 days'
+      GROUP BY DATE(sa.timestamp)
       ORDER BY date DESC
     `, [adminId]);
 
+    const totalSubmissions = parseInt(submissionsResult.rows[0].total);
+    const correctAttempts = parseInt(correctAttemptsResult.rows[0].total);
+    const correctRate = totalSubmissions > 0
+      ? ((correctAttempts / totalSubmissions) * 100).toFixed(1)
+      : 0;
+
     res.json({
       totalUsers: parseInt(usersResult.rows[0].total),
-      totalSubmissions: parseInt(submissionsResult.rows[0].total),
-      correctSubmissions: parseInt(correctResult.rows[0].total),
-      averageScore: parseFloat(avgScoreResult.rows[0].avg || 0).toFixed(2),
+      totalSubmissions: totalSubmissions,
+      problemsAttempted: parseInt(problemsAttemptedResult.rows[0].total),
+      problemsSolved: parseInt(problemsSolvedResult.rows[0].total),
+      averageAttempts: parseFloat(avgAttemptsResult.rows[0].avg || 0),
+      correctRate: correctRate,
+      averageScore: parseFloat(avgScoreResult.rows[0].avg || 0),
       problemTypes: problemTypesResult.rows,
       gradeDistribution: gradeDistResult.rows,
       recentActivity: recentActivityResult.rows
@@ -224,13 +257,31 @@ const getProblemAnalytics = async (req, res) => {
         p.problem_type,
         p.difficulty_level,
         c.title as chapter_title,
-        COUNT(DISTINCT s.user_id) as total_attempts,
-        COUNT(DISTINCT CASE WHEN s.is_correct THEN s.user_id END) as correct_attempts,
+
+        -- Submission statistics (from submission_attempts)
+        COUNT(sa.id) as total_submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
+
+        -- User statistics
+        COUNT(DISTINCT sa.user_id) as unique_students,
+        COUNT(DISTINCT CASE WHEN sa.is_correct_attempt THEN sa.user_id END) as students_solved,
+
+        -- Final submission statistics (from submissions)
         AVG(s.score) as avg_score,
         AVG(s.time_spent) as avg_time_spent,
         AVG(s.total_attempts) as avg_attempts_to_solve
+
       FROM problems p
       JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submission_attempts sa ON p.id = sa.problem_id
       LEFT JOIN submissions s ON p.id = s.problem_id
       GROUP BY p.id, p.title, p.problem_type, p.difficulty_level, c.title
       ORDER BY c.order_number, p.order_number
@@ -399,51 +450,72 @@ const getDetailedAnalytics = async (req, res) => {
         c.title as chapter_title,
         c.order_number as chapter_order,
 
-        -- Overall statistics
-        COUNT(DISTINCT s.user_id) as unique_students,
-        COUNT(s.id) as total_submissions,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        -- Submission statistics (from submission_attempts)
+        COUNT(DISTINCT sa.user_id) as unique_students,
+        COUNT(sa.id) as total_submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
+
+        -- Final submission statistics (from submissions)
         ROUND(AVG(s.score)::numeric, 2) as avg_score,
         ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent_seconds,
         ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts_to_solve,
         ROUND(AVG(s.hint_usage_count)::numeric, 2) as avg_hint_usage,
 
         -- First attempt success rate (critical for research)
-        COUNT(CASE WHEN s.total_attempts = 1 AND s.is_correct THEN 1 END) as first_attempt_success,
-        COUNT(CASE WHEN s.total_attempts = 1 THEN 1 END) as first_attempt_total,
+        COUNT(CASE WHEN sa.attempt_number = 1 AND sa.is_correct_attempt THEN 1 END) as first_attempt_success,
+        COUNT(CASE WHEN sa.attempt_number = 1 THEN 1 END) as first_attempt_total,
 
-        -- Time analysis
+        -- Time analysis (from final submissions)
         MIN(s.time_spent) as min_time_spent,
         MAX(s.time_spent) as max_time_spent,
         PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY s.time_spent) as median_time_spent
 
       FROM problems p
       JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submission_attempts sa ON p.id = sa.problem_id
+      LEFT JOIN users u1 ON sa.user_id = u1.id
       LEFT JOIN submissions s ON p.id = s.problem_id
-      LEFT JOIN users u ON s.user_id = u.id
-      WHERE u.admin_id = $1 OR s.id IS NULL
+      LEFT JOIN users u2 ON s.user_id = u2.id
+      WHERE (u1.admin_id = $1 OR u2.admin_id = $1) OR (sa.id IS NULL AND s.id IS NULL)
       GROUP BY p.id, p.title, p.problem_type, p.difficulty_level, p.order_number,
                c.id, c.title, c.order_number
       ORDER BY c.order_number, p.order_number
     `, [adminId]);
 
-    // 2. Error pattern analysis
+    // 2. Error pattern analysis (improved)
     const errorPatterns = await pool.query(`
       SELECT
         p.id as problem_id,
         p.title as problem_title,
         p.problem_type,
+        c.title as chapter_title,
         sa.error_message,
         COUNT(*) as error_count,
-        COUNT(DISTINCT sa.user_id) as affected_students
+        COUNT(DISTINCT sa.user_id) as affected_students,
+        ROUND(100.0 * COUNT(*) / NULLIF(
+          (SELECT COUNT(*) FROM submission_attempts sa2
+           JOIN users u2 ON sa2.user_id = u2.id
+           WHERE sa2.problem_id = p.id AND u2.admin_id = $1), 0
+        ), 2) as error_rate_percentage,
+        MAX(sa.timestamp) as last_occurrence
       FROM submission_attempts sa
       JOIN problems p ON sa.problem_id = p.id
+      JOIN chapters c ON p.chapter_id = c.id
       JOIN users u ON sa.user_id = u.id
       WHERE u.admin_id = $1
         AND sa.is_correct_attempt = false
         AND sa.error_message IS NOT NULL
-      GROUP BY p.id, p.title, p.problem_type, sa.error_message
-      ORDER BY error_count DESC
+        AND sa.error_message != ''
+      GROUP BY p.id, p.title, p.problem_type, c.title, sa.error_message
+      ORDER BY error_count DESC, error_rate_percentage DESC
       LIMIT 100
     `, [adminId]);
 
@@ -455,26 +527,37 @@ const getDetailedAnalytics = async (req, res) => {
         u.grade,
         u.created_at as registration_date,
 
-        -- Overall performance
-        COUNT(DISTINCT s.problem_id) as problems_attempted,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as problems_solved,
+        -- Overall performance (from submission_attempts)
+        COUNT(DISTINCT sa.problem_id) as problems_attempted,
+        COUNT(DISTINCT CASE WHEN s.is_correct THEN s.problem_id END) as problems_solved,
+        COUNT(sa.id) as total_submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
         ROUND(AVG(s.score)::numeric, 2) as avg_score,
         ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts,
         SUM(s.time_spent) as total_time_spent,
 
-        -- Problem type performance
-        COUNT(CASE WHEN p.problem_type = 'fill_blank' AND s.is_correct THEN 1 END) as fill_blank_solved,
-        COUNT(CASE WHEN p.problem_type = 'fill_blank' THEN 1 END) as fill_blank_attempted,
-        COUNT(CASE WHEN p.problem_type = 'predict' AND s.is_correct THEN 1 END) as predict_solved,
-        COUNT(CASE WHEN p.problem_type = 'predict' THEN 1 END) as predict_attempted,
-        COUNT(CASE WHEN p.problem_type = 'find_error' AND s.is_correct THEN 1 END) as find_error_solved,
-        COUNT(CASE WHEN p.problem_type = 'find_error' THEN 1 END) as find_error_attempted,
-        COUNT(CASE WHEN p.problem_type = 'mission' AND s.is_correct THEN 1 END) as mission_solved,
-        COUNT(CASE WHEN p.problem_type = 'mission' THEN 1 END) as mission_attempted
+        -- Problem type performance (from submission_attempts)
+        COUNT(CASE WHEN p.problem_type = 'fill_blank' AND sa.is_correct_attempt THEN 1 END) as fill_blank_correct,
+        COUNT(CASE WHEN p.problem_type = 'fill_blank' THEN sa.id END) as fill_blank_submissions,
+        COUNT(CASE WHEN p.problem_type = 'predict' AND sa.is_correct_attempt THEN 1 END) as predict_correct,
+        COUNT(CASE WHEN p.problem_type = 'predict' THEN sa.id END) as predict_submissions,
+        COUNT(CASE WHEN p.problem_type = 'find_error' AND sa.is_correct_attempt THEN 1 END) as find_error_correct,
+        COUNT(CASE WHEN p.problem_type = 'find_error' THEN sa.id END) as find_error_submissions,
+        COUNT(CASE WHEN p.problem_type = 'mission' AND sa.is_correct_attempt THEN 1 END) as mission_correct,
+        COUNT(CASE WHEN p.problem_type = 'mission' THEN sa.id END) as mission_submissions
 
       FROM users u
-      LEFT JOIN submissions s ON u.id = s.user_id
-      LEFT JOIN problems p ON s.problem_id = p.id
+      LEFT JOIN submission_attempts sa ON u.id = sa.user_id
+      LEFT JOIN problems p ON sa.problem_id = p.id
+      LEFT JOIN submissions s ON u.id = s.user_id AND sa.problem_id = s.problem_id
       WHERE u.admin_id = $1
       GROUP BY u.id, u.nickname, u.grade, u.created_at
       ORDER BY u.created_at
@@ -484,87 +567,126 @@ const getDetailedAnalytics = async (req, res) => {
     const problemTypeAnalysis = await pool.query(`
       SELECT
         p.problem_type,
-        COUNT(DISTINCT s.user_id) as students_attempted,
-        COUNT(s.id) as total_submissions,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT sa.user_id) as students_attempted,
+        COUNT(sa.id) as total_submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
         ROUND(AVG(s.score)::numeric, 2) as avg_score,
         ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent,
         ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts
       FROM problems p
+      LEFT JOIN submission_attempts sa ON p.id = sa.problem_id
+      LEFT JOIN users u1 ON sa.user_id = u1.id
       LEFT JOIN submissions s ON p.id = s.problem_id
-      LEFT JOIN users u ON s.user_id = u.id
-      WHERE u.admin_id = $1 OR s.id IS NULL
+      LEFT JOIN users u2 ON s.user_id = u2.id
+      WHERE (u1.admin_id = $1 OR u2.admin_id = $1) OR (sa.id IS NULL AND s.id IS NULL)
       GROUP BY p.problem_type
       ORDER BY p.problem_type
     `, [adminId]);
 
-    // 5. Time series data (daily)
+    // 5. Time series data (daily) - from submission_attempts
     const timeSeriesDaily = await pool.query(`
       SELECT
-        DATE(s.completed_at) as date,
-        COUNT(s.id) as submissions,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
-        COUNT(DISTINCT s.user_id) as active_students,
+        DATE(sa.timestamp) as date,
+        COUNT(sa.id) as submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT sa.user_id) as active_students,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
         ROUND(AVG(s.score)::numeric, 2) as avg_score
-      FROM submissions s
-      JOIN users u ON s.user_id = u.id
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      LEFT JOIN submissions s ON sa.user_id = s.user_id AND sa.problem_id = s.problem_id
       WHERE u.admin_id = $1
-      GROUP BY DATE(s.completed_at)
+      GROUP BY DATE(sa.timestamp)
       ORDER BY date DESC
       LIMIT 90
     `, [adminId]);
 
-    // 6. Time series data (weekly)
+    // 6. Time series data (weekly) - from submission_attempts
     const timeSeriesWeekly = await pool.query(`
       SELECT
-        DATE_TRUNC('week', s.completed_at) as week_start,
-        COUNT(s.id) as submissions,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
-        COUNT(DISTINCT s.user_id) as active_students,
+        DATE_TRUNC('week', sa.timestamp) as week_start,
+        COUNT(sa.id) as submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT sa.user_id) as active_students,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
         ROUND(AVG(s.score)::numeric, 2) as avg_score
-      FROM submissions s
-      JOIN users u ON s.user_id = u.id
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      LEFT JOIN submissions s ON sa.user_id = s.user_id AND sa.problem_id = s.problem_id
       WHERE u.admin_id = $1
-      GROUP BY DATE_TRUNC('week', s.completed_at)
+      GROUP BY DATE_TRUNC('week', sa.timestamp)
       ORDER BY week_start DESC
       LIMIT 52
     `, [adminId]);
 
-    // 7. Time series data (monthly)
+    // 7. Time series data (monthly) - from submission_attempts
     const timeSeriesMonthly = await pool.query(`
       SELECT
-        DATE_TRUNC('month', s.completed_at) as month_start,
-        COUNT(s.id) as submissions,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_submissions,
-        COUNT(DISTINCT s.user_id) as active_students,
+        DATE_TRUNC('month', sa.timestamp) as month_start,
+        COUNT(sa.id) as submissions,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_submissions,
+        COUNT(DISTINCT sa.user_id) as active_students,
+        ROUND(
+          CASE
+            WHEN COUNT(sa.id) > 0
+            THEN (COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END)::numeric / COUNT(sa.id)::numeric * 100)
+            ELSE 0
+          END,
+          1
+        ) as correct_rate,
         ROUND(AVG(s.score)::numeric, 2) as avg_score
-      FROM submissions s
-      JOIN users u ON s.user_id = u.id
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      LEFT JOIN submissions s ON sa.user_id = s.user_id AND sa.problem_id = s.problem_id
       WHERE u.admin_id = $1
-      GROUP BY DATE_TRUNC('month', s.completed_at)
+      GROUP BY DATE_TRUNC('month', sa.timestamp)
       ORDER BY month_start DESC
       LIMIT 12
     `, [adminId]);
 
-    // 8. Struggling points (problems with high failure rates)
+    // 8. Struggling points (problems with high failure rates) - from submission_attempts
     const strugglingPoints = await pool.query(`
       SELECT
         p.id as problem_id,
         p.title as problem_title,
         p.problem_type,
         c.title as chapter_title,
-        COUNT(s.id) as total_attempts,
-        COUNT(CASE WHEN s.is_correct THEN 1 END) as correct_attempts,
-        ROUND(100.0 * COUNT(CASE WHEN s.is_correct THEN 1 END) / NULLIF(COUNT(s.id), 0), 2) as success_rate,
+        COUNT(sa.id) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) / NULLIF(COUNT(sa.id), 0), 2) as success_rate,
         ROUND(AVG(s.total_attempts)::numeric, 2) as avg_attempts_to_solve,
         ROUND(AVG(s.time_spent)::numeric, 2) as avg_time_spent
       FROM problems p
       JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submission_attempts sa ON p.id = sa.problem_id
+      LEFT JOIN users u1 ON sa.user_id = u1.id
       LEFT JOIN submissions s ON p.id = s.problem_id
-      LEFT JOIN users u ON s.user_id = u.id
-      WHERE u.admin_id = $1
+      LEFT JOIN users u2 ON s.user_id = u2.id
+      WHERE (u1.admin_id = $1 OR u2.admin_id = $1)
       GROUP BY p.id, p.title, p.problem_type, c.title
-      HAVING COUNT(s.id) > 0
+      HAVING COUNT(sa.id) > 0
       ORDER BY success_rate ASC, avg_attempts_to_solve DESC
       LIMIT 20
     `, [adminId]);
@@ -732,6 +854,188 @@ const exportAnalyticsJSON = async (req, res) => {
   }
 };
 
+// Get error analysis for a specific problem
+const getErrorAnalysisByProblem = async (req, res) => {
+  const { problemId } = req.params;
+  const adminId = req.admin.adminId;
+
+  try {
+    // Get problem info
+    const problemResult = await pool.query(
+      `SELECT p.id, p.title, p.problem_type, p.difficulty_level, c.title as chapter_title
+       FROM problems p
+       JOIN chapters c ON p.chapter_id = c.id
+       WHERE p.id = $1`,
+      [problemId]
+    );
+
+    if (problemResult.rows.length === 0) {
+      return res.status(404).json({ error: '問題が見つかりません' });
+    }
+
+    const problem = problemResult.rows[0];
+
+    // Get all incorrect attempts with error messages
+    const incorrectAttempts = await pool.query(
+      `SELECT
+        sa.id,
+        sa.user_id,
+        u.nickname as student_name,
+        u.grade,
+        sa.attempt_number,
+        sa.error_message,
+        sa.hint_viewed,
+        sa.timestamp
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE sa.problem_id = $1
+        AND u.admin_id = $2
+        AND sa.is_correct_attempt = false
+      ORDER BY sa.timestamp DESC
+      LIMIT 500`,
+      [problemId, adminId]
+    );
+
+    // Group errors by message
+    const errorGroups = await pool.query(
+      `SELECT
+        sa.error_message,
+        COUNT(*) as count,
+        COUNT(DISTINCT sa.user_id) as unique_students,
+        ROUND(AVG(sa.attempt_number)::numeric, 2) as avg_attempt_number
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE sa.problem_id = $1
+        AND u.admin_id = $2
+        AND sa.is_correct_attempt = false
+        AND sa.error_message IS NOT NULL
+        AND sa.error_message != ''
+      GROUP BY sa.error_message
+      ORDER BY count DESC`,
+      [problemId, adminId]
+    );
+
+    // Get success vs failure statistics
+    const statistics = await pool.query(
+      `SELECT
+        COUNT(*) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) as correct_attempts,
+        COUNT(CASE WHEN NOT sa.is_correct_attempt THEN 1 END) as incorrect_attempts,
+        COUNT(DISTINCT sa.user_id) as unique_students,
+        COUNT(DISTINCT CASE WHEN sa.is_correct_attempt THEN sa.user_id END) as students_solved,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt THEN 1 END) / NULLIF(COUNT(*), 0), 2) as success_rate
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE sa.problem_id = $1
+        AND u.admin_id = $2`,
+      [problemId, adminId]
+    );
+
+    res.json({
+      problem,
+      statistics: statistics.rows[0],
+      errorGroups: errorGroups.rows,
+      recentIncorrectAttempts: incorrectAttempts.rows
+    });
+  } catch (error) {
+    log(`Get error analysis error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'サーバーエラーが発生しました' });
+  }
+};
+
+// Get comprehensive error analysis dashboard
+const getErrorAnalysisDashboard = async (req, res) => {
+  const adminId = req.admin.adminId;
+
+  try {
+    // 1. Most common errors across all problems
+    const topErrors = await pool.query(
+      `SELECT
+        sa.error_message,
+        COUNT(*) as total_occurrences,
+        COUNT(DISTINCT sa.problem_id) as problems_affected,
+        COUNT(DISTINCT sa.user_id) as students_affected
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1
+        AND sa.is_correct_attempt = false
+        AND sa.error_message IS NOT NULL
+        AND sa.error_message != ''
+      GROUP BY sa.error_message
+      ORDER BY total_occurrences DESC
+      LIMIT 20`,
+      [adminId]
+    );
+
+    // 2. Problems with highest error rates
+    const problematicProblems = await pool.query(
+      `SELECT
+        p.id as problem_id,
+        p.title as problem_title,
+        p.problem_type,
+        c.title as chapter_title,
+        COUNT(sa.id) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) as incorrect_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) / NULLIF(COUNT(sa.id), 0), 2) as error_rate
+      FROM problems p
+      JOIN chapters c ON p.chapter_id = c.id
+      LEFT JOIN submission_attempts sa ON p.id = sa.problem_id
+      LEFT JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1 OR sa.id IS NULL
+      GROUP BY p.id, p.title, p.problem_type, c.title
+      HAVING COUNT(sa.id) > 0
+      ORDER BY error_rate DESC, incorrect_attempts DESC
+      LIMIT 20`,
+      [adminId]
+    );
+
+    // 3. Students with most errors
+    const strugglingStudents = await pool.query(
+      `SELECT
+        u.id as student_id,
+        u.nickname,
+        u.grade,
+        COUNT(sa.id) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) as incorrect_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) / NULLIF(COUNT(sa.id), 0), 2) as error_rate
+      FROM users u
+      LEFT JOIN submission_attempts sa ON u.id = sa.user_id
+      WHERE u.admin_id = $1
+      GROUP BY u.id, u.nickname, u.grade
+      HAVING COUNT(sa.id) > 0
+      ORDER BY incorrect_attempts DESC, error_rate DESC
+      LIMIT 20`,
+      [adminId]
+    );
+
+    // 4. Error trends over time (last 30 days)
+    const errorTrends = await pool.query(
+      `SELECT
+        DATE(sa.timestamp) as date,
+        COUNT(*) as total_attempts,
+        COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) as incorrect_attempts,
+        ROUND(100.0 * COUNT(CASE WHEN sa.is_correct_attempt = false THEN 1 END) / NULLIF(COUNT(*), 0), 2) as error_rate
+      FROM submission_attempts sa
+      JOIN users u ON sa.user_id = u.id
+      WHERE u.admin_id = $1
+        AND sa.timestamp >= NOW() - INTERVAL '30 days'
+      GROUP BY DATE(sa.timestamp)
+      ORDER BY date DESC`,
+      [adminId]
+    );
+
+    res.json({
+      topErrors: topErrors.rows,
+      problematicProblems: problematicProblems.rows,
+      strugglingStudents: strugglingStudents.rows,
+      errorTrends: errorTrends.rows
+    });
+  } catch (error) {
+    log(`Get error analysis dashboard error: ${error.message}`, 'ERROR');
+    res.status(500).json({ error: 'サーバーエラーが発生しました' });
+  }
+};
+
 module.exports = {
   createStudent,
   getAllUsers,
@@ -744,5 +1048,7 @@ module.exports = {
   updateCorrectAnswer,
   getDetailedAnalytics,
   exportAnalyticsCSV,
-  exportAnalyticsJSON
+  exportAnalyticsJSON,
+  getErrorAnalysisByProblem,
+  getErrorAnalysisDashboard
 };

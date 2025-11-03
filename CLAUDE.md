@@ -94,8 +94,13 @@ docker-compose exec postgres psql -U postgres -d scratch_learning
 ### Submission Flow
 1. User uploads .sb3 file via multipart/form-data
 2. Backend parses SB3 (ZIP containing project.json) using JSZip
-3. compareScratchPrograms() compares submitted vs correct JSON structures
-4. Records both final submission (submissions table) and all attempts (submission_attempts table) for research
+3. **New Grading Engine v2.0** (backend/src/services/scratchGradingEngine.js):
+   - Normalizes variable names (katakana conversion, whitespace removal)
+   - Extracts block requirements from correct SB3 data
+   - Checks required blocks, parameters, and order constraints
+   - Generates detailed, structured feedback with specific hints
+4. compareScratchPrograms() uses new grading engine and returns structured feedback
+5. Records both final submission (submissions table) and all attempts (submission_attempts table) for research
 
 ### Database Schema
 - **users**: Students (username, password_hash, nickname, level, exp, grade 1-6)
@@ -113,7 +118,25 @@ All development activity is automatically logged to `logs/YYYYMMDD_HHMMSS_server
 
 ## Key Implementation Notes
 
-- SB3 grading logic in backend/src/controllers/submissionController.js uses simplified JSON comparison. Production version should implement block-by-block semantic comparison.
+### Grading System (v2.1 - Updated 2025-10-31)
+- **New Grading Engine**: backend/src/services/scratchGradingEngine.js implements semantic comparison with:
+  - **Variable Mapping (v2.1)**: Ignores variable names completely, maps variables by usage patterns
+    - Students can use any variable names (e.g., "りんご", "A", "x") and still get full marks
+    - System automatically matches variables based on how they're used, not their names
+    - Example: Variable "counter" (correct) ↔ Variable "apple" (student) → Mapped if usage is identical
+  - Variable name normalization (hiragana→katakana, whitespace/symbol removal) - kept for backwards compatibility
+  - Automatic requirement extraction from correct SB3 data
+  - Block-by-block comparison with flexible parameter matching (±10% tolerance)
+  - Order constraint checking for sequential blocks
+  - Detailed feedback generation (success/warning/error categories + hints)
+- **Feedback System**: Frontend displays structured feedback via FeedbackDisplay component (frontend/src/components/FeedbackDisplay.tsx)
+- **API Response**: POST /api/submissions/:problemId now returns `feedback` field with {summary, details[], hints[]}
+- **Documentation**:
+  - docs/採点システム仕様書.md - Original specification (v1.0)
+  - docs/採点システム改善提案.md - Improvement proposal (v2.0)
+  - docs/採点システム解説_v2.1.md - Easy-to-understand explanation with variable mapping (v2.1) ★NEW★
+
+### Other Notes
 - Frontend uses AuthContext to manage dual authentication (students vs admins) with different localStorage keys.
 - Database triggers automatically update updated_at timestamps.
 - All error messages and UI text are in Japanese for elementary school students.

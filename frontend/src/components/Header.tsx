@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import ExpGauge from './ExpGauge';
+import PointsGauge from './ExpGauge';
 
 const Header: React.FC = () => {
   const { user, admin, isAuthenticated, isAdmin, logout } = useAuth();
@@ -12,9 +12,9 @@ const Header: React.FC = () => {
     navigate('/');
   };
 
-  // Calculate EXP progress for current level
-  const currentLevelExp = user ? user.exp % (user.level * 100) : 0;
-  const expToNextLevel = user ? user.level * 100 - currentLevelExp : 100;
+  // Calculate points progress for current rank
+  const currentRankPoints = user ? user.points % (user.rank * 100) : 0;
+  const pointsToNextRank = user ? user.rank * 100 - currentRankPoints : 100;
 
   return (
     <header className="bg-primary-600 text-white shadow-lg">
@@ -30,10 +30,10 @@ const Header: React.FC = () => {
                 {!isAdmin && (
                   <>
                     <Link to="/chapters" className="hover:text-primary-100 transition">
-                      学習する
+                      <ruby>問題<rt>もんだい</rt></ruby>をとく
                     </Link>
                     <Link to="/progress" className="hover:text-primary-100 transition">
-                      進捗
+                      <ruby>自分<rt>じぶん</rt></ruby>の<ruby>記録<rt>きろく</rt></ruby>
                     </Link>
                   </>
                 )}
@@ -60,13 +60,13 @@ const Header: React.FC = () => {
                     <div className="flex items-center gap-4">
                       <div className="text-right">
                         <div className="text-sm font-bold">{user.nickname}</div>
-                        <div className="text-xs text-primary-100">Lv.{user.level}</div>
+                        <div className="text-xs text-primary-100">Rank {user.rank}</div>
                       </div>
                       <div className="w-48">
-                        <ExpGauge
-                          currentExp={currentLevelExp}
-                          expToNextLevel={expToNextLevel}
-                          level={user.level}
+                        <PointsGauge
+                          currentPoints={currentRankPoints}
+                          pointsToNextRank={pointsToNextRank}
+                          rank={user.rank}
                           animate={false}
                           showLabel={false}
                           size="small"

@@ -8,8 +8,8 @@ interface User {
   username: string;
   nickname: string;
   grade: number;
-  level: number;
-  exp: number;
+  rank: number;
+  points: number;
   total_submissions: number;
   correct_submissions: number;
   average_score: number;
@@ -193,7 +193,7 @@ const AdminUsers: React.FC = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        Lv.{user.level} ({user.exp} EXP)
+                        Rank {user.rank} ({user.points} ポイント)
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {user.total_submissions || 0}

@@ -46,10 +46,10 @@ const Home: React.FC = () => {
                   </h2>
                   <div className="flex gap-4 items-center mb-6">
                     <div className="bg-blue-100 px-4 py-2 rounded-full animate-bounce-gentle">
-                      <span className="text-blue-700 font-bold">レベル {user.level}</span>
+                      <span className="text-blue-700 font-bold">ランク {user.rank}</span>
                     </div>
                     <div className="bg-yellow-100 px-4 py-2 rounded-full">
-                      <span className="text-yellow-700 font-bold"><ruby>経験値<rt>けいけんち</rt></ruby> {user.exp}</span>
+                      <span className="text-yellow-700 font-bold">ポイント {user.points}</span>
                     </div>
                   </div>
                   <Link

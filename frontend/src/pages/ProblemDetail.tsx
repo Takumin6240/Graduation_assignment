@@ -3,8 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { problemsAPI, submissionsAPI } from '../services/api';
 import { Problem, Hint } from '../types';
 import Loading from '../components/Loading';
-import ExpGauge from '../components/ExpGauge';
-import LevelUpModal from '../components/LevelUpModal';
+import PointsGauge from '../components/ExpGauge';
+import RankUpModal from '../components/LevelUpModal';
+import FeedbackDisplay from '../components/FeedbackDisplay';
 import { useAuth } from '../contexts/AuthContext';
 
 const ProblemDetail: React.FC = () => {
@@ -21,8 +22,8 @@ const ProblemDetail: React.FC = () => {
   const [allProblems, setAllProblems] = useState<Problem[]>([]);
   const [answerX, setAnswerX] = useState<string>('');
   const [answerY, setAnswerY] = useState<string>('');
-  const [showLevelUpModal, setShowLevelUpModal] = useState(false);
-  const [displayedExp, setDisplayedExp] = useState(0);
+  const [showRankUpModal, setShowRankUpModal] = useState(false);
+  const [displayedPoints, setDisplayedPoints] = useState(0);
   const [hints, setHints] = useState<Hint[]>([]);
   const [showHints, setShowHints] = useState(false);
   const [hintUsageCount, setHintUsageCount] = useState(0);
@@ -116,29 +117,29 @@ const ProblemDetail: React.FC = () => {
         await refreshUser();
       }
 
-      // Show level up modal if leveled up
-      if (response.data.expData?.leveledUp) {
+      // Show rank up modal if ranked up
+      if (response.data.pointsData?.rankedUp) {
         setTimeout(() => {
-          setShowLevelUpModal(true);
+          setShowRankUpModal(true);
         }, 1500); // Show after 1.5 seconds
       }
 
-      // Animate EXP counter
-      if (response.data.expData) {
-        const targetExp = response.data.expData.earnedExp;
-        let currentExp = 0;
+      // Animate points counter
+      if (response.data.pointsData) {
+        const targetPoints = response.data.pointsData.earnedPoints;
+        let currentPoints = 0;
         const duration = 1500; // 1.5 seconds
         const steps = 50;
-        const increment = targetExp / steps;
+        const increment = targetPoints / steps;
         const stepDuration = duration / steps;
 
         const timer = setInterval(() => {
-          currentExp += increment;
-          if (currentExp >= targetExp) {
-            setDisplayedExp(targetExp);
+          currentPoints += increment;
+          if (currentPoints >= targetPoints) {
+            setDisplayedPoints(targetPoints);
             clearInterval(timer);
           } else {
-            setDisplayedExp(Math.floor(currentExp));
+            setDisplayedPoints(Math.floor(currentPoints));
           }
         }, stepDuration);
       }
@@ -177,9 +178,11 @@ const ProblemDetail: React.FC = () => {
   if (loading) return <Loading />;
   if (!problem) return <div><ruby>問題<rt>もんだい</rt></ruby>が<ruby>見<rt>み</rt></ruby>つかりません</div>;
 
+  const problemImageSrc = getProblemTypeImage(problem.problem_type);
+
   if (result) {
     const isPerfectScore = result.score === 100;
-    const expData = result.expData;
+    const pointsData = result.pointsData;
 
     // Find next problem
     const currentIndex = allProblems.findIndex(p => p.id === Number(problemId));
@@ -189,13 +192,13 @@ const ProblemDetail: React.FC = () => {
 
     return (
       <div className="container mx-auto px-4 py-8">
-        {/* Level Up Modal */}
-        {expData?.leveledUp && (
-          <LevelUpModal
-            isOpen={showLevelUpModal}
-            previousLevel={expData.previousLevel}
-            newLevel={expData.newLevel}
-            onClose={() => setShowLevelUpModal(false)}
+        {/* Rank Up Modal */}
+        {pointsData?.rankedUp && (
+          <RankUpModal
+            isOpen={showRankUpModal}
+            previousRank={pointsData.previousRank}
+            newRank={pointsData.newRank}
+            onClose={() => setShowRankUpModal(false)}
           />
         )}
 
@@ -242,37 +245,37 @@ const ProblemDetail: React.FC = () => {
               {result.score}<ruby>点<rt>てん</rt></ruby>
             </div>
 
-            {/* EXP獲得表示 */}
-            {expData && result.isCorrect && (
+            {/* ポイント獲得表示 */}
+            {pointsData && result.isCorrect && (
               <div className="mb-6 p-6 bg-white rounded-xl shadow-lg border-2 border-yellow-300">
                 <div className="flex items-center justify-center gap-4 mb-4">
-                  <img src="/たまごの殻からコンニチハ！するひよこ.png" alt="EXP" className="w-16 h-16" />
+                  <img src="/たまごの殻からコンニチハ！するひよこ.png" alt="ポイント" className="w-16 h-16" />
                   <div className="text-left">
                     <div className="text-3xl font-black text-yellow-600 animate-count-up">
-                      +{displayedExp} EXP
+                      +{displayedPoints} ポイント
                     </div>
-                    {expData.bonusExp > 0 && (
+                    {pointsData.bonusPoints > 0 && (
                       <div className="text-sm text-orange-600 font-bold">
-                        ボーナス: +{expData.bonusExp} EXP
+                        ボーナス: +{pointsData.bonusPoints} ポイント
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* EXP Gauge */}
-                <ExpGauge
-                  currentExp={expData.currentLevelExp}
-                  expToNextLevel={expData.expToNextLevel}
-                  level={expData.newLevel}
+                {/* Points Gauge */}
+                <PointsGauge
+                  currentPoints={pointsData.currentRankPoints}
+                  pointsToNextRank={pointsData.pointsToNextRank}
+                  rank={pointsData.newRank}
                   animate={true}
                   showLabel={true}
                   size="large"
                 />
 
-                {expData.leveledUp && (
+                {pointsData.rankedUp && (
                   <div className="mt-4 p-3 bg-gradient-to-r from-yellow-100 to-orange-100 rounded-lg border-2 border-yellow-400">
                     <div className="text-lg font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 to-orange-600">
-                      <ruby>レベルアップ<rt>れべるあっぷ</rt></ruby>！ Lv.{expData.previousLevel} → Lv.{expData.newLevel}
+                      ランクアップ！ Rank {pointsData.previousRank} → Rank {pointsData.newRank}
                     </div>
                   </div>
                 )}
@@ -290,7 +293,18 @@ const ProblemDetail: React.FC = () => {
             <p className="text-lg text-gray-700 mb-6">
               <ruby>試行<rt>しこう</rt></ruby><ruby>回数<rt>かいすう</rt></ruby>: {result.attemptNumber}<ruby>回目<rt>かいめ</rt></ruby>
             </p>
+          </div>
 
+          {/* 詳細フィードバック表示 */}
+          {result.feedback && problem.problem_type !== 'predict' && (
+            <FeedbackDisplay
+              feedback={result.feedback}
+              score={result.score}
+              isCorrect={result.isCorrect}
+            />
+          )}
+
+          <div className="mt-6">
             <div className="flex gap-4 justify-center flex-wrap">
               <button
                 onClick={() => navigate(`/chapters/${problem.chapter_id}`)}
@@ -334,8 +348,6 @@ const ProblemDetail: React.FC = () => {
       </div>
     );
   }
-
-  const problemImageSrc = getProblemTypeImage(problem.problem_type);
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-interface LevelUpModalProps {
+interface RankUpModalProps {
   isOpen: boolean;
-  previousLevel: number;
-  newLevel: number;
+  previousRank: number;
+  newRank: number;
   onClose: () => void;
 }
 
-const LevelUpModal: React.FC<LevelUpModalProps> = ({
+const RankUpModal: React.FC<RankUpModalProps> = ({
   isOpen,
-  previousLevel,
-  newLevel,
+  previousRank,
+  newRank,
   onClose
 }) => {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -63,7 +63,7 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({
       )}
 
       {/* Modal Content */}
-      <div className="relative bg-white rounded-3xl shadow-2xl p-12 max-w-lg mx-4 text-center transform animate-scale-in">
+      <div className="relative bg-white rounded-3xl shadow-2xl p-12 max-w-xl mx-4 text-center transform animate-scale-in">
         {/* Sparkles */}
         <div className="absolute -top-6 -left-6 text-6xl animate-spin-slow">✨</div>
         <div className="absolute -top-6 -right-6 text-6xl animate-spin-slow" style={{ animationDelay: '0.5s' }}>✨</div>
@@ -72,30 +72,30 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({
         <div className="mb-6 flex justify-center">
           <img
             src="/合格証を見せるひよこ.png"
-            alt="レベルアップ"
+            alt="ランクアップ"
             className="w-40 h-40 animate-bounce"
           />
         </div>
 
         {/* Title */}
         <h2 className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-500 to-pink-500 mb-4 animate-pulse">
-          <ruby>レベルアップ<rt>れべるあっぷ</rt></ruby>！
+          ランクアップ！
         </h2>
 
-        {/* Level Display */}
+        {/* Rank Display */}
         <div className="flex items-center justify-center gap-4 mb-6">
           <div className="text-4xl font-bold text-gray-700">
-            Lv.{previousLevel}
+            Rank {previousRank}
           </div>
           <div className="text-5xl text-yellow-500 animate-pulse">→</div>
           <div className="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-500 animate-scale-in">
-            Lv.{newLevel}
+            Rank {newRank}
           </div>
         </div>
 
         {/* Message */}
         <p className="text-xl text-gray-700 font-bold">
-          おめでとう！さらに<ruby>強<rt>つよ</rt></ruby>くなったよ！
+          おめでとう！ランクが<ruby>上<rt>あ</rt></ruby>がったよ！
         </p>
 
         {/* Close button */}
@@ -110,4 +110,4 @@ const LevelUpModal: React.FC<LevelUpModalProps> = ({
   );
 };
 
-export default LevelUpModal;
+export default RankUpModal;
