@@ -1,8 +1,20 @@
 /**
- * Scratch採点エンジン v2.1
+ * Scratch採点エンジン v2.3
  *
  * 意味的等価性を判定し、詳細なフィードバックを提供する新しい採点システム
+ *
  * v2.1の改善点: 変数名を無視し、変数の使用パターンで比較
+ * v2.2の改善点:
+ *   - 全ブロックタイプ（制御、見た目、音、イベント等）の値判別を実装
+ *   - 値の誤差判定を改善（大幅な誤りでも「値が間違っている」と明確に指摘）
+ *   - 余分なブロック・変数の検出機能を追加
+ *   - 点数に応じたきめ細かいメッセージ（85点で「あともう少し」等）
+ * v2.3の改善点（見やすさ重視）:
+ *   - エラーの優先度付け（重要な問題から表示）
+ *   - 正解している部分は表示しない（間違いに集中）
+ *   - カテゴリ別サマリー（問題の多いカテゴリを強調、3個以上のエラーがある場合）
+ *   - ヒントは最大3個まで（優先度順、重複削除）
+ *   - すべてのエラーを表示（制限なし）
  */
 
 // ========================================
@@ -500,13 +512,28 @@ const BLOCK_LABELS = {
   'event_whenflagclicked': '緑の旗がクリックされたとき',
   'event_whenkeypressed': 'キーが押されたとき',
   'event_whenthisspriteclicked': 'このスプライトがクリックされたとき',
+  'event_whenbroadcastreceived': '○を受け取ったとき',
+  'event_broadcast': '○を送る',
+  'event_broadcastandwait': '○を送って待つ',
+  'event_whenstageclicked': 'ステージがクリックされたとき',
+  'event_whenbackdropswitchesto': '背景が○になったとき',
 
   // 動き
   'motion_movesteps': '○歩動かす',
   'motion_turnright': '右に○度回す',
   'motion_turnleft': '左に○度回す',
   'motion_gotoxy': 'x:○ y:○へ行く',
+  'motion_goto': '○へ行く',
   'motion_glidesecstoxy': '○秒で x:○ y:○へ行く',
+  'motion_glideto': '○秒で○へ行く',
+  'motion_pointindirection': '○度に向ける',
+  'motion_pointtowards': '○へ向ける',
+  'motion_changexby': 'xを○ずつ変える',
+  'motion_setx': 'xを○にする',
+  'motion_changeyby': 'yを○ずつ変える',
+  'motion_sety': 'yを○にする',
+  'motion_ifonedgebounce': 'もし端に着いたら、跳ね返る',
+  'motion_setrotationstyle': '回転方法を○にする',
 
   // 見た目
   'looks_say': '○と言う',
@@ -515,10 +542,27 @@ const BLOCK_LABELS = {
   'looks_thinkforsecs': '○と○秒考える',
   'looks_show': '表示する',
   'looks_hide': '隠す',
+  'looks_switchcostumeto': 'コスチュームを○にする',
+  'looks_nextcostume': '次のコスチュームにする',
+  'looks_switchbackdropto': '背景を○にする',
+  'looks_nextbackdrop': '次の背景にする',
+  'looks_changesizeby': '大きさを○ずつ変える',
+  'looks_setsizeto': '大きさを○%にする',
+  'looks_changeeffectby': '○の効果を○ずつ変える',
+  'looks_seteffectto': '○の効果を○にする',
+  'looks_cleargraphiceffects': '画像効果をなくす',
+  'looks_gotofrontback': '最前面へ移動する / 最背面へ移動する',
+  'looks_goforwardbackwardlayers': '○層○へ移動する',
 
   // 音
   'sound_play': '○の音を鳴らす',
   'sound_playuntildone': '○の音を最後まで鳴らす',
+  'sound_stopallsounds': 'すべての音を止める',
+  'sound_changeeffectby': '○の効果を○ずつ変える',
+  'sound_seteffectto': '○の効果を○にする',
+  'sound_cleareffects': '音の効果をなくす',
+  'sound_changevolumeby': '音量を○ずつ変える',
+  'sound_setvolumeto': '音量を○%にする',
 
   // 制御
   'control_repeat': '○回繰り返す',
@@ -527,17 +571,87 @@ const BLOCK_LABELS = {
   'control_if_else': 'もし○なら、でなければ',
   'control_wait': '○秒待つ',
   'control_wait_until': '○まで待つ',
+  'control_repeat_until': '○まで繰り返す',
+  'control_stop': '○を止める',
+  'control_start_as_clone': 'クローンされたとき',
+  'control_create_clone_of': '○のクローンを作る',
+  'control_delete_this_clone': 'このクローンを削除する',
+
+  // 調べる
+  'sensing_touchingobject': '○に触れた',
+  'sensing_touchingcolor': '○色に触れた',
+  'sensing_coloristouchingcolor': '○色が○色に触れた',
+  'sensing_distanceto': '○までの距離',
+  'sensing_askandwait': '○と聞いて待つ',
+  'sensing_answer': '答え',
+  'sensing_keypressed': '○キーが押された',
+  'sensing_mousedown': 'マウスが押された',
+  'sensing_mousex': 'マウスのx座標',
+  'sensing_mousey': 'マウスのy座標',
+  'sensing_setdragmode': 'ドラッグを○にする',
+  'sensing_loudness': '音量',
+  'sensing_timer': 'タイマー',
+  'sensing_resettimer': 'タイマーをリセット',
+  'sensing_of': '○の○',
+  'sensing_current': '現在の○',
+  'sensing_dayssince2000': '2000年からの日数',
+  'sensing_username': 'ユーザー名',
+
+  // 演算
+  'operator_add': '○+○',
+  'operator_subtract': '○-○',
+  'operator_multiply': '○×○',
+  'operator_divide': '○÷○',
+  'operator_random': '○から○までの乱数',
+  'operator_gt': '○>○',
+  'operator_lt': '○<○',
+  'operator_equals': '○=○',
+  'operator_and': '○かつ○',
+  'operator_or': '○または○',
+  'operator_not': '○ではない',
+  'operator_join': '○と○',
+  'operator_letter_of': '○の○番目の文字',
+  'operator_length': '○の長さ',
+  'operator_contains': '○に○が含まれる',
+  'operator_mod': '○を○で割った余り',
+  'operator_round': '○を四捨五入',
+  'operator_mathop': '○の○',
 
   // データ
   'data_setvariableto': '○を○にする',
   'data_changevariableby': '○を○ずつ変える',
   'data_hidevariable': '○を隠す',
   'data_showvariable': '○を表示する',
+  'data_addtolist': '○を○に追加する',
+  'data_deleteoflist': '○の○番目を削除する',
+  'data_deletealloflist': '○をすべて削除する',
+  'data_insertatlist': '○を○の○番目に挿入する',
+  'data_replaceitemoflist': '○の○番目を○で置き換える',
+  'data_itemoflist': '○の○番目',
+  'data_itemnumoflist': '○の中の○の位置',
+  'data_lengthoflist': '○の長さ',
+  'data_listcontainsitem': '○に○が含まれる',
+  'data_showlist': '○を表示する',
+  'data_hidelist': '○を隠す',
 
   // ペン
   'pen_penDown': 'ペンを下ろす',
   'pen_penUp': 'ペンを上げる',
-  'pen_clear': '消す'
+  'pen_clear': '消す',
+  'pen_stamp': 'スタンプ',
+  'pen_setPenColorToColor': 'ペンの色を○にする',
+  'pen_changePenColorParamBy': 'ペンの○を○ずつ変える',
+  'pen_setPenColorParamTo': 'ペンの○を○にする',
+  'pen_changePenSizeBy': 'ペンの太さを○ずつ変える',
+  'pen_setPenSizeTo': 'ペンの太さを○にする',
+
+  // 音楽拡張
+  'music_playDrumForBeats': '○の音を○拍鳴らす',
+  'music_restForBeats': '○拍休む',
+  'music_playNoteForBeats': '○の音符を○拍鳴らす',
+  'music_setInstrument': '楽器を○にする',
+  'music_setTempo': 'テンポを○にする',
+  'music_changeTempo': 'テンポを○ずつ変える'
 };
 
 function getBlockLabel(opcode) {
@@ -657,7 +771,7 @@ function addBlockRequirement(requiredBlocks, block) {
 // ========================================
 
 /**
- * プログラムから特定のブロックを検索
+ * プログラムから特定のブロックを検索（値は後で別途チェック）
  */
 function findBlocks(program, opcode, inputs = null) {
   const found = [];
@@ -672,9 +786,8 @@ function findBlocks(program, opcode, inputs = null) {
       // 通常のブロック
       for (const block of script.blocks) {
         if (block.opcode === opcode) {
-          if (!inputs || inputsMatch(block.inputs, inputs)) {
-            found.push(block);
-          }
+          // opcodeだけで検索（値のチェックはせず、全て返す）
+          found.push(block);
         }
 
         // サブスタック内も検索
@@ -693,9 +806,8 @@ function searchInSubstack(substack, opcode, inputs, found) {
   for (const [key, blocks] of Object.entries(substack)) {
     for (const block of blocks) {
       if (block.opcode === opcode) {
-        if (!inputs || inputsMatch(block.inputs, inputs)) {
-          found.push(block);
-        }
+        // opcodeだけで検索（値のチェックはせず、全て返す）
+        found.push(block);
       }
 
       // 再帰的にサブスタックを検索
@@ -707,67 +819,165 @@ function searchInSubstack(substack, opcode, inputs, found) {
 }
 
 /**
- * 入力値が一致するかチェック
+ * 入力値が一致するかチェック（詳細情報を返す）
+ * @returns {object} { exactMatch: boolean, closeMatch: boolean, details: array }
  */
-function inputsMatch(actualInputs, expectedInputs) {
+function checkInputMatch(actualInputs, expectedInputs) {
+  const result = {
+    exactMatch: true,
+    closeMatch: true,
+    details: []
+  };
+
   for (const [key, expectedValue] of Object.entries(expectedInputs)) {
     const actualValue = actualInputs[key];
 
-    // 数値は許容範囲でチェック（±10%）
+    // 数値の場合
     if (typeof expectedValue === 'number' && typeof actualValue === 'number') {
-      const tolerance = Math.abs(expectedValue) * 0.1;
-      if (Math.abs(actualValue - expectedValue) > tolerance) {
-        return false;
+      const diff = Math.abs(actualValue - expectedValue);
+      const tolerance = Math.abs(expectedValue) * 0.1; // ±10%
+
+      if (diff === 0) {
+        // 完全一致
+        result.details.push({
+          key,
+          status: 'exact',
+          expected: expectedValue,
+          actual: actualValue
+        });
+      } else if (diff <= tolerance) {
+        // 許容範囲内（近い値）
+        result.exactMatch = false;
+        result.details.push({
+          key,
+          status: 'close',
+          expected: expectedValue,
+          actual: actualValue,
+          diff: diff
+        });
+      } else {
+        // 許容範囲外（大幅に違う）
+        result.exactMatch = false;
+        result.closeMatch = false;
+        result.details.push({
+          key,
+          status: 'wrong',
+          expected: expectedValue,
+          actual: actualValue,
+          diff: diff
+        });
       }
-    } else if (actualValue !== expectedValue) {
-      return false;
+    } else if (actualValue === expectedValue) {
+      // 文字列等の完全一致
+      result.details.push({
+        key,
+        status: 'exact',
+        expected: expectedValue,
+        actual: actualValue
+      });
+    } else {
+      // 不一致
+      result.exactMatch = false;
+      result.closeMatch = false;
+      result.details.push({
+        key,
+        status: 'wrong',
+        expected: expectedValue,
+        actual: actualValue
+      });
     }
   }
 
-  return true;
+  return result;
 }
 
 /**
- * ブロック要件をチェック
+ * ブロック要件をチェック（改善版：ブロックの存在と値を分離してチェック）
  */
 function checkBlockRequirements(program, requiredBlocks) {
   const results = [];
 
   for (const requirement of requiredBlocks) {
-    const found = findBlocks(program, requirement.opcode, requirement.inputs);
+    // Step 1: opcodeだけでブロックを検索
+    const foundBlocks = findBlocks(program, requirement.opcode);
 
     const result = {
       requirement,
-      found,
+      found: foundBlocks,
       passed: false,
       score: 0,
       feedback: null
     };
 
-    // 数量チェック
-    if (found.length === requirement.count) {
-      result.passed = true;
-      result.score = requirement.points;
-    } else if (found.length > 0) {
-      // 部分点
-      result.score = Math.round(requirement.points * 0.5);
-
-      if (found.length < requirement.count) {
-        result.feedback = `「${requirement.label}」ブロックが${found.length}個ありますが、${requirement.count}個必要です`;
-      } else {
-        result.feedback = `「${requirement.label}」ブロックが${found.length}個ありますが、${requirement.count}個で十分です`;
-      }
-    } else {
+    // Step 2: ブロックが見つからない場合
+    if (foundBlocks.length === 0) {
       result.feedback = `「${requirement.label}」ブロックがありません`;
+      results.push(result);
+      continue;
     }
 
-    // パラメータの詳細チェック
-    if (found.length > 0 && Object.keys(requirement.inputs).length > 0) {
-      const paramCheck = checkParameters(found[0], requirement.inputs);
-      if (!paramCheck.allMatch) {
-        result.passed = false;
-        result.score = Math.round(requirement.points * paramCheck.matchRatio);
-        result.feedback = paramCheck.feedback;
+    // Step 3: ブロックは見つかった。値をチェック
+    const hasInputs = Object.keys(requirement.inputs).length > 0;
+
+    if (!hasInputs) {
+      // 値のチェックが不要な場合（例: 表示する、隠す など）
+      if (foundBlocks.length === requirement.count) {
+        result.passed = true;
+        result.score = requirement.points;
+      } else if (foundBlocks.length < requirement.count) {
+        result.score = Math.round(requirement.points * 0.5);
+        result.feedback = `「${requirement.label}」ブロックが${foundBlocks.length}個ありますが、${requirement.count}個必要です`;
+      } else {
+        result.score = Math.round(requirement.points * 0.8);
+        result.feedback = `「${requirement.label}」ブロックが${foundBlocks.length}個ありますが、${requirement.count}個で十分です（余分なブロック）`;
+      }
+    } else {
+      // 値のチェックが必要な場合
+      let bestMatch = null;
+      let bestMatchScore = -1;
+
+      // 各ブロックの値をチェックして、最も一致度が高いものを選ぶ
+      for (const block of foundBlocks) {
+        const matchResult = checkInputMatch(block.inputs, requirement.inputs);
+
+        if (matchResult.exactMatch) {
+          bestMatch = { block, matchResult, score: 1.0 };
+          break; // 完全一致が見つかったら終了
+        } else if (matchResult.closeMatch && bestMatchScore < 0.8) {
+          bestMatch = { block, matchResult, score: 0.8 };
+          bestMatchScore = 0.8;
+        } else if (!bestMatch || (bestMatchScore < 0.3)) {
+          bestMatch = { block, matchResult, score: 0.3 };
+          bestMatchScore = 0.3;
+        }
+      }
+
+      if (bestMatch) {
+        if (bestMatch.matchResult.exactMatch) {
+          // 完全一致
+          result.passed = true;
+          result.score = requirement.points;
+        } else if (bestMatch.matchResult.closeMatch) {
+          // 近い値
+          result.score = Math.round(requirement.points * 0.8);
+
+          const wrongDetails = bestMatch.matchResult.details
+            .filter(d => d.status === 'close')
+            .map(d => `${getInputLabel(d.key)}の値が少し違います（正解: ${d.expected}、あなた: ${d.actual}）`)
+            .join('、');
+
+          result.feedback = `「${requirement.label}」ブロックはありますが、${wrongDetails}`;
+        } else {
+          // 値が大幅に違う
+          result.score = Math.round(requirement.points * 0.3);
+
+          const wrongDetails = bestMatch.matchResult.details
+            .filter(d => d.status === 'wrong')
+            .map(d => `${getInputLabel(d.key)}の値が間違っています（正解: ${d.expected}、あなた: ${d.actual}）`)
+            .join('、');
+
+          result.feedback = `「${requirement.label}」ブロックはありますが、${wrongDetails}`;
+        }
       }
     }
 
@@ -778,46 +988,155 @@ function checkBlockRequirements(program, requiredBlocks) {
 }
 
 /**
- * パラメータをチェック
+ * 入力パラメータの名前をわかりやすく表示
  */
-function checkParameters(block, expectedInputs) {
-  const matches = [];
-  const mismatches = [];
+function getInputLabel(inputKey) {
+  const labels = {
+    'STEPS': '歩数',
+    'DEGREES': '角度',
+    'X': 'x座標',
+    'Y': 'y座標',
+    'SECS': '秒数',
+    'MESSAGE': 'メッセージ',
+    'TIMES': '回数',
+    'VALUE': '値',
+    'DURATION': '長さ',
+    'VOLUME': '音量',
+    'SIZE': '大きさ',
+    'CHANGE': '変化量'
+  };
 
-  for (const [key, expectedValue] of Object.entries(expectedInputs)) {
-    const actualValue = block.inputs[key];
+  return labels[inputKey] || inputKey;
+}
 
-    if (actualValue === expectedValue) {
-      matches.push(key);
-    } else {
-      mismatches.push({
-        key,
-        expected: expectedValue,
-        actual: actualValue
+// ========================================
+// 5. 余分なブロック・変数の検出
+// ========================================
+
+/**
+ * 全ブロックを収集
+ */
+function collectAllBlocks(program) {
+  const allBlocks = [];
+
+  for (const sprite of program.sprites) {
+    for (const script of sprite.scripts) {
+      // イベントブロック
+      if (script.eventBlock) {
+        allBlocks.push({
+          opcode: script.eventBlock.type,
+          category: getBlockCategory(script.eventBlock.type),
+          label: getBlockLabel(script.eventBlock.type)
+        });
+      }
+
+      // 通常のブロック
+      for (const block of script.blocks) {
+        allBlocks.push({
+          opcode: block.opcode,
+          category: getBlockCategory(block.opcode),
+          label: getBlockLabel(block.opcode)
+        });
+
+        // サブスタック内も収集
+        collectBlocksFromSubstack(block.substack, allBlocks);
+      }
+    }
+  }
+
+  return allBlocks;
+}
+
+/**
+ * サブスタック内のブロックを収集
+ */
+function collectBlocksFromSubstack(substack, allBlocks) {
+  for (const [key, blocks] of Object.entries(substack)) {
+    for (const block of blocks) {
+      allBlocks.push({
+        opcode: block.opcode,
+        category: getBlockCategory(block.opcode),
+        label: getBlockLabel(block.opcode)
+      });
+
+      // 再帰的にサブスタックを収集
+      if (block.substack) {
+        collectBlocksFromSubstack(block.substack, allBlocks);
+      }
+    }
+  }
+}
+
+/**
+ * 余分なブロックを検出
+ */
+function detectExtraBlocks(submittedProgram, correctProgram) {
+  const submittedBlocks = collectAllBlocks(submittedProgram);
+  const correctBlocks = collectAllBlocks(correctProgram);
+
+  // 正解に含まれるブロックのopcodeをカウント
+  const correctBlockCounts = {};
+  for (const block of correctBlocks) {
+    correctBlockCounts[block.opcode] = (correctBlockCounts[block.opcode] || 0) + 1;
+  }
+
+  // 提出されたブロックをカウント
+  const submittedBlockCounts = {};
+  for (const block of submittedBlocks) {
+    submittedBlockCounts[block.opcode] = (submittedBlockCounts[block.opcode] || 0) + 1;
+  }
+
+  // 余分なブロックを検出
+  const extraBlocks = [];
+  for (const [opcode, count] of Object.entries(submittedBlockCounts)) {
+    const correctCount = correctBlockCounts[opcode] || 0;
+    if (count > correctCount) {
+      extraBlocks.push({
+        opcode,
+        label: getBlockLabel(opcode),
+        category: getBlockCategory(opcode),
+        extraCount: count - correctCount
       });
     }
   }
 
-  const totalParams = Object.keys(expectedInputs).length;
-  const matchRatio = totalParams > 0 ? matches.length / totalParams : 1;
+  return extraBlocks;
+}
 
-  let feedback = null;
-  if (mismatches.length > 0) {
-    const details = mismatches.map(m =>
-      `${m.key}は「${m.expected}」であるべきですが、「${m.actual}」になっています`
-    ).join('、');
-    feedback = `パラメータが正しくありません: ${details}`;
+/**
+ * 余分な変数を検出
+ */
+function detectExtraVariables(submittedProgram, correctProgram) {
+  const submittedVars = new Set();
+  const correctVars = new Set();
+
+  // 正解の変数を収集
+  for (const sprite of correctProgram.sprites) {
+    for (const varKey of Object.keys(sprite.variables)) {
+      correctVars.add(varKey);
+    }
   }
 
-  return {
-    allMatch: mismatches.length === 0,
-    matchRatio,
-    feedback
-  };
+  // 提出された変数を収集
+  for (const sprite of submittedProgram.sprites) {
+    for (const varKey of Object.keys(sprite.variables)) {
+      submittedVars.add(varKey);
+    }
+  }
+
+  // 余分な変数
+  const extraVars = [];
+  for (const varKey of submittedVars) {
+    if (!correctVars.has(varKey)) {
+      extraVars.push(varKey);
+    }
+  }
+
+  return extraVars;
 }
 
 // ========================================
-// 5. 順序制約のチェック
+// 6. 順序制約のチェック
 // ========================================
 
 /**
@@ -909,38 +1228,63 @@ function calculateScore(blockResults, orderResults) {
 }
 
 /**
- * フィードバックを生成
+ * フィードバックを生成（見やすさ重視版 - 複雑な問題でも分かりやすく）
  */
-function generateFeedback(blockResults, orderResults, score) {
-  const details = [];
-  const hints = [];
+function generateFeedback(blockResults, orderResults, score, extraBlocks = [], extraVars = []) {
+  const allDetails = [];
+  const allHints = [];
 
-  // ブロック要件のフィードバック
+  // エラーの優先度を定義
+  const PRIORITY = {
+    CRITICAL: 3,  // ブロックが完全に欠けている
+    HIGH: 2,      // 値が大幅に間違っている
+    MEDIUM: 1,    // 値が少し違う、余分な要素
+    SUCCESS: 0    // 成功
+  };
+
+  // ブロック要件のフィードバック収集
   for (const result of blockResults) {
     if (result.passed) {
-      details.push({
+      allDetails.push({
         type: 'success',
         icon: '✓',
-        message: `「${result.requirement.label}」ブロックがあります`
+        message: `「${result.requirement.label}」ブロックがあります`,
+        priority: PRIORITY.SUCCESS,
+        category: result.requirement.category
       });
     } else if (result.score > 0) {
-      details.push({
+      // 値が間違っているが、ブロックはある
+      const priority = result.score >= 50 ? PRIORITY.MEDIUM : PRIORITY.HIGH;
+      allDetails.push({
         type: 'warning',
         icon: '△',
-        message: result.feedback
+        message: result.feedback,
+        priority: priority,
+        category: result.requirement.category
       });
 
       // ヒント生成
-      hints.push(`「${result.requirement.category}」カテゴリを確認してください`);
+      allHints.push({
+        message: `「${result.requirement.category}」カテゴリを確認してください`,
+        priority: priority,
+        category: result.requirement.category
+      });
     } else {
-      details.push({
+      // ブロックが完全に欠けている
+      allDetails.push({
         type: 'error',
         icon: '✗',
-        message: result.feedback
+        message: result.feedback,
+        priority: PRIORITY.CRITICAL,
+        category: result.requirement.category
       });
 
       // 具体的なヒント
-      hints.push(`「${result.requirement.category}」カテゴリから「${result.requirement.label}」ブロックを追加してみましょう`);
+      allHints.push({
+        message: `「${result.requirement.category}」カテゴリから「${result.requirement.label}」ブロックを追加してみましょう`,
+        priority: PRIORITY.CRITICAL,
+        category: result.requirement.category
+      });
     }
   }
 
@@ -950,43 +1294,177 @@ function generateFeedback(blockResults, orderResults, score) {
     if (result.passed) {
       orderCorrectCount++;
     } else if (result.feedback) {
-      details.push({
+      allDetails.push({
         type: 'error',
         icon: '✗',
-        message: result.feedback
+        message: result.feedback,
+        priority: PRIORITY.HIGH,
+        category: '順序'
       });
 
-      hints.push('ブロックを正しい順番に並べ替えてみましょう');
+      allHints.push({
+        message: 'ブロックを正しい順番に並べ替えてみましょう',
+        priority: PRIORITY.HIGH,
+        category: '順序'
+      });
     }
   }
 
-  // 順序が全て正しい場合のみ成功メッセージ
+  // 順序が全て正しい場合
   if (orderResults.length > 0 && orderCorrectCount === orderResults.length) {
-    details.push({
+    allDetails.push({
       type: 'success',
       icon: '✓',
-      message: 'ブロックの順序が正しいです'
+      message: 'ブロックの順序が正しいです',
+      priority: PRIORITY.SUCCESS,
+      category: '順序'
     });
   }
 
-  // サマリー生成
+  // 余分なブロックの警告
+  if (extraBlocks.length > 0) {
+    // 余分なブロックが多い場合はまとめる
+    if (extraBlocks.length <= 2) {
+      for (const extra of extraBlocks) {
+        allDetails.push({
+          type: 'warning',
+          icon: '⚠',
+          message: `余分な「${extra.label}」ブロックが${extra.extraCount}個含まれています`,
+          priority: PRIORITY.MEDIUM,
+          category: '余分な要素'
+        });
+      }
+    } else {
+      // 3個以上の場合はまとめて表示
+      const totalExtra = extraBlocks.reduce((sum, b) => sum + b.extraCount, 0);
+      allDetails.push({
+        type: 'warning',
+        icon: '⚠',
+        message: `余分なブロックが${totalExtra}個含まれています`,
+        priority: PRIORITY.MEDIUM,
+        category: '余分な要素'
+      });
+    }
+
+    allHints.push({
+      message: '不要なブロックを削除すると、よりシンプルになります',
+      priority: PRIORITY.MEDIUM,
+      category: '余分な要素'
+    });
+  }
+
+  // 余分な変数の警告
+  if (extraVars.length > 0) {
+    allDetails.push({
+      type: 'warning',
+      icon: '⚠',
+      message: `余分な変数が${extraVars.length}個含まれています`,
+      priority: PRIORITY.MEDIUM,
+      category: '余分な要素'
+    });
+
+    allHints.push({
+      message: '不要な変数を削除してください',
+      priority: PRIORITY.MEDIUM,
+      category: '余分な要素'
+    });
+  }
+
+  // エラーと警告のみを優先度順にソート（成功メッセージは表示しない）
+  const errorsAndWarnings = allDetails.filter(d => d.type !== 'success');
+
+  errorsAndWarnings.sort((a, b) => b.priority - a.priority);
+
+  // 詳細メッセージを構築（すべてのエラーと警告を表示）
+  const details = [...errorsAndWarnings];
+
+  // スコアが高い場合（90-99点）で、エラーが少ない場合は励ましのメッセージを追加
+  if (score >= 90 && score < 100 && errorsAndWarnings.length <= 2 && errorsAndWarnings.length > 0) {
+    details.unshift({
+      type: 'info',
+      icon: '👍',
+      message: 'ほとんどのブロックが正しいです！あと少しで完璧です'
+    });
+  }
+
+  // ヒントを優先度順にソート、重複を削除、最大3個まで
+  const uniqueHints = [];
+  const seenMessages = new Set();
+
+  allHints.sort((a, b) => b.priority - a.priority);
+
+  for (const hint of allHints) {
+    if (!seenMessages.has(hint.message) && uniqueHints.length < 3) {
+      uniqueHints.push(hint.message);
+      seenMessages.add(hint.message);
+    }
+  }
+
+  // カテゴリ別サマリーを生成（エラーが3個以上ある場合）
+  let categorySummary = null;
+  if (errorsAndWarnings.length >= 3) {
+    const categoryCount = {};
+    for (const detail of errorsAndWarnings) {
+      if (detail.category) {
+        categoryCount[detail.category] = (categoryCount[detail.category] || 0) + 1;
+      }
+    }
+
+    const sortedCategories = Object.entries(categoryCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);  // 最大3カテゴリまで表示
+
+    if (sortedCategories.length > 0) {
+      categorySummary = '問題の多いカテゴリ: ' +
+        sortedCategories.map(([cat, count]) => `${cat}(${count}個)`).join('、');
+    }
+  }
+
+  // サマリー生成（カテゴリサマリーも含める）
   let summary;
   if (score === 100) {
     summary = '完璧です！プログラムが正解と完全に一致しています。';
+  } else if (score >= 90) {
+    summary = '素晴らしい！ほぼ完璧です。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
+  } else if (score >= 85) {
+    summary = 'あともう少しで完璧です！';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
   } else if (score >= 80) {
     summary = '正解です！よくできました。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
+  } else if (score >= 70) {
+    summary = 'いい感じです！もう少し頑張りましょう。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
   } else if (score >= 60) {
     summary = 'あと少しで正解です！もう一息です。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
   } else if (score >= 40) {
-    summary = 'いい感じです！まだいくつか修正が必要です。';
+    summary = 'まだいくつか修正が必要です。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
   } else {
-    summary = 'もう一度確認してみましょう。下のヒントを参考にしてください。';
+    summary = 'もう一度確認してみましょう。';
+    if (categorySummary) {
+      summary += ` ${categorySummary}`;
+    }
   }
 
   return {
     summary,
     details,
-    hints: [...new Set(hints)]  // 重複削除
+    hints: uniqueHints  // 優先度順、重複削除、最大3個
   };
 }
 
@@ -1052,11 +1530,20 @@ function evaluateScratchProgram(submittedData, correctData, customConfig = null)
     requirements.orderConstraints
   );
 
-  // Step 7: スコア計算
+  // Step 7: 余分なブロック・変数を検出
+  const extraBlocks = detectExtraBlocks(normalizedSubmitted, normalizedCorrect);
+  const extraVars = detectExtraVariables(normalizedSubmitted, normalizedCorrect);
+
+  console.log('=== Extra Elements Detection ===');
+  console.log('Extra blocks:', extraBlocks);
+  console.log('Extra variables:', extraVars);
+  console.log('================================');
+
+  // Step 8: スコア計算
   const score = calculateScore(blockResults, orderResults);
 
-  // Step 8: フィードバック生成
-  const feedback = generateFeedback(blockResults, orderResults, score);
+  // Step 9: フィードバック生成（余分なブロック・変数の情報を含む）
+  const feedback = generateFeedback(blockResults, orderResults, score, extraBlocks, extraVars);
 
   return {
     score,
