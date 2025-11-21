@@ -118,7 +118,6 @@ const AdminAnalytics: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'problems' | 'students' | 'errors' | 'timeseries'>('overview');
   const [timeSeriesView, setTimeSeriesView] = useState<'daily' | 'weekly' | 'monthly'>('daily');
-  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetchAnalytics();
@@ -136,52 +135,14 @@ const AdminAnalytics: React.FC = () => {
     }
   };
 
-  const handleExportCSV = async () => {
-    setExporting(true);
-    try {
-      const response = await adminAPI.exportAnalyticsCSV();
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `analytics_${Date.now()}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error: any) {
-      console.error('Failed to export CSV:', error);
-      alert('CSVエクスポートに失敗しました');
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const handleExportJSON = async () => {
-    setExporting(true);
-    try {
-      const response = await adminAPI.exportAnalyticsJSON();
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `analytics_${Date.now()}.json`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (error: any) {
-      console.error('Failed to export JSON:', error);
-      alert('JSONエクスポートに失敗しました');
-    } finally {
-      setExporting(false);
-    }
-  };
-
   const getProblemTypeLabel = (type: string) => {
     const labels: Record<string, { label: string; icon: string; color: string }> = {
-      fill_blank: { label: '穴埋め問題', icon: '📝', color: 'text-blue-600' },
-      predict: { label: '予測問題', icon: '🔮', color: 'text-purple-600' },
-      find_error: { label: 'バグ発見', icon: '🐛', color: 'text-red-600' },
-      mission: { label: 'ミッション', icon: '🚀', color: 'text-green-600' },
+      fill_blank: { label: '穴埋め問題', icon: '', color: 'text-blue-600' },
+      predict: { label: '予測問題', icon: '', color: 'text-purple-600' },
+      find_error: { label: 'バグ発見', icon: '', color: 'text-red-600' },
+      mission: { label: 'ミッション', icon: '', color: 'text-green-600' },
     };
-    return labels[type] || { label: type, icon: '❓', color: 'text-gray-600' };
+    return labels[type] || { label: type, icon: '', color: 'text-gray-600' };
   };
 
   const stripHtmlTags = (html: string): string => {
@@ -224,47 +185,20 @@ const AdminAnalytics: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Header with Export Buttons */}
+      {/* Header */}
       <div className="mb-8">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-4xl font-bold text-primary-700 mb-2">📊 学習分析ダッシュボード</h1>
-            <p className="text-gray-600">卒業研究用の詳細な学習データ分析</p>
-          </div>
-          <div className="flex gap-3">
-            <button
-              onClick={handleExportCSV}
-              disabled={exporting}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition disabled:opacity-50 flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              CSV出力
-            </button>
-            <button
-              onClick={handleExportJSON}
-              disabled={exporting}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition disabled:opacity-50 flex items-center gap-2"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              JSON出力
-            </button>
-          </div>
-        </div>
+        <h1 className="text-4xl font-bold text-primary-700 mb-2">学習分析ダッシュボード</h1>
       </div>
 
       {/* Tab Navigation */}
       <div className="mb-6 border-b border-gray-200">
         <div className="flex gap-2 overflow-x-auto">
           {[
-            { key: 'overview', label: '📈 全体概要', icon: '📈' },
-            { key: 'problems', label: '📚 問題別分析', icon: '📚' },
-            { key: 'students', label: '👥 生徒別分析', icon: '👥' },
-            { key: 'errors', label: '🚨 エラー分析', icon: '🚨' },
-            { key: 'timeseries', label: '📅 時系列分析', icon: '📅' },
+            { key: 'overview', label: '全体概要', icon: '' },
+            { key: 'problems', label: '問題別分析', icon: '' },
+            { key: 'students', label: '生徒別分析', icon: '' },
+            { key: 'errors', label: 'エラー分析', icon: '' },
+            { key: 'timeseries', label: '時系列分析', icon: '' },
           ].map((tab) => (
             <button
               key={tab.key}
@@ -345,7 +279,7 @@ const AdminAnalytics: React.FC = () => {
 
           {/* Problem Type Comparison */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">📊 問題タイプ別比較</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">問題タイプ別比較</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {analytics.problemTypeAnalysis.map((type) => {
                 const typeInfo = getProblemTypeLabel(type.problem_type);
@@ -354,7 +288,6 @@ const AdminAnalytics: React.FC = () => {
                 return (
                   <div key={type.problem_type} className="border-2 border-gray-200 rounded-lg p-4 hover:border-primary-300 transition">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-2xl">{typeInfo.icon}</span>
                       <span className={`font-bold ${typeInfo.color}`}>{typeInfo.label}</span>
                     </div>
                     <div className="space-y-2 text-sm">
@@ -383,7 +316,7 @@ const AdminAnalytics: React.FC = () => {
 
           {/* Learning Curve - Attempt Progression */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">📈 学習曲線（試行回数と正解率の関係）</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">学習曲線（試行回数と正解率の関係）</h2>
             <p className="text-gray-600 mb-6">試行回数が増えるにつれて正解率がどう変化するかを示します</p>
             <div className="space-y-3">
               {analytics.attemptProgression.slice(0, 10).map((attempt) => {
@@ -417,7 +350,7 @@ const AdminAnalytics: React.FC = () => {
 
           {/* Struggling Points - Top 10 */}
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">🚨 つまずきポイント TOP10</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">つまずきポイント TOP10</h2>
             <p className="text-gray-600 mb-6">成功率が低く、生徒が苦戦している問題</p>
             <div className="overflow-x-auto">
               <table className="min-w-full">
@@ -446,7 +379,7 @@ const AdminAnalytics: React.FC = () => {
                           <div className="text-xs text-gray-500" dangerouslySetInnerHTML={{ __html: point.chapter_title }}></div>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
-                          <span className="text-lg">{typeInfo.icon}</span>
+                          <span className={`text-sm ${typeInfo.color}`}>{typeInfo.label}</span>
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap">
                           <span className={`font-bold ${successRate < 30 ? 'text-red-600' : successRate < 50 ? 'text-yellow-600' : 'text-green-600'}`}>
@@ -474,7 +407,7 @@ const AdminAnalytics: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">
             <p className="text-blue-800 font-medium">
-              📌 各問題の詳細な統計データを表示します。一回目正答率は特に重要な指標です。
+              各問題の詳細な統計データを表示します。一回目正答率は特に重要な指標です。
             </p>
           </div>
 
@@ -491,12 +424,11 @@ const AdminAnalytics: React.FC = () => {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="text-2xl">{typeInfo.icon}</span>
                       <span className={`px-3 py-1 rounded-full text-sm font-bold ${typeInfo.color} bg-gray-100`}>
                         {typeInfo.label}
                       </span>
                       <span className="px-3 py-1 rounded-full text-sm font-bold bg-gray-200 text-gray-700">
-                        難易度 {'⭐'.repeat(problem.difficulty_level)}
+                        難易度 {problem.difficulty_level}
                       </span>
                     </div>
                     <h3
@@ -554,7 +486,7 @@ const AdminAnalytics: React.FC = () => {
                 <div className="bg-gradient-to-r from-orange-50 to-yellow-50 border-2 border-orange-300 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-700 mb-1">🎯 一回目の挑戦での正解率（重要指標）</p>
+                      <p className="text-sm font-medium text-gray-700 mb-1">一回目の挑戦での正解率（重要指標）</p>
                       <p className="text-xs text-gray-600">
                         {problem.first_attempt_success}人/{problem.first_attempt_total}人が一回目で正解
                       </p>
@@ -576,7 +508,7 @@ const AdminAnalytics: React.FC = () => {
                 {/* Time Analysis */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm font-medium text-gray-700 mb-2">⏱️ 所要時間の分布</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">所要時間の分布</p>
                     <div className="space-y-1 text-xs">
                       <div className="flex justify-between">
                         <span className="text-gray-600">最短:</span>
@@ -594,7 +526,7 @@ const AdminAnalytics: React.FC = () => {
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm font-medium text-gray-700 mb-2">💡 ヒント使用状況</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">ヒント使用状況</p>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-gray-800">{Number(problem.avg_hint_usage).toFixed(1)}</div>
                       <div className="text-xs text-gray-600">平均ヒント使用回数</div>
@@ -602,16 +534,16 @@ const AdminAnalytics: React.FC = () => {
                   </div>
 
                   <div className="bg-gray-50 rounded-lg p-3">
-                    <p className="text-sm font-medium text-gray-700 mb-2">📊 問題の評価</p>
+                    <p className="text-sm font-medium text-gray-700 mb-2">問題の評価</p>
                     <div className="text-xs space-y-1">
                       {correctRate < 40 && (
-                        <p className="text-red-600 font-medium">⚠️ 難易度が高すぎる可能性</p>
+                        <p className="text-red-600 font-medium">難易度が高すぎる可能性</p>
                       )}
                       {correctRate > 90 && (
-                        <p className="text-blue-600 font-medium">✅ 難易度が適切または易しい</p>
+                        <p className="text-blue-600 font-medium">難易度が適切または易しい</p>
                       )}
                       {firstAttemptRate < 30 && (
-                        <p className="text-orange-600 font-medium">💭 問題文の改善を検討</p>
+                        <p className="text-orange-600 font-medium">問題文の改善を検討</p>
                       )}
                     </div>
                   </div>
@@ -627,7 +559,7 @@ const AdminAnalytics: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-green-50 border-2 border-green-300 rounded-xl p-4">
             <p className="text-green-800 font-medium">
-              👥 各生徒の学習状況と得意/苦手な問題タイプを分析します。ニックネームは論文用に保持されています。
+              各生徒の学習状況と得意/苦手な問題タイプを分析します。ニックネームは論文用に保持されています。
             </p>
           </div>
 
@@ -649,10 +581,10 @@ const AdminAnalytics: React.FC = () => {
                 : 0;
 
               const problemTypes = [
-                { name: '穴埋め', rate: fillBlankRate, icon: '📝', submissions: student.fill_blank_submissions, correct: student.fill_blank_correct },
-                { name: '予測', rate: predictRate, icon: '🔮', submissions: student.predict_submissions, correct: student.predict_correct },
-                { name: 'バグ発見', rate: findErrorRate, icon: '🐛', submissions: student.find_error_submissions, correct: student.find_error_correct },
-                { name: 'ミッション', rate: missionRate, icon: '🚀', submissions: student.mission_submissions, correct: student.mission_correct },
+                { name: '穴埋め', rate: fillBlankRate, icon: '', submissions: student.fill_blank_submissions, correct: student.fill_blank_correct },
+                { name: '予測', rate: predictRate, icon: '', submissions: student.predict_submissions, correct: student.predict_correct },
+                { name: 'バグ発見', rate: findErrorRate, icon: '', submissions: student.find_error_submissions, correct: student.find_error_correct },
+                { name: 'ミッション', rate: missionRate, icon: '', submissions: student.mission_submissions, correct: student.mission_correct },
               ].filter(t => t.submissions > 0);
 
               const weakestType = problemTypes.reduce((min, type) => type.rate < min.rate ? type : min, problemTypes[0]);
@@ -663,7 +595,7 @@ const AdminAnalytics: React.FC = () => {
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-4">
                       <div className="bg-primary-100 rounded-full w-16 h-16 flex items-center justify-center">
-                        <span className="text-2xl">👤</span>
+                        <span className="text-2xl font-bold text-primary-700">{student.nickname.charAt(0)}</span>
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-gray-800">{student.nickname}</h3>
@@ -722,14 +654,13 @@ const AdminAnalytics: React.FC = () => {
                     <h4 className="text-sm font-bold text-gray-700 mb-3">問題タイプ別の成績（提出ベース）</h4>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                       {[
-                        { name: '穴埋め', icon: '📝', rate: fillBlankRate, correct: student.fill_blank_correct, submissions: student.fill_blank_submissions },
-                        { name: '予測', icon: '🔮', rate: predictRate, correct: student.predict_correct, submissions: student.predict_submissions },
-                        { name: 'バグ発見', icon: '🐛', rate: findErrorRate, correct: student.find_error_correct, submissions: student.find_error_submissions },
-                        { name: 'ミッション', icon: '🚀', rate: missionRate, correct: student.mission_correct, submissions: student.mission_submissions },
+                        { name: '穴埋め', icon: '', rate: fillBlankRate, correct: student.fill_blank_correct, submissions: student.fill_blank_submissions },
+                        { name: '予測', icon: '', rate: predictRate, correct: student.predict_correct, submissions: student.predict_submissions },
+                        { name: 'バグ発見', icon: '', rate: findErrorRate, correct: student.find_error_correct, submissions: student.find_error_submissions },
+                        { name: 'ミッション', icon: '', rate: missionRate, correct: student.mission_correct, submissions: student.mission_submissions },
                       ].map((type) => (
                         <div key={type.name} className="border-2 border-gray-200 rounded-lg p-3">
                           <div className="flex items-center gap-2 mb-2">
-                            <span className="text-lg">{type.icon}</span>
                             <span className="text-xs font-medium text-gray-700">{type.name}</span>
                           </div>
                           <div className="text-center">
@@ -750,22 +681,22 @@ const AdminAnalytics: React.FC = () => {
                   {/* Insights */}
                   {problemTypes.length > 0 && (
                     <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-300 rounded-lg p-4">
-                      <p className="text-sm font-bold text-gray-800 mb-2">📊 学習傾向の分析</p>
+                      <p className="text-sm font-bold text-gray-800 mb-2">学習傾向の分析</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                         <div>
                           <p className="text-green-700 font-medium">
-                            ✅ 得意: {strongestType.icon} {strongestType.name} ({strongestType.rate}%)
+                            得意: {strongestType.name} ({strongestType.rate}%)
                           </p>
                         </div>
                         <div>
                           <p className="text-red-700 font-medium">
-                            ⚠️ 苦手: {weakestType.icon} {weakestType.name} ({weakestType.rate}%)
+                            苦手: {weakestType.name} ({weakestType.rate}%)
                           </p>
                         </div>
                       </div>
                       {correctRate < 50 && (
                         <p className="text-orange-700 font-medium mt-2 text-sm">
-                          💭 推奨: {weakestType.name}問題の復習とヒントの活用を促してください
+                          推奨: {weakestType.name}問題の復習とヒントの活用を促してください
                         </p>
                       )}
                     </div>
@@ -782,7 +713,7 @@ const AdminAnalytics: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-red-50 border-2 border-red-300 rounded-xl p-4">
             <p className="text-red-800 font-medium">
-              🚨 よく発生するエラーパターンを分析します。エラーメッセージから生徒のつまずきポイントを特定できます。
+              よく発生するエラーパターンを分析します。エラーメッセージから生徒のつまずきポイントを特定できます。
             </p>
           </div>
 
@@ -812,7 +743,7 @@ const AdminAnalytics: React.FC = () => {
                           <div dangerouslySetInnerHTML={{ __html: error.problem_title }} className="text-sm font-medium text-gray-900"></div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-lg">{typeInfo.icon}</span>
+                          <span className={`text-sm ${typeInfo.color}`}>{typeInfo.label}</span>
                         </td>
                         <td className="px-6 py-4">
                           <code className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
@@ -840,7 +771,7 @@ const AdminAnalytics: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-purple-50 border-2 border-purple-300 rounded-xl p-4 flex justify-between items-center">
             <p className="text-purple-800 font-medium">
-              📅 時系列で学習活動を追跡します。日別、週別、月別の粒度で表示できます。
+              時系列で学習活動を追跡します。日別、週別、月別の粒度で表示できます。
             </p>
             <div className="flex gap-2">
               {['daily', 'weekly', 'monthly'].map((view) => (

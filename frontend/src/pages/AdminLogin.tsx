@@ -86,13 +86,6 @@ const AdminLogin: React.FC = () => {
               新規登録
             </Link>
           </p>
-          <p className="text-gray-600 text-sm">
-            学生の方は{' '}
-            <Link to="/login" className="text-primary-600 font-medium hover:underline">
-              こちら
-            </Link>
-            {' '}からログインしてください
-          </p>
         </div>
       </div>
     </div>

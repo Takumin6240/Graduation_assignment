@@ -75,7 +75,8 @@ const getAllUsers = async (req, res) => {
         u.points,
         u.created_at,
         COUNT(DISTINCT s.id) as total_submissions,
-        COUNT(DISTINCT CASE WHEN s.is_correct THEN s.id END) as correct_submissions
+        COUNT(DISTINCT CASE WHEN s.is_correct THEN s.id END) as correct_submissions,
+        ROUND(AVG(s.score)::numeric, 2) as average_score
       FROM users u
       LEFT JOIN submissions s ON u.id = s.user_id
       WHERE u.admin_id = $1

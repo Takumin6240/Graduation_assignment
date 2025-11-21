@@ -72,7 +72,8 @@
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT id, chapter_id, title FROM problems WHERE title LIKE ''%マスター%'' ORDER BY chapter_id;\")",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT description FROM chapters WHERE id = 4;\")",
       "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT description FROM problems WHERE id = 1;\")",
-      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT learning_objective FROM problems WHERE id = 1;\")"
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT learning_objective FROM problems WHERE id = 1;\")",
+      "Bash(\"/mnt/c/Program Files/Docker/Docker/resources/bin/docker.exe\" compose exec -T postgres psql -U postgres -d scratch_learning -c \"SELECT u.id, u.username, u.nickname, COUNT(s.id) as submission_count, AVG(s.score) as avg_score FROM users u LEFT JOIN submissions s ON u.id = s.user_id GROUP BY u.id ORDER BY u.id;\")"
     ],
     "deny": [],
     "ask": []
